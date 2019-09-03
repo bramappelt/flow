@@ -112,7 +112,7 @@ for soil in all_soiltypes[:1]:
     
     ############################ TRANSIENT MODEL ##############################
 
-    FEt = Flow1DFV("transient")
+    FEt = Flow1DFE("transient")
     FEt.set_field1d(array=xsp)
     FEt.set_systemfluxfunction(richards_equation)
     FEt.set_initial_states(initial_states)

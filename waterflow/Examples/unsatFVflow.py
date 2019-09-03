@@ -105,7 +105,7 @@ for soil in all_soiltypes[:1]:
     
     print(sum(FV.states))
     print("")
-    FV.waterbalance(print_=True)
+    FV.calcbalance(print_=True)
     print("")
     print(FV)
     
