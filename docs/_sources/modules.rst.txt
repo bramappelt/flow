@@ -1,5 +1,5 @@
-waterflow
-=========
+flow
+====
 
 .. toctree::
    :maxdepth: 4
