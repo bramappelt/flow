@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import quad
@@ -443,7 +445,7 @@ class Flow1DFE(object):
                 self.spatflux[name] = [np.array(f)]
 
             # if function has two arguments > f(x,s)
-            if len(signature(Q).parameters) == 2:
+            elif len(signature(Q).parameters) >= 2:
                 self.Sspatflux[name] = [Q, np.array(f)]
 
     def remove_pointflux(self, *args):
@@ -479,6 +481,7 @@ class Flow1DFE(object):
                         raise type(e)(str(name) + " is not a spatialflux.")
 
     def states_to_function(self):
+        ''' gives a continuous function of states in the domain '''
         circular = True
         states = self.states.copy()
         # check if west boundary is of type Dirichlet
@@ -497,52 +500,114 @@ class Flow1DFE(object):
         else:
             return partial(np.interp, xp = self.nodes, fp = states)
 
-    def solve(self, maxiter=1000, rmse_threshold=1e-16, mae_threshold=1e-16):
+    def dt_solve(self, dt, maxiter=500, threshold=1e-3, transient=True):
+        ''' solve the system for one specific time step '''
         self._check_boundaries()
         west = self._west
         east = self._east
-        self.stats = {"rmse" : [], "mae" : []}
-        iter_step = 1
-        while iter_step <= maxiter:
-            self._aggregate_forcing()
-            self._internal_forcing()
-            self._statedep_forcing()
-            self._CMAT(self.nodes, self.states)
 
-            solution = np.linalg.solve(self.coefmatr[west:east, west:east],
-                                       -1*self.forcing[west:east]).flatten()
+        if transient:
+            # adapt storage change function for time step and previous states
+            storage_change = self.Sspatflux['storage_change'][0]
+            previous_states = self.states_to_function()
+            storage_change = partial(storage_change, prevstate=previous_states, dt=dt)
+            self.Sspatflux['storage_change'][0] = storage_change
 
-            prevstates = self.states
-            curstates = np.copy(prevstates)
-            curstates[west:east] += solution
-            self.states = curstates
+        itercount = 1
+        while itercount <= maxiter:
+                self._aggregate_forcing()
+                self._internal_forcing()
+                self._statedep_forcing()
+                self._CMAT(self.nodes, self.states)
+        
+                solution = np.linalg.solve(self.coefmatr[west:east, west:east],
+                                           -1*self.forcing[west:east]).flatten()
+        
+                prevstates = self.states
+                curstates = np.copy(prevstates)
+                curstates[west:east] += solution
+                self.states = curstates
+                
+                # update forcing and boundaries at new states
+                self._aggregate_forcing()
+                self._internal_forcing()
+                self._statedep_forcing()
 
-            self._aggregate_forcing()
-            self._internal_forcing()
-            self._statedep_forcing()
+                # check solution for conversion
+                max_abs_change = max(abs(prevstates - curstates))
+                max_abs_allowed_change = max(abs(threshold * curstates))
+                if max_abs_change < max_abs_allowed_change:
+                    break
 
-            rmse = RMSE(prevstates, curstates)
-            mae = MAE(prevstates, curstates)
+                itercount += 1
+        else:
+            return itercount
+        return itercount
 
-            if rmse < rmse_threshold:
-                self.stats["rmse"].append(rmse)
-                self.stats["mae"].append(mae)
-                print("Small rmse", iter_step)
+    def solve(self, dt_min=0.01, dt_max=0.5, end_time=1, maxiter=500, threshold=1e-3, transient=False, verbosity=True):
+        ''' solve the system for a given period of time '''
+        
+        solved_states = {0: deepcopy(self)}
+        time_data = [0]
+        dt_data = [None]
+        iter_data = [None]
+
+        dt = dt_min
+        time = dt
+
+        while time <= end_time:
+            # solve for given dt
+            iters = self.dt_solve(dt, maxiter, threshold, transient)
+
+            if verbosity:
+                if transient:
+                    fmt = 'Converged at time={} for dt={} with {} iterations'
+                    print(fmt.format(time, dt, iters))
+                else:
+                    print('Converged at {} iterations'.format(iters))
+
+            if not transient:
+                solved_states['stationary'] = deepcopy(self)
+                iter_data.append(iters)
                 break
 
-            if mae < mae_threshold:
-                self.stats["rmse"].append(rmse)
-                self.stats["mae"].append(mae)
-                print("Small mae", iter_step)
+            if dt == dt_min and iters == maxiter:
+                print('Maxiter at dt_min reached...')
                 break
 
-            self.stats["rmse"].append(rmse)
-            self.stats["mae"].append(mae)
+            # build data record
+            solved_states[time] = deepcopy(self)
+            time_data.append(time)
+            dt_data.append(dt)
+            iter_data.append(iters)
 
-            if iter_step == maxiter:
-                print("max iter reached", iter_step)
+            # adapt time step as function of iterations
+            if iters <= 5:
+                dt *= 1.5
+                if dt > dt_max:
+                    dt = dt_max
+            elif iters >= 10:
+                dt *= 0.5
+                if dt < dt_min:
+                    dt = dt_min
 
-            iter_step += 1
+            # last time step calculated should be end_time exactly
+            remaining_time = end_time - time
+            if remaining_time == 0:
+                pass
+            elif remaining_time < dt:
+                dt = remaining_time
+
+            # increment time
+            time += dt
+    
+        # attach all solve data to last created object
+        solve_data = {}
+        solve_data['solved_states'] = solved_states
+        solve_data['time_data'] = time_data
+        solve_data['dt_data'] = dt_data 
+        solve_data['iter_data'] = iter_data
+        self.solve_data = solve_data
 
     def calcbalance(self, print_=False):
         # internal fluxes
@@ -718,7 +783,7 @@ if __name__ == "__main__":
     print("")
     print(FE)
 
-# ############################### UNSTRUCTURED #################################
+# ############################### UNSTRUCTURED ################################
     
     FEu = Flow1DFE("unstructured")
     xsp, _ = spacing(nx, L, linear=False, loc=[4, 7], power=2, weight=10)
