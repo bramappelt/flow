@@ -70,7 +70,7 @@ for soil in all_soiltypes[:1]:
     ############################# STATIONARY MODEL ###############################
     
     FE = Flow1DFE("unsaturated")
-    FE.scheme = "quadratic"
+    FE.scheme = "linear"
     FE.set_field1d(array=xsp)
     
     FE.set_initial_states(initial_states)
@@ -80,9 +80,9 @@ for soil in all_soiltypes[:1]:
     FE.add_neumann_BC(1.0, "east")
     #FE.add_dirichlet_BC(-40, "east")
     
-    FE.add_pointflux(-0.5, -50.5, "stupidwell")
+    #FE.add_pointflux(-0.5, -50.5, "stupidwell")
     
-    FE.solve(rmse_threshold=1e-12)
+    FE.solve(rmse_threshold=1e-4)
     
     fig, (ax1, ax2, ax3) = plt.subplots(nrows=1, ncols=3, sharey=True)
     ax1.plot(FE.states, FE.nodes, "-o")

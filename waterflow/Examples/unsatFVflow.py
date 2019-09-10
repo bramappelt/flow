@@ -55,7 +55,7 @@ for soil in all_soiltypes[:1]:
         return -VG_conductivity(100*(s - x)) * gradient
     
     def richards_equation(x, psi, gradient, kfun=VG_conductivity):
-        return -VG_conductivity(psi) * (gradient + 1)
+        return -kfun(psi) * (gradient + 1)
     
     def storage_change(x, s):
         return -(VG_pressureh(s) - VG_pressureh(prevstate(x))) / dt

@@ -719,7 +719,7 @@ if __name__ == "__main__":
     print(FE)
 
 # ############################### UNSTRUCTURED #################################
-
+    
     FEu = Flow1DFE("unstructured")
     xsp, _ = spacing(nx, L, linear=False, loc=[4, 7], power=2, weight=10)
     FEu.set_field1d(array=xsp)
