@@ -1,4 +1,5 @@
 from copy import deepcopy
+import time
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -31,7 +32,7 @@ class Flow1DFE(object):
         self.Spointflux = {}
         self.Sspatflux = {}
         self.forcing = None
-        self.scheme = "cubic"
+        self.scheme = "linear"
         self.stats = {"rmse" : [], "mae" : []}
         self.balance = {}
         # private attributes
@@ -360,7 +361,7 @@ class Flow1DFE(object):
                 except KeyError as e:
                     raise type(e)("No boundary named " + str(name) + ".")
 
-    def add_pointflux(self, rate, pos, name):
+    def add_pointflux(self, rate, pos, name=None):
         f = [x*0.0 for x in range(len(self.nodes))]
         if isinstance(rate, int) or isinstance(rate, float):
             rate = [rate]
@@ -379,7 +380,12 @@ class Flow1DFE(object):
                 # assign to the forcing vector
                 f[idx_l] += r * lfactor
                 f[idx_r] += r * rfactor
-            self.pointflux[name] = [np.array(f)]
+            
+            if name:
+                self.pointflux[name] = [np.array(f)]
+            else:
+                name = str(time.time())
+                self.pointflux[name] = [np.array(f)]
 
         # add state dependent pointflux
         elif callable(rate):
@@ -390,28 +396,44 @@ class Flow1DFE(object):
             nodedist = self.nodes[idx_r] - self.nodes[idx_l]
             lfactor = 1 - (pos - self.nodes[idx_l]) / nodedist
             rfactor = 1 - lfactor
+            
+            if not name:
+                name = rate.__name__
+
             # create data structure
             self.Spointflux[name] = [(rate, (idx_l, idx_r, lfactor, rfactor)),
                                      np.array(f)]
 
-    def add_spatialflux(self, q, name, exact=False):
+    def add_spatialflux(self, q, name=None, exact=False):
         if isinstance(q, int) or isinstance(q, float):
             Q = np.repeat(q, len(self.nodes)).astype(np.float64)
         elif isinstance(q, list) or isinstance(q, np.ndarray):
-            Q = np.array(q,).astype(np.float64)
+            Q = np.array(q).astype(np.float64)
         elif callable(q):
             Q = q
 
         if not callable(Q):
             f = Q * self.lengths
-            self.spatflux[name] = [np.array(f)]
+            if name:
+                self.spatflux[name] = [np.array(f)]
+            else:
+                # unique key for unnamed forcing
+                name = str(time.time())
+                self.spatflux[name] = [np.array(f)]
 
-        # if function, check its number of arguments
         else:
+            # prepare a domain spaced and zero-ed array
             f = [x*0.0 for x in range(len(self.nodes))]
 
+            # check callable's number of positional arguments
+            fparams = signature(Q).parameters
+            nargs = sum(i == str(j) for i, j in fparams.items())
+
+            if not name:
+                name = Q.__name__
+
             # if function has one argument > f(x)
-            if len(signature(Q).parameters) == 1:
+            if nargs == 1:
                 # linear appoximation integral
                 if not exact:
                     pos, weight = self.gausquad[self.scheme]
@@ -424,7 +446,9 @@ class Flow1DFE(object):
                             f[i] +=  Q(x) * weight[-idx-1] * pos[-idx-1] * L    ### no pos negatives??
                             # to right node
                             f[i+1] += Q(x) * weight[idx] * pos[idx] * L
-                if exact:
+                
+                # only possible if analytical solution exists
+                else:
                     # exact integral
                     nodes = self.nodes
                     for i in range(len(self.nodes) - 1):
@@ -445,7 +469,17 @@ class Flow1DFE(object):
                 self.spatflux[name] = [np.array(f)]
 
             # if function has two arguments > f(x,s)
-            elif len(signature(Q).parameters) >= 2:
+            elif nargs == 2:
+                self.Sspatflux[name] = [Q, np.array(f)]
+
+            elif nargs == 3:
+                # implement time dependence ??
+                pass
+
+            # only valid for the storage change function
+            # f(x, s, prevstate, dt)
+            elif nargs == 4:
+                name = 'storage_change'
                 self.Sspatflux[name] = [Q, np.array(f)]
 
     def remove_pointflux(self, *args):
@@ -500,13 +534,13 @@ class Flow1DFE(object):
         else:
             return partial(np.interp, xp = self.nodes, fp = states)
 
-    def dt_solve(self, dt, maxiter=500, threshold=1e-3, transient=True):
+    def dt_solve(self, dt, maxiter=500, threshold=1e-3):
         ''' solve the system for one specific time step '''
         self._check_boundaries()
         west = self._west
         east = self._east
 
-        if transient:
+        if self.Sspatflux.get('storage_change', None):
             # adapt storage change function for time step and previous states
             storage_change = self.Sspatflux['storage_change'][0]
             previous_states = self.states_to_function()
@@ -544,7 +578,7 @@ class Flow1DFE(object):
             return itercount
         return itercount
 
-    def solve(self, dt_min=0.01, dt_max=0.5, end_time=1, maxiter=500, threshold=1e-3, transient=False, verbosity=True):
+    def solve(self, dt_min=0.01, dt_max=0.5, end_time=1, maxiter=500, threshold=1e-3, verbosity=True):
         ''' solve the system for a given period of time '''
         
         solved_states = {0: deepcopy(self)}
@@ -557,16 +591,16 @@ class Flow1DFE(object):
 
         while time <= end_time:
             # solve for given dt
-            iters = self.dt_solve(dt, maxiter, threshold, transient)
+            iters = self.dt_solve(dt, maxiter, threshold)
 
             if verbosity:
-                if transient:
+                if self.Sspatflux.get('storage_change', None):
                     fmt = 'Converged at time={} for dt={} with {} iterations'
                     print(fmt.format(time, dt, iters))
                 else:
                     print('Converged at {} iterations'.format(iters))
 
-            if not transient:
+            if not self.Sspatflux.get('storage_change', None):
                 solved_states['stationary'] = deepcopy(self)
                 iter_data.append(iters)
                 break
@@ -695,130 +729,3 @@ class Flow1DFE(object):
                         print(key, self.balance[key])
                     except Exception as e:
                         raise type(e)
-
-
-if __name__ == "__main__":
-    L = 20
-    nx = 11
-    domain = [L, nx]
-    S = 1.0
-    dt = 1.0
-    runs = 1
-
-    ksat = 1.5
-
-    def kfun(x):
-        return ksat + 0.0065*x
-
-
-# ############################## FLUXFUNCTIONS #################################
-
-    def fluxfunction(x, s, gradient):
-        return -1 * gradient * ksat
-
-    def fluxfunction_s(x, s, gradient):
-        return -1 * gradient * ksat * s
-
-    def fluxfunction_var_k(x, s, gradient):
-        return - kfun(x) * gradient
-
-    def fluxfunction_var_k_s(x, s, gradient):
-        return - kfun(x) * s * gradient
-
-# ############################## POINT FLUXES ##################################
-
-    Spointflux = partial(np.interp, xp=[4.9, 4.95, 5.005], 
-                         fp=[-0.02, -0.029, -0.034])
-    
-# ############################## SPATIAL FLUXES ###############################
-
-    def rainfun(x): # !! inspect new poly scaled??
-        return 1.98e-5*x**3 - 7.34e-4 * x**2 + 5.36e-3 * x
-
-    def rainfunc(x):
-        return x*0.001 + 0.001
-
-    a2, x2, b2, rainfun2 = polynomial([[0, 0.001], [5, 0.003], [10, 0.005],
-                                    [15, 0.003], [20, 0.002]])
-
-    def storage_change(x, s):
-        return -S*(s - prevstate(x)) / dt
-
-    def stateposfunc(x, s):
-        return (-2 + np.sin(x) + s) / 1000
-
-# ################################ STRUCTURED #################################
-
-    FE = Flow1DFE("structured")
-    FE.set_field1d(linear=domain)
-    FE.set_systemfluxfunction(fluxfunction)
-    FE.set_initial_states(4.90)
-
-    FE.add_dirichlet_BC(5.0, "west")
-    #FE.add_dirichlet_BC(5.01, "east")
-    #FE.add_neumann_BC(0.01, "east")
-
-    FE.add_pointflux([-0.027, -0.015], [4.0, 8.0], "well!")
-    FE.add_pointflux(-0.02, 10, "well1")
-    FE.add_pointflux(Spointflux, 6.0, "Swell!")
-
-    FE.add_spatialflux(0.003, "recharge")
-    FE.add_spatialflux(rainfun2, "rainfun2", exact=False)
-    FE.add_spatialflux(rainfunc, "rainfunc", exact=False)
-    #FE.add_spatialflux(rainfun, "rainfun") <<
-    FE.add_spatialflux(stateposfunc, "spf")
-
-    FE.add_spatialflux(storage_change, "sc")
-    for i in range(runs):
-        prevstate = FE.states_to_function()
-        FE.solve(rmse_threshold=1e-10)
-        plt.plot(FE.nodes, FE.states, ls="-.", color="red")
-
-    FE.remove_spatialflux("sc")
-    FE.solve(rmse_threshold=1e-10)
-    plt.plot(FE.nodes, FE.states, color="magenta", label="FE")
-    print(sum(FE.states))
-    print("")
-    FE.calcbalance()
-    print("")
-    print(FE)
-
-# ############################### UNSTRUCTURED ################################
-    
-    FEu = Flow1DFE("unstructured")
-    xsp, _ = spacing(nx, L, linear=False, loc=[4, 7], power=2, weight=10)
-    FEu.set_field1d(array=xsp)
-    FEu.set_systemfluxfunction(fluxfunction)
-    FEu.set_initial_states(4.9)
-
-    FEu.add_dirichlet_BC(5, "west")
-    FEu.add_dirichlet_BC(5.01, "east")
-    #FEu.add_neumann_BC(0.01, "east")
-
-    FEu.add_pointflux([-0.027, -0.015], [4.0, 8.0], "well!")
-    FEu.add_pointflux(-0.02, 6.0, "well1")
-    FEu.add_pointflux(Spointflux, 5, "Swell!")
-
-    FEu.add_spatialflux(0.003, "recharge")
-    FEu.add_spatialflux(rainfunc, "rainfunc")
-    FEu.add_spatialflux(rainfun2, "rainfun2", exact=False)
-    #FEu.add_spatialflux(rainfun, "rainfun") <<
-    FEu.add_spatialflux(stateposfunc, "stateposfunc")
-
-    FEu.add_spatialflux(storage_change, "sc")
-    for i in range(runs):
-        prevstate = FEu.states_to_function()
-        FEu.solve(rmse_threshold=1e-10)
-        plt.plot(FEu.nodes, FEu.states, "-.", color="black")
-
-    FEu.remove_spatialflux("sc")
-    FEu.solve(rmse_threshold=1e-10)
-    plt.plot(FEu.nodes, FEu.states, color="magenta", label="FEu")
-    # plt.legend()
-    # print(sum(FEu.states))
-    # print("")
-    FEu.calcbalance()
-    # print("")
-    print(FEu)
-
-    plt.title('Finite Elements')

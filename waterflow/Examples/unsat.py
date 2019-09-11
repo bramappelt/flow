@@ -1,6 +1,3 @@
-import sys
-sys.path.insert(1, 'C:\\Users\\bramb\\Documents\\thesis\\flow')
-
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import animation
@@ -50,17 +47,14 @@ def VG_conductivity(h, ksat=ksat, a=a, n=n):
 def richards_equation(x, psi, gradient, kfun=VG_conductivity):
     return -VG_conductivity(psi) * (gradient + 1)
 
-def storage_change2(x, s):
-    return -(VG_pressureh(s) - VG_pressureh(prevstate(x))) / dt
-
-def storage_change(x, s, prevstate, dt):
-    return -(VG_pressureh(s) - VG_pressureh(prevstate(x))) / dt
+def storage_change(x, s, prevstate, dt, fun=VG_pressureh, S=1):
+    return - S * (fun(s) - fun(prevstate(x))) / dt
 
 
 ############################ SOLVE TRANSIENT ################################
 
 FE_ut = Flow1DFE('Unsaturated transient model')
-FE_ut.scheme = 'linear'
+FE_ut.scheme = 'quintic'
 FE_ut.set_field1d(array=xsp)
 FE_ut.set_initial_states(initial_states)
 FE_ut.set_systemfluxfunction(richards_equation)
@@ -69,19 +63,33 @@ FE_ut.add_dirichlet_BC(0, 'west')
 # think about dirichlet plot init
 FE_ut.add_neumann_BC(-0.1, 'east')
 
-FE_ut.add_spatialflux(storage_change, 'storage_change')
-FE_ut.solve(transient=True, dt_max=2, end_time=4)
+FE_ut.add_spatialflux(storage_change)
+FE_ut.solve(dt_max=1, end_time=4)
 
 fig, [[ax1, ax2], [ax3, ax4]] = plt.subplots(nrows=2, ncols=2)
 solve_data = FE_ut.solve_data
 
 for k, v in solve_data['solved_states'].items():
-    ax1.plot(v.states, v.nodes)
+    if k == 0:
+        intrp_states = v.states_to_function()
+        ax1.plot(intrp_states(v.nodes), v.nodes)
+    else:
+        ax1.plot(v.states, v.nodes)
+
+ax1.set_xlabel('distance (m)')
+ax1.set_ylabel('heads (m)')
+ax1.set_title('Hydraulic heads')
 
 ax2.plot(solve_data['time_data'], solve_data['dt_data'], '.-', color='green')
+ax2.set_xlabel('time (d)')
+ax2.set_ylabel('dt (d)')
+
 ax3.plot(solve_data['time_data'], solve_data['iter_data'], '.-', color='blue')
+ax3.set_xlabel('time (d)')
+ax3.set_ylabel('iterations (-)')
+
 ax4.plot(solve_data['time_data'][1:], np.cumsum(solve_data['iter_data'][1:]), '.-', color='red')
+ax4.set_xlabel('time (d)')
+ax4.set_ylabel('cumulative dt (d)')
 
-plt.grid()
 plt.show()
-
