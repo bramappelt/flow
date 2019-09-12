@@ -85,8 +85,8 @@ print(FE)
 
 # plotting
 fig, ax = plt.subplots()
-for k, v in FE.solve_data['solved_states'].items():
-    if k == 0:
+for i, v in enumerate(FE.solve_data['solved_objects']):
+    if i == 0:
         intrp_states = v.states_to_function()
         ax.plot(v.nodes, intrp_states(v.nodes), '.-')
     else:
@@ -125,8 +125,8 @@ print(FEu)
 
 # plotting
 fig, ax = plt.subplots()
-for k, v in FEu.solve_data['solved_states'].items():
-    if k == 0:
+for i, v in enumerate(FEu.solve_data['solved_objects']):
+    if i == 0:
         intrp_states = v.states_to_function()
         ax.plot(v.nodes, intrp_states(v.nodes), '.-')
     else:
@@ -170,8 +170,8 @@ print(FEut)
 fig, [[ax1, ax2], [ax3, ax4]] = plt.subplots(nrows=2, ncols=2)
 solve_data = FEut.solve_data
 
-for k, v in solve_data['solved_states'].items():
-    if k == 0:
+for i, v in enumerate(solve_data['solved_objects']):
+    if i == 0:
         intrp_states = v.states_to_function()
         ax1.plot(v.nodes, intrp_states(v.nodes), '.-')
     else:
@@ -186,15 +186,15 @@ ax1.set_xlabel('distance (m)')
 ax1.set_ylabel('heads (m)')
 ax1.set_title('Hydraulic heads')
 
-ax2.plot(solve_data['time_data'], solve_data['dt_data'], '.-', color='green')
+ax2.plot(solve_data['time'], solve_data['dt'], '.-', color='green')
 ax2.set_xlabel('time (d)')
 ax2.set_ylabel('dt (d)')
 
-ax3.plot(solve_data['time_data'], solve_data['iter_data'], '.-', color='blue')
+ax3.plot(solve_data['time'], solve_data['iter'], '.-', color='blue')
 ax3.set_xlabel('time (d)')
 ax3.set_ylabel('iterations (-)')
 
-ax4.plot(solve_data['time_data'][1:], np.cumsum(solve_data['iter_data'][1:]), '.-', color='red')
+ax4.plot(solve_data['time'][1:], np.cumsum(solve_data['iter'][1:]), '.-', color='red')
 ax4.set_xlabel('time (d)')
 ax4.set_ylabel('cumulative dt (d)')
 

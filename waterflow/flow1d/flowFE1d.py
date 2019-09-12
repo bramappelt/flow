@@ -1,8 +1,10 @@
 from copy import deepcopy
 import time
+import os
 
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 from scipy.integrate import quad
 from inspect import signature
 from functools import partial
@@ -581,7 +583,7 @@ class Flow1DFE(object):
     def solve(self, dt_min=0.01, dt_max=0.5, end_time=1, maxiter=500, threshold=1e-3, verbosity=True):
         ''' solve the system for a given period of time '''
         
-        solved_states = {0: deepcopy(self)}
+        solved_objs = [deepcopy(self)]
         time_data = [0]
         dt_data = [None]
         iter_data = [None]
@@ -601,7 +603,7 @@ class Flow1DFE(object):
                     print('Converged at {} iterations'.format(iters))
 
             if not self.Sspatflux.get('storage_change', None):
-                solved_states['stationary'] = deepcopy(self)
+                solved_objs.append(deepcopy(self))
                 iter_data.append(iters)
                 break
 
@@ -610,7 +612,7 @@ class Flow1DFE(object):
                 break
 
             # build data record
-            solved_states[time] = deepcopy(self)
+            solved_objs.append(deepcopy(self))
             time_data.append(time)
             dt_data.append(dt)
             iter_data.append(iters)
@@ -637,10 +639,10 @@ class Flow1DFE(object):
     
         # attach all solve data to last created object
         solve_data = {}
-        solve_data['solved_states'] = solved_states
-        solve_data['time_data'] = time_data
-        solve_data['dt_data'] = dt_data 
-        solve_data['iter_data'] = iter_data
+        solve_data['solved_objects'] = solved_objs
+        solve_data['time'] = time_data
+        solve_data['dt'] = dt_data 
+        solve_data['iter'] = iter_data
         self.solve_data = solve_data
 
     def calcbalance(self, print_=False):
@@ -729,3 +731,26 @@ class Flow1DFE(object):
                         print(key, self.balance[key])
                     except Exception as e:
                         raise type(e)
+
+    def save(self, print_time, savepath='C:/Users/bramb/Documents/thesis/output'):
+        if not os.path.isdir(savepath):
+            os.mkdir(savepath)
+
+        # new dir for current run
+        rundir = time.strftime('%d%b%Y_%H%M%S', time.gmtime(time.time()))
+        runpath = os.path.join(savepath, rundir)
+        os.mkdir(runpath)
+
+        # time data to file
+        timefile = os.path.join(runpath, 'time.xlsx')
+        transient_data = pd.DataFrame(data=self.solve_data)
+        transient_data.to_excel(timefile, engine='xlsxwriter')
+
+        statefile = os.path.join(runpath, 'states.xlsx')
+        with pd.ExcelWriter(statefile) as fw:
+            for row in transient_data.itertuples(index=False):
+                obj, t = row.solved_objects, row.time
+
+                # call a function that dataframe-ifies the object
+                dft = pd.DataFrame({'nodes': obj.nodes, 'states': obj.states})
+                dft.to_excel(fw, sheet_name=str(t))
