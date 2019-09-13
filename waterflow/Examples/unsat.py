@@ -20,6 +20,7 @@ nx = 101
 xsp, _ = spacing(nx, L)
 xsp = xsp - 100
 initial_states = np.repeat(0, nx)
+# initial_states = np.linspace(0, -100, 101)
 
 theta_r = SOIL['theta.res']
 theta_s = SOIL['theta.sat']
@@ -54,7 +55,7 @@ def storage_change(x, s, prevstate, dt, fun=VG_pressureh, S=1):
 ############################ SOLVE TRANSIENT ################################
 
 FE_ut = Flow1DFE('Unsaturated transient model')
-FE_ut.scheme = 'quintic'
+FE_ut.scheme = 'linear'
 FE_ut.set_field1d(array=xsp)
 FE_ut.set_initial_states(initial_states)
 FE_ut.set_systemfluxfunction(richards_equation)
@@ -64,9 +65,9 @@ FE_ut.add_dirichlet_BC(0, 'west')
 FE_ut.add_neumann_BC(-0.1, 'east')
 
 FE_ut.add_spatialflux(storage_change)
-FE_ut.solve(dt_max=1, end_time=4)
+FE_ut.solve(dt_min=1, dt_max=1, end_time=4)
 
-FE_ut.save(3)
+FE_ut.save(3, dirname='unsat')
 
 fig, [[ax1, ax2], [ax3, ax4]] = plt.subplots(nrows=2, ncols=2)
 solve_data = FE_ut.solve_data
@@ -78,8 +79,8 @@ for i, v in enumerate(solve_data['solved_objects']):
     else:
         ax1.plot(v.states, v.nodes)
 
-ax1.set_xlabel('distance (m)')
-ax1.set_ylabel('heads (m)')
+ax1.set_xlabel('heads (m)')
+ax1.set_ylabel('distance (m)')
 ax1.set_title('Hydraulic heads')
 
 ax2.plot(solve_data['time'], solve_data['dt'], '.-', color='green')

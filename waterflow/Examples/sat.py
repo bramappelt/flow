@@ -81,7 +81,6 @@ FE.add_spatialflux(stateposfunc, "spf")
 
 FE.solve()
 FE.calcbalance(print_=True)
-print(FE)
 
 # plotting
 fig, ax = plt.subplots()
@@ -121,7 +120,6 @@ FEu.add_spatialflux(stateposfunc, "stateposfunc")
 
 FEu.solve()
 FEu.calcbalance(print_=True)
-print(FEu)
 
 # plotting
 fig, ax = plt.subplots()
@@ -164,7 +162,7 @@ FEut.add_spatialflux(storage_change)
 
 FEut.solve(end_time=100, dt_max=5, threshold=1e-3)
 FEut.calcbalance(print_=True)
-print(FEut)
+FEut.save(3, invert=False)
 
 # plotting
 fig, [[ax1, ax2], [ax3, ax4]] = plt.subplots(nrows=2, ncols=2)

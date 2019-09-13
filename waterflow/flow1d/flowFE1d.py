@@ -604,6 +604,8 @@ class Flow1DFE(object):
 
             if not self.Sspatflux.get('storage_change', None):
                 solved_objs.append(deepcopy(self))
+                time_data.append(time) 
+                dt_data.append(dt)
                 iter_data.append(iters)
                 break
 
@@ -732,14 +734,31 @@ class Flow1DFE(object):
                     except Exception as e:
                         raise type(e)
 
-    def save(self, print_time, savepath='C:/Users/bramb/Documents/thesis/output'):
+    def dataframeify(self, invert):
+        data = {}
+        for k, v in self.__dict__.items():
+            if isinstance(v, np.ndarray):
+                if v.ndim == 1:
+                    data[k] = v
+        
+        df = pd.DataFrame(data)
+        if invert:
+            df = df.iloc[::-1].reset_index(drop=True)
+        return df
+
+    def save(self, print_time, invert=True, dirname=None, savepath='C:/Users/bramb/Documents/thesis/output'):
         if not os.path.isdir(savepath):
             os.mkdir(savepath)
 
         # new dir for current run
-        rundir = time.strftime('%d%b%Y_%H%M%S', time.gmtime(time.time()))
-        runpath = os.path.join(savepath, rundir)
-        os.mkdir(runpath)
+        if not dirname:
+            dirname = time.strftime('%d%b%Y_%H%M%S', time.gmtime(time.time()))
+            runpath = os.path.join(savepath, dirname)
+            os.mkdir(runpath)
+        else:
+            runpath = os.path.join(savepath, dirname)
+            if not os.path.isdir(runpath):
+                os.mkdir(runpath)
 
         # time data to file
         timefile = os.path.join(runpath, 'time.xlsx')
@@ -751,6 +770,6 @@ class Flow1DFE(object):
             for row in transient_data.itertuples(index=False):
                 obj, t = row.solved_objects, row.time
 
-                # call a function that dataframe-ifies the object
-                dft = pd.DataFrame({'nodes': obj.nodes, 'states': obj.states})
+                # call a function that 'dataframeifies' the object
+                dft = pd.DataFrame(obj.dataframeify(invert=invert))
                 dft.to_excel(fw, sheet_name=str(t))
