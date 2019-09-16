@@ -19,7 +19,7 @@ runs = 1
 
 ksat = 1.5
 
-def kfun(x):
+def kfun(x, s):
     return ksat + 0.0065*x
 
 # ############################## FLUXFUNCTIONS #################################
@@ -30,11 +30,11 @@ def fluxfunction(x, s, gradient):
 def fluxfunction_s(x, s, gradient):
     return -1 * gradient * ksat * s
 
-def fluxfunction_var_k(x, s, gradient):
-    return - kfun(x) * gradient
+def fluxfunction_var_k(x, s, gradient, kfun):
+    return - kfun(x, s) * gradient
 
-def fluxfunction_var_k_s(x, s, gradient):
-    return - kfun(x) * s * gradient
+def fluxfunction_var_k_s(x, s, gradient, kfun):
+    return - kfun(x, s) * s * gradient
 
 # ############################## POINT FLUXES ##################################
 
@@ -62,7 +62,7 @@ def stateposfunc(x, s):
 
 FE = Flow1DFE("structured")
 FE.set_field1d(linear=domain)
-FE.set_systemfluxfunction(fluxfunction)
+FE.set_systemfluxfunction(fluxfunction_var_k, kfun=kfun)
 FE.set_initial_states(4.90)
 
 FE.add_dirichlet_BC(5.0, "west")
@@ -81,6 +81,7 @@ FE.add_spatialflux(stateposfunc, "spf")
 
 FE.solve()
 FE.calcbalance(print_=True)
+FE.save(3, invert=False, dirname='sat_structured')
 
 # plotting
 fig, ax = plt.subplots()
@@ -101,7 +102,7 @@ ax.grid()
 FEu = Flow1DFE("unstructured")
 xsp, _ = spacing(nx, L, linear=False, loc=[4, 7], power=2, weight=10)
 FEu.set_field1d(array=xsp)
-FEu.set_systemfluxfunction(fluxfunction)
+FEu.set_systemfluxfunction(fluxfunction_var_k, kfun=kfun)
 FEu.set_initial_states(4.90)
 
 FEu.add_dirichlet_BC(5, "west")
@@ -120,6 +121,7 @@ FEu.add_spatialflux(stateposfunc, "stateposfunc")
 
 FEu.solve()
 FEu.calcbalance(print_=True)
+FEu.save(3, invert=False, dirname='sat_unstructured')
 
 # plotting
 fig, ax = plt.subplots()
@@ -142,7 +144,7 @@ FEut = Flow1DFE("unstructured & transient")
 FEut.scheme = 'linear'
 xsp, _ = spacing(nx, L, linear=False, loc=[4, 7], power=2, weight=10)
 FEut.set_field1d(array=xsp)
-FEut.set_systemfluxfunction(fluxfunction)
+FEut.set_systemfluxfunction(fluxfunction_var_k, kfun=kfun)
 FEut.set_initial_states(4.9)
 
 FEut.add_dirichlet_BC(5, "west")
@@ -162,7 +164,7 @@ FEut.add_spatialflux(storage_change)
 
 FEut.solve(end_time=100, dt_max=5, threshold=1e-3)
 FEut.calcbalance(print_=True)
-FEut.save(3, invert=False)
+FEut.save(3, invert=False, dirname='sat_transient')
 
 # plotting
 fig, [[ax1, ax2], [ax3, ax4]] = plt.subplots(nrows=2, ncols=2)

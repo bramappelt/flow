@@ -35,6 +35,8 @@ class Flow1DFE(object):
         self.Sspatflux = {}
         self.forcing = None
         self.scheme = "linear"
+        self.conductivities = []
+        self.moisture = []
         self.stats = {"rmse" : [], "mae" : []}
         self.balance = {}
         # private attributes
@@ -200,6 +202,14 @@ class Flow1DFE(object):
             if type_ == "Dirichlet":
                 self.states[pos] = val
 
+    def _calc_theta_k(self):
+        if hasattr(self, 'kfun'):
+            k = [self.kfun(n, s) for n, s in zip(self.nodes, self.states)]
+            self.conductivities = np.array(k)
+        if hasattr(self, 'tfun'):
+            t = [self.tfun(s) for s in self.states]
+            self.moisture = np.array(t)
+
     def _FE_precalc(self, nodes):
         # calculate the x positions of each integration point between nodes
         xintegration = [[] for x in range(len(nodes) - 1)]
@@ -310,7 +320,10 @@ class Flow1DFE(object):
         self.scheme = scheme
 
     def set_systemfluxfunction(self, function, **kwargs):
-        def fluxfunction(x, s, gradient, **kwargs):
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+
+        def fluxfunction(x, s, gradient):
             return function(x, s, gradient, **kwargs)
         self.systemfluxfunc = fluxfunction
 
@@ -319,7 +332,7 @@ class Flow1DFE(object):
             states = float(states)
             self.states = np.array([states for x in range(len(self.nodes))])
         else:
-            self.states = np.array(states, dtype=np.float64)
+            self.states = np.array(states, dtype=np.float64)    
 
     def add_dirichlet_BC(self, value, where):
         if isinstance(value, int) or isinstance(value, float):
@@ -578,6 +591,8 @@ class Flow1DFE(object):
                 itercount += 1
         else:
             return itercount
+        
+        self._calc_theta_k()
         return itercount
 
     def solve(self, dt_min=0.01, dt_max=0.5, end_time=1, maxiter=500, threshold=1e-3, verbosity=True):
@@ -735,12 +750,21 @@ class Flow1DFE(object):
                         raise type(e)
 
     def dataframeify(self, invert):
+        columns = ['lengths', 'nodes', 'states', 'moisture',
+                   'conductivities','pointflux', 'Spointflux',
+                   'spatflux', 'Sspatflux', 'internal_forcing']
         data = {}
-        for k, v in self.__dict__.items():
-            if isinstance(v, np.ndarray):
-                if v.ndim == 1:
-                    data[k] = v
-        
+        for idx, name in enumerate(columns):
+            if 0 <= idx < 3:
+                data[name] = self.__dict__.get(name)
+            elif 3 <= idx < 5:
+                values = self.__dict__.get(name)
+                if list(values):
+                    data[name] = values
+            else:
+                for k, v in self.__dict__.get(name).items():
+                    data[k] = v[-1]
+
         df = pd.DataFrame(data)
         if invert:
             df = df.iloc[::-1].reset_index(drop=True)

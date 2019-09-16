@@ -37,7 +37,7 @@ def VG_pressureh(h, theta_r=theta_r, theta_s=theta_s, a=a, n=n):
     m = 1-1/n
     return theta_r + (theta_s-theta_r) / (1+(a*-h)**n)**m
 
-def VG_conductivity(h, ksat=ksat, a=a, n=n):
+def VG_conductivity(x, h, ksat=ksat, a=a, n=n):
     if h >= 0:
         return ksat
     m = 1-1/n
@@ -45,8 +45,8 @@ def VG_conductivity(h, ksat=ksat, a=a, n=n):
     h_down = (1 + (a * -h)**n)**(m / 2)
     return (h_up / h_down) * ksat
 
-def richards_equation(x, psi, gradient, kfun=VG_conductivity):
-    return -VG_conductivity(psi) * (gradient + 1)
+def richards_equation(x, s, gradient, kfun):
+    return -kfun(x, s) * (gradient + 1)
 
 def storage_change(x, s, prevstate, dt, fun=VG_pressureh, S=1):
     return - S * (fun(s) - fun(prevstate(x))) / dt
@@ -55,19 +55,21 @@ def storage_change(x, s, prevstate, dt, fun=VG_pressureh, S=1):
 ############################ SOLVE TRANSIENT ################################
 
 FE_ut = Flow1DFE('Unsaturated transient model')
-FE_ut.scheme = 'linear'
+FE_ut.scheme = 'quintic'
 FE_ut.set_field1d(array=xsp)
 FE_ut.set_initial_states(initial_states)
-FE_ut.set_systemfluxfunction(richards_equation)
+FE_ut.set_systemfluxfunction(richards_equation, kfun=VG_conductivity)
 FE_ut.add_dirichlet_BC(0, 'west')
 
 # think about dirichlet plot init
 FE_ut.add_neumann_BC(-0.1, 'east')
 
 FE_ut.add_spatialflux(storage_change)
-FE_ut.solve(dt_min=1, dt_max=1, end_time=4)
+FE_ut.tfun = VG_pressureh
 
-FE_ut.save(3, dirname='unsat')
+FE_ut.solve(dt_min=0.01, dt_max=1, end_time=4)
+
+FE_ut.save(3, dirname='unsat_transient')
 
 fig, [[ax1, ax2], [ax3, ax4]] = plt.subplots(nrows=2, ncols=2)
 solve_data = FE_ut.solve_data
