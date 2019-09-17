@@ -37,8 +37,14 @@ class Flow1DFE(object):
         self.scheme = "linear"
         self.conductivities = []
         self.moisture = []
-        self.stats = {"rmse" : [], "mae" : []}
-        self.balance = {}
+        self.stats = {"rmse" : [], "mae" : []} ### ??
+        self.solve_data = None
+        # dataframes
+        self.df_states = None
+        self.df_balance = None
+        self.df_balance_summary = None
+        self.df_solved_times = None
+        self.df_print_times = None
         # private attributes
         self._west = None
         self._east = None
@@ -56,7 +62,8 @@ class Flow1DFE(object):
     def __repr__(self):
         return "Flow1DFE("+ str(self.id) +")"
 
-    def __str__(self):
+    def summary(self):
+        ''' FIX THIS '''
         id_ = "{}".format(self.id)
         if self.nodes is not None:
             len_ = "System lenght: {}".format(self.nodes[-1] - self.nodes[0])
@@ -663,6 +670,7 @@ class Flow1DFE(object):
         self.solve_data = solve_data
 
     def calcbalance(self, print_=False):
+        data = {}
         # internal fluxes
         self._internal_forcing(calcbal=True)
         internalfluxes = self.internal_forcing['internal_forcing'][-1]
@@ -686,7 +694,7 @@ class Flow1DFE(object):
             # if constant/position dependent then no need for a new calculation
             else:
                 pnt += pointfluxes[key][-1]
-            self.balance["pnt-"+str(key)] = pointfluxes[key][-1]
+            data.update({"pnt-"+str(key): pointfluxes[key][-1]})
 
         # add all spatial fluxes
         spat = np.repeat(0.0, len(self.nodes))
@@ -711,7 +719,7 @@ class Flow1DFE(object):
             # if constant/position dependent then no need for a new calculation
             else:
                 spat += spatialfluxes[key][-1]
-            self.balance["spat-"+str(key)] = spatialfluxes[key][-1]
+            data.update({"spat-"+str(key): spatialfluxes[key][-1]})
 
         # flow over boundaries
         leftb = internalfluxes[0] + (spat[0] + pnt[0])
@@ -723,33 +731,20 @@ class Flow1DFE(object):
         net[0] -= leftb
         net[-1] -= rightb
 
-        self.balance['internal'] = internalfluxes
-        self.balance['all-spatial'] = spat
-        self.balance['all-points'] = pnt
-        self.balance['all-external'] = pnt + spat
-        self.balance['lbound'] = leftb
-        self.balance['rbound'] = rightb
-        self.balance['bounds'] = bnd
-        self.balance['net'] = net
+        # dump waterbalance & summary to dataframe
+        data.update({'internal': internalfluxes, 'all-spatial': spat,
+                     'all-points': pnt, 'all-external': pnt + spat, 
+                     'lbound': leftb, 'rbound': rightb, 'net': net})
+        df_balance = pd.DataFrame(data)
+        df_balance_summary = df_balance.sum().transpose()
+        self.df_balance = df_balance
+        self.df_balance_summary = df_balance_summary
 
         if print_:
-            basis_terms = ["internal", "all-spatial", "all-points",
-                           "all-external", "lbound", "rbound", "bounds",
-                           "net"]
-            for key in self.balance.keys():
-                if key not in basis_terms:
-                    print(key, sum(self.balance[key]))
-
-            for key in basis_terms:
-                try:
-                    print(key, sum(self.balance[key]))
-                except:
-                    try:
-                        print(key, self.balance[key])
-                    except Exception as e:
-                        raise type(e)
+            print(self.df_balance_summary)
 
     def dataframeify(self, invert):
+        ''' write current static model to dataframe '''
         columns = ['lengths', 'nodes', 'states', 'moisture',
                    'conductivities','pointflux', 'Spointflux',
                    'spatflux', 'Sspatflux', 'internal_forcing']
@@ -768,9 +763,61 @@ class Flow1DFE(object):
         df = pd.DataFrame(data)
         if invert:
             df = df.iloc[::-1].reset_index(drop=True)
-        return df
+        self.df_states = df
 
-    def save(self, print_time, invert=True, dirname=None, savepath='C:/Users/bramb/Documents/thesis/output'):
+    def transient_data(self, print_times=None, include_maxima=True):
+        ''' write transient solve data to dataframe '''
+        self.df_solved_times = pd.DataFrame(data=self.solve_data)
+
+        # solve model at specific print times
+        if print_times:
+            st = self.solve_data['time']
+            solved_obj = self.solve_data['solved_objects']
+
+            if isinstance(print_times, (list, np.ndarray)):
+                pt = np.array(print_times)
+                pt = np.delete(pt, np.argwhere(pt < min(st)))
+                pt = np.delete(pt, np.argwhere(pt > max(st)))
+                if include_maxima:
+                    pt = np.insert(pt, 0, min(st))
+                    pt = np.append(pt, max(st))
+            else:
+                pt = np.linspace(min(st), max(st), print_times)
+            pt.sort()
+            pt = np.unique(pt)
+
+            # Find solved model that is nearest in terms of time
+            # solve the model for the new time from here
+            new_obj = []
+            for t, i in zip(pt, np.searchsorted(st, pt)):
+                # print time already equals known state
+                if t == st[i]:
+                    new_obj.append(deepcopy(solved_obj[i]))
+                # calculate model state at new time
+                else:
+                    dts = t - st[i - 1]
+                    obj = deepcopy(solved_obj[i - 1])
+                    obj.dt_solve(dts)
+                    new_obj.append(obj)
+            
+            # dump model states at print times to dataframe
+            data = {'solved_objects': new_obj, 'time': pt}
+            df_print_times = pd.DataFrame(data=data)
+            self.df_print_times = df_print_times
+        
+        # if no specific print times remove dataframe
+        else:
+            self.df_print_times = None
+
+    def transient_dataframeify(self, nodes):
+        ''' combine static dataframes '''
+        pass
+
+    def build_dataframes(self):
+        # replace this for _calc_theta_k
+        pass
+
+    def save(self, print_time, nodes=None, invert=True, dirname=None, savepath='C:/Users/bramb/Documents/thesis/output'):
         if not os.path.isdir(savepath):
             os.mkdir(savepath)
 
@@ -784,16 +831,55 @@ class Flow1DFE(object):
             if not os.path.isdir(runpath):
                 os.mkdir(runpath)
 
-        # time data to file
+        # time data to file (original solve data)
         timefile = os.path.join(runpath, 'time.xlsx')
         transient_data = pd.DataFrame(data=self.solve_data)
         transient_data.to_excel(timefile, engine='xlsxwriter')
 
+        # states & forcing (for every timestep)
         statefile = os.path.join(runpath, 'states.xlsx')
         with pd.ExcelWriter(statefile) as fw:
             for row in transient_data.itertuples(index=False):
                 obj, t = row.solved_objects, row.time
+                obj.dataframeify(invert=invert)
+                obj.df_states.to_excel(fw, sheet_name=str(t))
 
-                # call a function that 'dataframeifies' the object
-                dft = pd.DataFrame(obj.dataframeify(invert=invert))
-                dft.to_excel(fw, sheet_name=str(t))
+        # waterbalance (for every timestep)
+        balancefile = os.path.join(runpath, 'balance.xlsx')
+        with pd.ExcelWriter(balancefile) as fw:
+            for row in transient_data.itertuples(index=False):
+                obj, t = row.solved_objects, row.time
+                # fix this
+                if t != 0:
+                    obj.calcbalance()
+                    obj.df_balance.to_excel(fw, sheet_name=str(t))
+
+        # waterbalance summary (transient, summary per time step)
+        summary = os.path.join(runpath, 'balance_summary.xlsx')
+        with pd.ExcelWriter(summary) as fw:
+            df = pd.DataFrame()
+            times = []
+            for row in transient_data.itertuples(index=False):
+                obj, t = row.solved_objects, row.time
+                # fix this
+                if t != 0:
+                    times.append(t)
+                    obj.calcbalance()
+                    df = df.append(obj.df_balance_summary, ignore_index=True)
+            df['times'] = times
+            df.to_excel(fw, sheet_name='transient')
+
+        # follow nodes over time (transient (node(s) per time step))
+        if nodes:
+            nodefile = os.path.join(runpath, 'selected_nodes.xlsx')
+            with pd.ExcelWriter(nodefile) as fw:
+                for node in nodes:
+                    df = pd.DataFrame()
+                    times = []
+                    for row in transient_data.itertuples(index=False):
+                        obj, t = row.solved_objects, row.time
+                        n = obj.df_states[obj.df_states['nodes'] == node]
+                        times.append(t)
+                        df = df.append(n, ignore_index=True, sort=False)
+                    df['times'] = times
+                    df.to_excel(fw, sheet_name=str(node))

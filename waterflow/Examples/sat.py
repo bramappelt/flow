@@ -80,7 +80,6 @@ FE.add_spatialflux(rainfun, "rainfun")
 FE.add_spatialflux(stateposfunc, "spf")
 
 FE.solve()
-FE.calcbalance(print_=True)
 FE.save(3, invert=False, dirname='sat_structured')
 
 # plotting
@@ -120,7 +119,6 @@ FEu.add_spatialflux(rainfun, "rainfun")
 FEu.add_spatialflux(stateposfunc, "stateposfunc")
 
 FEu.solve()
-FEu.calcbalance(print_=True)
 FEu.save(3, invert=False, dirname='sat_unstructured')
 
 # plotting
@@ -149,7 +147,7 @@ FEut.set_initial_states(4.9)
 
 FEut.add_dirichlet_BC(5, "west")
 #FEut.add_dirichlet_BC(5.01, "east")
-#FEut.add_neumann_BC(0.01, "east")
+#FEut.add_neumann_BC(0.1, "east")
 
 FEut.add_pointflux([-0.027, -0.015], [4.0, 8.0], "well!")
 FEut.add_pointflux(-0.02, 6.0, "well1")
@@ -163,7 +161,6 @@ FEut.add_spatialflux(stateposfunc, "stateposfunc")
 FEut.add_spatialflux(storage_change)
 
 FEut.solve(end_time=100, dt_max=5, threshold=1e-3)
-FEut.calcbalance(print_=True)
 FEut.save(3, invert=False, dirname='sat_transient')
 
 # plotting

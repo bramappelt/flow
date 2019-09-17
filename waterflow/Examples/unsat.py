@@ -60,16 +60,15 @@ FE_ut.set_field1d(array=xsp)
 FE_ut.set_initial_states(initial_states)
 FE_ut.set_systemfluxfunction(richards_equation, kfun=VG_conductivity)
 FE_ut.add_dirichlet_BC(0, 'west')
-
-# think about dirichlet plot init
 FE_ut.add_neumann_BC(-0.1, 'east')
 
 FE_ut.add_spatialflux(storage_change)
 FE_ut.tfun = VG_pressureh
 
-FE_ut.solve(dt_min=0.01, dt_max=1, end_time=4)
+FE_ut.solve(dt_min=0.01, dt_max=1, end_time=10)
+FE_ut.transient_data(print_times=6)
 
-FE_ut.save(3, dirname='unsat_transient')
+FE_ut.save(3, dirname='unsat_transient', nodes=[0, 50, 101])
 
 fig, [[ax1, ax2], [ax3, ax4]] = plt.subplots(nrows=2, ncols=2)
 solve_data = FE_ut.solve_data
