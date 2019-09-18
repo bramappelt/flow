@@ -66,9 +66,15 @@ FE_ut.add_spatialflux(storage_change)
 FE_ut.tfun = VG_pressureh
 
 FE_ut.solve(dt_min=0.01, dt_max=1, end_time=10)
-FE_ut.transient_data(print_times=6)
 
-FE_ut.save(3, dirname='unsat_transient', nodes=[0, 50, 101])
+FE_ut.transient_data()
+FE_ut.transient_data(print_times=5)
+
+FE_ut.transient_dataframeify(nodes=[0, -50, -100])
+
+
+FE_ut.save(dirname='test_unsat_transient')
+
 
 fig, [[ax1, ax2], [ax3, ax4]] = plt.subplots(nrows=2, ncols=2)
 solve_data = FE_ut.solve_data
