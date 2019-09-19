@@ -1,17 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import animation
-from scipy.interpolate import interp1d
-from copy import deepcopy
 
 from waterflow.flow1d.flowFE1d import Flow1DFE
 from waterflow.utility import conductivityfunctions as CF
-from waterflow.utility import fluxfunctions as FF
-from waterflow.utility import forcingfunctions as Ffunc
 from waterflow.utility.spacing import spacing
 
 
-############################## MODEL INPUT ##################################
+# ############################# MODEL INPUT ##################################
 
 
 SOIL = CF.select_soil('B13')
@@ -37,6 +32,7 @@ def VG_pressureh(h, theta_r=theta_r, theta_s=theta_s, a=a, n=n):
     m = 1-1/n
     return theta_r + (theta_s-theta_r) / (1+(a*-h)**n)**m
 
+
 def VG_conductivity(x, h, ksat=ksat, a=a, n=n):
     if h >= 0:
         return ksat
@@ -45,25 +41,27 @@ def VG_conductivity(x, h, ksat=ksat, a=a, n=n):
     h_down = (1 + (a * -h)**n)**(m / 2)
     return (h_up / h_down) * ksat
 
+
 def richards_equation(x, s, gradient, kfun):
     return -kfun(x, s) * (gradient + 1)
+
 
 def storage_change(x, s, prevstate, dt, fun=VG_pressureh, S=1):
     return - S * (fun(s) - fun(prevstate(x))) / dt
 
 
-############################ SOLVE TRANSIENT ################################
+# ########################### SOLVE TRANSIENT ################################
 
 FE_ut = Flow1DFE('Unsaturated transient model')
 FE_ut.scheme = 'quintic'
 FE_ut.set_field1d(array=xsp)
 FE_ut.set_initial_states(initial_states)
 FE_ut.set_systemfluxfunction(richards_equation, kfun=VG_conductivity)
-FE_ut.add_dirichlet_BC(0, 'west')
+FE_ut.add_dirichlet_BC(-0.5, 'west')
 FE_ut.add_neumann_BC(-0.1, 'east')
+FE_ut.tfun = VG_pressureh
 
 FE_ut.add_spatialflux(storage_change)
-FE_ut.tfun = VG_pressureh
 
 FE_ut.solve(dt_min=0.01, dt_max=1, end_time=10)
 
@@ -73,7 +71,7 @@ FE_ut.transient_data(print_times=5)
 FE_ut.transient_dataframeify(nodes=[0, -50, -100])
 
 
-FE_ut.save(dirname='test_unsat_transient')
+FE_ut.save(dirname='unsat_transient')
 
 
 fig, [[ax1, ax2], [ax3, ax4]] = plt.subplots(nrows=2, ncols=2)

@@ -1,17 +1,13 @@
+from inspect import signature
+from functools import partial
 from copy import deepcopy
 import time
 import os
 
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
 from scipy.integrate import quad
-from inspect import signature
-from functools import partial
 
-from waterflow.utility.spacing import spacing
-from waterflow.utility.statistics import RMSE, MAE
-from waterflow.utility.forcingfunctions import polynomial
 
 '''
 documentation !!
@@ -37,7 +33,8 @@ class Flow1DFE(object):
         self.scheme = "linear"
         self.conductivities = []
         self.moisture = []
-        self.stats = {"rmse" : [], "mae" : []} ### ??
+        self.stats = {"rmse": [], "mae": []}  # ## ??
+        self.isinitial = True
         self.solve_data = None
         # dataframes
         self.df_states = None
@@ -64,7 +61,7 @@ class Flow1DFE(object):
         self._calcgaussianquadrature()
 
     def __repr__(self):
-        return "Flow1DFE("+ str(self.id) +")"
+        return "Flow1DFE(" + str(self.id) + ")"
 
     def summary(self):
         ''' FIX THIS '''
@@ -89,8 +86,8 @@ class Flow1DFE(object):
             netbalance = "Not yet solved"
 
         return "id: {}\n{}\n{}\nBCs: {}\nPointflux: {}\nSpatial flux: {}\
-               \nNet balance: {}\n".format(id_, len_, num_nodes, bcs, pointflux,
-               spatflux, netbalance)
+               \nNet balance: {}\n".format(id_, len_, num_nodes, bcs,
+                                           pointflux, spatflux, netbalance)
 
     def _calcgaussianquadrature(self):
         ''' Calculate gaussian quadrature points '''
@@ -139,7 +136,7 @@ class Flow1DFE(object):
         if not calcbal:
             self.forcing = self.forcing + np.array(f)
 
-    def _statedep_forcing(self):        
+    def _statedep_forcing(self):
         # point state dependent forcing
         f = [0.0 for x in range(len(self.nodes))]
         for key in self.Spointflux.keys():
@@ -199,7 +196,7 @@ class Flow1DFE(object):
             elif type_ == "Dirichlet" and pos == -1:
                 self.add_neumann_BC(value=0, where="west")
             else:
-                raise np.linalg.LinAlgError("Singular matrix") 
+                raise np.linalg.LinAlgError("Singular matrix")
         # both boundaries cannot be of type neumann
         if len(keys) == 2:
             val0, type_0, pos0 = self.BCs[keys[0]]
@@ -220,6 +217,21 @@ class Flow1DFE(object):
         if hasattr(self, 'tfun'):
             t = [self.tfun(s) for s in self.states]
             self.moisture = np.array(t)
+
+    def _update_storage_change(self, prevstate, dt):
+        ''' feed new previous states function and timestep '''
+        storagechange = self.Sspatflux.get('storage_change', None)
+        if storagechange:
+            storagechange[0] = partial(storagechange[0],
+                                       prevstate=self.states_to_function(),
+                                       dt=dt)
+
+    def _solve_initial_object(self):
+        if self.isinitial:
+            self._check_boundaries()
+            self.forcing = np.repeat(0, len(self.states))
+            self._internal_forcing()
+            self._update_storage_change(self.states_to_function(), dt=1)
 
     def _FE_precalc(self, nodes):
         # calculate the x positions of each integration point between nodes
@@ -249,7 +261,7 @@ class Flow1DFE(object):
         self.nframe = np.array(list((zip(middle, nodal_distances))))
         self.lengths = np.array(length)
 
-    def _CMAT(self, nodes, states): # !!!! 
+    def _CMAT(self, nodes, states):
         systemflux = self.systemfluxfunc
         A = np.zeros((len(nodes), len(nodes)))
         # internal flux
@@ -306,6 +318,7 @@ class Flow1DFE(object):
 
     def wrap_bf_linear(self, node, where):
         n = self.nodes
+
         def basis_function(x):
             if where == "left":
                 return (n[node + 1] - x) / (n[node + 1] - n[node])
@@ -343,7 +356,7 @@ class Flow1DFE(object):
             states = float(states)
             self.states = np.array([states for x in range(len(self.nodes))])
         else:
-            self.states = np.array(states, dtype=np.float64)    
+            self.states = np.array(states, dtype=np.float64)
 
     def add_dirichlet_BC(self, value, where):
         if isinstance(value, int) or isinstance(value, float):
@@ -373,7 +386,7 @@ class Flow1DFE(object):
 
     def remove_BC(self, *args):
         if len(args) == 0:
-            self.BCs  = {}
+            self.BCs = {}
             self._west = None
             self._east = None
         else:
@@ -406,7 +419,7 @@ class Flow1DFE(object):
                 # assign to the forcing vector
                 f[idx_l] += r * lfactor
                 f[idx_r] += r * rfactor
-            
+
             if name:
                 self.pointflux[name] = [np.array(f)]
             else:
@@ -422,7 +435,7 @@ class Flow1DFE(object):
             nodedist = self.nodes[idx_r] - self.nodes[idx_l]
             lfactor = 1 - (pos - self.nodes[idx_l]) / nodedist
             rfactor = 1 - lfactor
-            
+
             if not name:
                 name = rate.__name__
 
@@ -468,17 +481,17 @@ class Flow1DFE(object):
                         L = self.nframe[i, 1]
                         for idx in range(len(pos)):
                             x = self.xintegration[i][idx]
-                            # to left node
-                            f[i] +=  Q(x) * weight[-idx-1] * pos[-idx-1] * L    ### no pos negatives??
+                            # to left node (no pos negatives?)
+                            f[i] += Q(x) * weight[-idx-1] * pos[-idx-1] * L
                             # to right node
                             f[i+1] += Q(x) * weight[idx] * pos[idx] * L
-                
+
                 # only possible if analytical solution exists
                 else:
                     # exact integral
                     nodes = self.nodes
                     for i in range(len(self.nodes) - 1):
-                        l = self.wrap_bf_linear(i,  "left")
+                        l = self.wrap_bf_linear(i, "left")
                         r = self.wrap_bf_linear(i, "right")
 
                         def to_left(x):
@@ -488,7 +501,7 @@ class Flow1DFE(object):
                             return r(x) * Q(x)
 
                         # to left node
-                        f[i] += quad(to_left, nodes[i],nodes[i+1])[0]
+                        f[i] += quad(to_left, nodes[i], nodes[i+1])[0]
                         # to right node
                         f[i+1] += quad(to_right, nodes[i], nodes[i+1])[0]
 
@@ -552,13 +565,13 @@ class Flow1DFE(object):
         if self._east == -1:
             states[-1] = self.BCs["east"][0]
             circular = False
-        # if none entered of both of type Neumann, return None
+        # if none entered or both of type Neumann, return None
         if circular:
             print("Define the boundary conditions first")
             return None
         # linearly interpolate between states including assigned boundaries
         else:
-            return partial(np.interp, xp = self.nodes, fp = states)
+            return partial(np.interp, xp=self.nodes, fp=states)
 
     def dt_solve(self, dt, maxiter=500, threshold=1e-3):
         ''' solve the system for one specific time step '''
@@ -566,49 +579,45 @@ class Flow1DFE(object):
         west = self._west
         east = self._east
 
-        if self.Sspatflux.get('storage_change', None):
-            # adapt storage change function for time step and previous states
-            storage_change = self.Sspatflux['storage_change'][0]
-            previous_states = self.states_to_function()
-            storage_change = partial(storage_change, prevstate=previous_states, dt=dt)
-            self.Sspatflux['storage_change'][0] = storage_change
+        # if system is transient
+        self._update_storage_change(self.states_to_function(), dt)
 
         itercount = 1
         while itercount <= maxiter:
-                self._aggregate_forcing()
-                self._internal_forcing()
-                self._statedep_forcing()
-                self._CMAT(self.nodes, self.states)
-        
-                solution = np.linalg.solve(self.coefmatr[west:east, west:east],
-                                           -1*self.forcing[west:east]).flatten()
-        
-                prevstates = self.states
-                curstates = np.copy(prevstates)
-                curstates[west:east] += solution
-                self.states = curstates
-                
-                # update forcing and boundaries at new states
-                self._aggregate_forcing()
-                self._internal_forcing()
-                self._statedep_forcing()
+            self._aggregate_forcing()
+            self._internal_forcing()
+            self._statedep_forcing()
+            self._CMAT(self.nodes, self.states)
 
-                # check solution for conversion
-                max_abs_change = max(abs(prevstates - curstates))
-                max_abs_allowed_change = max(abs(threshold * curstates))
-                if max_abs_change < max_abs_allowed_change:
-                    break
+            solution = np.linalg.solve(self.coefmatr[west:east, west:east],
+                                       -1*self.forcing[west:east]).flatten()
 
-                itercount += 1
+            prevstates = self.states
+            curstates = np.copy(prevstates)
+            curstates[west:east] += solution
+            self.states = curstates
+
+            # update forcing and boundaries at new states
+            self._aggregate_forcing()
+            self._internal_forcing()
+            self._statedep_forcing()
+
+            # check solution for conversion
+            max_abs_change = max(abs(prevstates - curstates))
+            max_abs_allowed_change = max(abs(threshold * curstates))
+            if max_abs_change < max_abs_allowed_change:
+                break
+
+            itercount += 1
         else:
             return itercount
-        
-        self._calc_theta_k()
+        self.isinitial = False
         return itercount
 
-    def solve(self, dt_min=0.01, dt_max=0.5, end_time=1, maxiter=500, threshold=1e-3, verbosity=True):
+    def solve(self, dt_min=0.01, dt_max=0.5, end_time=1, maxiter=500,
+              threshold=1e-3, verbosity=True):
         ''' solve the system for a given period of time '''
-        
+
         solved_objs = [deepcopy(self)]
         time_data = [0]
         dt_data = [None]
@@ -630,7 +639,7 @@ class Flow1DFE(object):
 
             if not self.Sspatflux.get('storage_change', None):
                 solved_objs.append(deepcopy(self))
-                time_data.append(time) 
+                time_data.append(time)
                 dt_data.append(dt)
                 iter_data.append(iters)
                 break
@@ -664,12 +673,12 @@ class Flow1DFE(object):
 
             # increment time
             time += dt
-    
+
         # attach all solve data to last created object
         solve_data = {}
         solve_data['solved_objects'] = solved_objs
         solve_data['time'] = time_data
-        solve_data['dt'] = dt_data 
+        solve_data['dt'] = dt_data
         solve_data['iter'] = iter_data
         self.solve_data = solve_data
 
@@ -737,7 +746,7 @@ class Flow1DFE(object):
 
         # dump waterbalance & summary to dataframe
         data.update({'internal': internalfluxes, 'all-spatial': spat,
-                     'all-points': pnt, 'all-external': pnt + spat, 
+                     'all-points': pnt, 'all-external': pnt + spat,
                      'lbound': leftb, 'rbound': rightb, 'net': net})
         df_balance = pd.DataFrame(data)
         df_balance_summary = df_balance.sum().transpose()
@@ -749,8 +758,11 @@ class Flow1DFE(object):
 
     def dataframeify(self, invert):
         ''' write current static model to dataframe '''
+        self._calc_theta_k()
+        self._solve_initial_object()
+
         columns = ['lengths', 'nodes', 'states', 'moisture',
-                   'conductivities','pointflux', 'Spointflux',
+                   'conductivities', 'pointflux', 'Spointflux',
                    'spatflux', 'Sspatflux', 'internal_forcing']
         data = {}
         for idx, name in enumerate(columns):
@@ -803,12 +815,12 @@ class Flow1DFE(object):
                     obj = deepcopy(solved_obj[i - 1])
                     obj.dt_solve(dts)
                     new_obj.append(obj)
-            
+
             # dump model states at print times to dataframe
             data = {'solved_objects': new_obj, 'time': pt}
             dft_print_times = pd.DataFrame(data=data)
             self.dft_print_times = dft_print_times
-        
+
         # if no specific print times remove dataframe
         else:
             self.dft_print_times = None
@@ -824,19 +836,22 @@ class Flow1DFE(object):
         dft_states = {}
         dft_balance = {}
         dft_nodes = {}
-        dft_balance_summary = pd.DataFrame()
+        dft_bal_sum = pd.DataFrame()
         for row in timedf.itertuples(index=False):
             obj, t = row.solved_objects, row.time
+
+            # states dataframe
             obj.dataframeify(invert=invert)
             dft_states.update({t: obj.df_states})
-            # FIX THIS !
-            if t != 0:
-                obj.calcbalance()
-                dft_balance.update({t: obj.df_balance})
-                dft_balance_summary = dft_balance_summary.append(obj.df_balance_summary, ignore_index=True)
 
-            # track specific nodes
-            if nodes and t != 0: # FIX THIS !
+            # balance dataframes
+            obj.calcbalance()
+            dft_balance.update({t: obj.df_balance})
+            dft_bal_sum = dft_bal_sum.append(obj.df_balance_summary,
+                                             ignore_index=True)
+
+            # track specific nodes (if present)
+            if nodes:
                 if not dft_nodes:
                     dft_nodes = dict((k, np.array([])) for k in nodes)
                 df = obj.df_states
@@ -847,6 +862,8 @@ class Flow1DFE(object):
                         dft_nodes[node] = np.vstack((dft_nodes[node], nrow))
                     else:
                         dft_nodes[node] = nrow
+
+        # nodes dataframe (if present)
         if nodes:
             d = {}
             for k, v in dft_nodes.items():
@@ -854,12 +871,10 @@ class Flow1DFE(object):
                 d[k].insert(0, timedf.time.name, timedf.time)
             self.dft_nodes = d
 
-            # dft_nodes = dict((k, pd.DataFrame(dft_nodes[k], columns=c)) for k in dft_nodes)
-
         self.dft_states = dft_states
         self.dft_balance = dft_balance
-        dft_balance_summary.insert(0, timedf.time.name, timedf.time)
-        self.dft_balance_summary = dft_balance_summary
+        dft_bal_sum.insert(0, timedf.time.name, timedf.time)
+        self.dft_balance_summary = dft_bal_sum
 
     def build_static_dataframes(self):
         # replace this for _calc_theta_k
@@ -884,7 +899,7 @@ class Flow1DFE(object):
             if k.startswith('dft_'):
                 fname = f"{k}.xlsx"
                 save_file = os.path.join(runpath, fname)
-                
+
                 if isinstance(v, pd.core.frame.DataFrame):
                     with pd.ExcelWriter(save_file) as fw:
                         v.to_excel(fw, sheet_name=k)

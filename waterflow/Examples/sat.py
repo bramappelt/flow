@@ -81,6 +81,10 @@ FE.add_spatialflux(stateposfunc, "spf")
 
 FE.solve()
 
+FE.transient_data()
+FE.transient_dataframeify(invert=False, nodes=[0,10,20])
+FE.save(dirname='sat_structured')
+
 # plotting
 fig, ax = plt.subplots()
 for i, v in enumerate(FE.solve_data['solved_objects']):
@@ -118,6 +122,9 @@ FEu.add_spatialflux(rainfun, "rainfun")
 FEu.add_spatialflux(stateposfunc, "stateposfunc")
 
 FEu.solve()
+FEu.transient_data()
+FEu.transient_dataframeify(invert=False)
+FEu.save(dirname='sat_unstructured')
 
 # plotting
 fig, ax = plt.subplots()
@@ -161,8 +168,7 @@ FEut.add_spatialflux(storage_change)
 FEut.solve(end_time=100, dt_max=5, threshold=1e-3)
 FEut.transient_data(print_times=10)
 FEut.transient_dataframeify(invert=False, nodes=[0, 10, 20])
-FEut.save(dirname='test_sat_transient')
-
+FEut.save(dirname='sat_transient')
 
 
 # plotting
