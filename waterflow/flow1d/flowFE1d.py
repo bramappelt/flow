@@ -630,6 +630,20 @@ class Flow1DFE(object):
             # solve for given dt
             iters = self.dt_solve(dt, maxiter, threshold)
 
+            # catch cases where maxiter is reached
+            if iters > maxiter:
+                if dt == dt_min:
+                    print(f'Maxiter {iters} at dt_min {dt_min} reached')
+                    break
+                else:
+                    print(f'Maxiter {iters} reached, dt {dt} is lowered...')
+                    dt *= 0.5
+                    if dt < dt_min:
+                        dt = dt_min
+                    # revert back to previous model state
+                    self.states = solved_objs[-1].states
+                    continue
+
             if verbosity:
                 if self.Sspatflux.get('storage_change', None):
                     fmt = 'Converged at time={} for dt={} with {} iterations'
@@ -637,15 +651,12 @@ class Flow1DFE(object):
                 else:
                     print('Converged at {} iterations'.format(iters))
 
+            # break out of loop when system is stationary
             if not self.Sspatflux.get('storage_change', None):
                 solved_objs.append(deepcopy(self))
                 time_data.append(time)
                 dt_data.append(dt)
                 iter_data.append(iters)
-                break
-
-            if dt == dt_min and iters == maxiter:
-                print('Maxiter at dt_min reached...')
                 break
 
             # build data record
@@ -654,7 +665,7 @@ class Flow1DFE(object):
             dt_data.append(dt)
             iter_data.append(iters)
 
-            # adapt time step as function of iterations
+            # adapt dt as function of iterations of previous step
             if iters <= 5:
                 dt *= 1.5
                 if dt > dt_max:

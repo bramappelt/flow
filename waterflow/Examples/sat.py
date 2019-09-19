@@ -8,7 +8,7 @@ from waterflow.utility import forcingfunctions as Ffunc
 from waterflow.utility.spacing import spacing
 
 
-################################  MODEL INPUT ##################################
+# ###############################  MODEL INPUT ################################
 
 L = 20
 nx = 11
@@ -19,44 +19,57 @@ runs = 1
 
 ksat = 1.5
 
+
 def kfun(x, s):
     return ksat + 0.0065*x
 
-# ############################## FLUXFUNCTIONS #################################
+
+# ############################## FLUXFUNCTIONS ################################
+
 
 def fluxfunction(x, s, gradient):
     return -1 * gradient * ksat
 
+
 def fluxfunction_s(x, s, gradient):
     return -1 * gradient * ksat * s
+
 
 def fluxfunction_var_k(x, s, gradient, kfun):
     return - kfun(x, s) * gradient
 
+
 def fluxfunction_var_k_s(x, s, gradient, kfun):
     return - kfun(x, s) * s * gradient
 
-# ############################## POINT FLUXES ##################################
 
-Spointflux = partial(np.interp, xp=[4.9, 4.95, 5.005], 
-                        fp=[-0.02, -0.029, -0.034])
+# ############################## POINT FLUXES #################################
+
+Spointflux = partial(np.interp, xp=[4.9, 4.95, 5.005],
+                     fp=[-0.02, -0.029, -0.034])
 
 # ############################## SPATIAL FLUXES ###############################
 
-def rainfun(x): # !! inspect new poly scaled??
+
+def rainfun(x):  # !! inspect new poly scaled??
     return 1.98e-5*x**3 - 7.34e-4 * x**2 + 5.36e-3 * x
+
 
 def rainfunc(x):
     return x*0.001 + 0.001
 
+
 a2, x2, b2, rainfun2 = Ffunc.polynomial([[0, 0.001], [5, 0.003], [10, 0.005],
                                         [15, 0.003], [20, 0.002]])
+
 
 def storage_change(x, s, prevstate, dt, fun=lambda x: x, S=1):
     return - S * (fun(s) - fun(prevstate(x))) / dt
 
+
 def stateposfunc(x, s):
     return (-2 + np.sin(x) + s) / 1000
+
 
 # ################################ STRUCTURED #################################
 
@@ -66,8 +79,8 @@ FE.set_systemfluxfunction(fluxfunction_var_k, kfun=kfun)
 FE.set_initial_states(4.90)
 
 FE.add_dirichlet_BC(5.0, "west")
-#FE.add_dirichlet_BC(5.01, "east")
-#FE.add_neumann_BC(0.01, "east")
+# FE.add_dirichlet_BC(5.01, "east")
+# FE.add_neumann_BC(0.01, "east")
 
 FE.add_pointflux([-0.027, -0.015], [4.0, 8.0])
 FE.add_pointflux(-0.02, 6.0)
@@ -82,7 +95,7 @@ FE.add_spatialflux(stateposfunc, "spf")
 FE.solve()
 
 FE.transient_data()
-FE.transient_dataframeify(invert=False, nodes=[0,10,20])
+FE.transient_dataframeify(invert=False, nodes=[0, 10, 20])
 FE.save(dirname='sat_structured')
 
 # plotting
@@ -108,8 +121,8 @@ FEu.set_systemfluxfunction(fluxfunction_var_k, kfun=kfun)
 FEu.set_initial_states(4.90)
 
 FEu.add_dirichlet_BC(5, "west")
-#FEu.add_dirichlet_BC(5.01, "east")
-#FEu.add_neumann_BC(0.01, "east")
+# FEu.add_dirichlet_BC(5.01, "east")
+# FEu.add_neumann_BC(0.01, "east")
 
 FEu.add_pointflux([-0.027, -0.015], [4.0, 8.0], "well!")
 FEu.add_pointflux(-0.02, 6.0, "well1")
@@ -141,7 +154,7 @@ ax.set_title(FEu.id)
 ax.grid()
 
 
-# ################################ TRANSIENT ###################################
+# ################################ TRANSIENT ##################################
 
 FEut = Flow1DFE("unstructured & transient")
 FEut.scheme = 'linear'
@@ -151,8 +164,8 @@ FEut.set_systemfluxfunction(fluxfunction_var_k, kfun=kfun)
 FEut.set_initial_states(4.9)
 
 FEut.add_dirichlet_BC(5, "west")
-#FEut.add_dirichlet_BC(5.01, "east")
-#FEut.add_neumann_BC(0.1, "east")
+# FEut.add_dirichlet_BC(5.01, "east")
+# FEut.add_neumann_BC(0.1, "east")
 
 FEut.add_pointflux([-0.027, -0.015], [4.0, 8.0], "well!")
 FEut.add_pointflux(-0.02, 6.0, "well1")
@@ -190,18 +203,23 @@ ax1.plot(FEut.nodes, FEut.states, color='black')
 ax1.set_xlabel('distance (m)')
 ax1.set_ylabel('heads (m)')
 ax1.set_title('Hydraulic heads')
+ax1.grid(True)
 
 ax2.plot(solve_data['time'], solve_data['dt'], '.-', color='green')
 ax2.set_xlabel('time (d)')
 ax2.set_ylabel('dt (d)')
+ax2.grid(True)
 
 ax3.plot(solve_data['time'], solve_data['iter'], '.-', color='blue')
 ax3.set_xlabel('time (d)')
 ax3.set_ylabel('iterations (-)')
+ax3.grid(True)
 
-ax4.plot(solve_data['time'][1:], np.cumsum(solve_data['iter'][1:]), '.-', color='red')
+ax4.plot(solve_data['time'][1:], np.cumsum(solve_data['iter'][1:]), '.-',
+         color='red')
 ax4.set_xlabel('time (d)')
 ax4.set_ylabel('cumulative dt (d)')
+ax4.grid(True)
 
 fig.suptitle(FEut.id)
 plt.show()

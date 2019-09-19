@@ -63,12 +63,11 @@ FE_ut.tfun = VG_pressureh
 
 FE_ut.add_spatialflux(storage_change)
 
-FE_ut.solve(dt_min=0.01, dt_max=1, end_time=10)
+FE_ut.solve(dt_min=0.01, dt_max=2, end_time=10, maxiter=500)
 
-FE_ut.transient_data()
-FE_ut.transient_data(print_times=5)
+FE_ut.transient_data(print_times=30)
 
-FE_ut.transient_dataframeify(nodes=[0, -50, -100])
+FE_ut.transient_dataframeify(nodes=[0, -20, -50, -80, -100])
 
 
 FE_ut.save(dirname='unsat_transient')
@@ -84,20 +83,25 @@ for i, v in enumerate(solve_data['solved_objects']):
     else:
         ax1.plot(v.states, v.nodes)
 
-ax1.set_xlabel('heads (m)')
-ax1.set_ylabel('distance (m)')
+ax1.set_xlabel('heads (cm)')
+ax1.set_ylabel('distance (cm)')
 ax1.set_title('Hydraulic heads')
+ax1.grid(True)
 
 ax2.plot(solve_data['time'], solve_data['dt'], '.-', color='green')
 ax2.set_xlabel('time (d)')
 ax2.set_ylabel('dt (d)')
+ax2.grid(True)
 
 ax3.plot(solve_data['time'], solve_data['iter'], '.-', color='blue')
 ax3.set_xlabel('time (d)')
 ax3.set_ylabel('iterations (-)')
+ax3.grid(True)
 
-ax4.plot(solve_data['time'][1:], np.cumsum(solve_data['iter'][1:]), '.-', color='red')
+ax4.plot(solve_data['time'][1:], np.cumsum(solve_data['iter'][1:]), '.-',
+         color='red')
 ax4.set_xlabel('time (d)')
 ax4.set_ylabel('cumulative dt (d)')
+ax4.grid(True)
 
 plt.show()
