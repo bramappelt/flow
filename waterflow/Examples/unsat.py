@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 
 from waterflow.flow1d.flowFE1d import Flow1DFE
 from waterflow.utility import conductivityfunctions as CF
+from waterflow.utility.plotting import quickplot, solverplot
 from waterflow.utility.spacing import spacing
 
 
@@ -65,43 +66,14 @@ FE_ut.add_spatialflux(storage_change)
 
 FE_ut.solve(dt_min=0.01, dt_max=2, end_time=10, maxiter=500)
 
-FE_ut.transient_data(print_times=30)
-
-FE_ut.transient_dataframeify(nodes=[0, -20, -50, -80, -100])
-
+FE_ut.transient_dataframeify(nodes=[0, -20, -50, -80, -100], print_times=50)
 
 FE_ut.save(dirname='unsat_transient')
 
+quickplot(FE_ut.dft_states, x='states', y='nodes', title='Hydraulic heads over time (d)', xunit='cm', yunit='cm')
+quickplot(FE_ut.dft_nodes, x='time', y='states', title='Hydraulic heads at specific nodes over time (d)', xunit='days', yunit='cm')
+quickplot(FE_ut.dft_solved_times, x='time', y='dt', title='Solver', xunit='d', yunit='d', y2='iter')
+quickplot(FE_ut.dft_balance_summary, x='time', y='spat-storage_change', xunit='d', yunit='', title='storage change')
 
-fig, [[ax1, ax2], [ax3, ax4]] = plt.subplots(nrows=2, ncols=2)
-solve_data = FE_ut.solve_data
-
-for i, v in enumerate(solve_data['solved_objects']):
-    if i == 0:
-        intrp_states = v.states_to_function()
-        ax1.plot(intrp_states(v.nodes), v.nodes)
-    else:
-        ax1.plot(v.states, v.nodes)
-
-ax1.set_xlabel('heads (cm)')
-ax1.set_ylabel('distance (cm)')
-ax1.set_title('Hydraulic heads')
-ax1.grid(True)
-
-ax2.plot(solve_data['time'], solve_data['dt'], '.-', color='green')
-ax2.set_xlabel('time (d)')
-ax2.set_ylabel('dt (d)')
-ax2.grid(True)
-
-ax3.plot(solve_data['time'], solve_data['iter'], '.-', color='blue')
-ax3.set_xlabel('time (d)')
-ax3.set_ylabel('iterations (-)')
-ax3.grid(True)
-
-ax4.plot(solve_data['time'][1:], np.cumsum(solve_data['iter'][1:]), '.-',
-         color='red')
-ax4.set_xlabel('time (d)')
-ax4.set_ylabel('cumulative dt (d)')
-ax4.grid(True)
-
+solverplot(FE_ut)
 plt.show()

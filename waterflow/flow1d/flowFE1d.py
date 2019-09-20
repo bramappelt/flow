@@ -792,8 +792,11 @@ class Flow1DFE(object):
             df = df.iloc[::-1].reset_index(drop=True)
         self.df_states = df
 
-    def transient_data(self, print_times=None, include_maxima=True):
+    def transient_dataframeify(self, print_times=None, include_maxima=True,
+                               nodes=None, invert=True):
         ''' write transient solve data to dataframe '''
+
+        # times at which the model has been solved
         self.dft_solved_times = pd.DataFrame(data=self.solve_data)
 
         # solve model at specific print times
@@ -801,6 +804,7 @@ class Flow1DFE(object):
             st = self.solve_data['time']
             solved_obj = self.solve_data['solved_objects']
 
+            # print_times can be a sequence or a scalar
             if isinstance(print_times, (list, np.ndarray)):
                 pt = np.array(print_times)
                 pt = np.delete(pt, np.argwhere(pt < min(st)))
@@ -836,14 +840,13 @@ class Flow1DFE(object):
         else:
             self.dft_print_times = None
 
-    def transient_dataframeify(self, nodes=None, invert=True):
-        ''' combine static dataframes to form transient ones'''
-        timedf = self.dft_solved_times
-
         # if available, use print times instead of solved_times
         if self.dft_print_times is not None:
             timedf = self.dft_print_times
+        else:
+            timedf = self.dft_solved_times
 
+        # build all dataframes
         dft_states = {}
         dft_balance = {}
         dft_nodes = {}

@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 
 from waterflow.flow1d.flowFE1d import Flow1DFE
 from waterflow.utility import forcingfunctions as Ffunc
+from waterflow.utility.plotting import quickplot, solverplot
 from waterflow.utility.spacing import spacing
 
 
@@ -94,7 +95,6 @@ FE.add_spatialflux(stateposfunc, "spf")
 
 FE.solve()
 
-FE.transient_data()
 FE.transient_dataframeify(invert=False, nodes=[0, 10, 20])
 FE.save(dirname='sat_structured')
 
@@ -135,7 +135,6 @@ FEu.add_spatialflux(rainfun, "rainfun")
 FEu.add_spatialflux(stateposfunc, "stateposfunc")
 
 FEu.solve()
-FEu.transient_data()
 FEu.transient_dataframeify(invert=False)
 FEu.save(dirname='sat_unstructured')
 
@@ -179,10 +178,12 @@ FEut.add_spatialflux(stateposfunc, "stateposfunc")
 FEut.add_spatialflux(storage_change)
 
 FEut.solve(end_time=100, dt_max=5, threshold=1e-3)
-FEut.transient_data(print_times=10)
-FEut.transient_dataframeify(invert=False, nodes=[0, 10, 20])
+FEut.transient_dataframeify(invert=False, nodes=[0, 10, 20], print_times=20)
 FEut.save(dirname='sat_transient')
 
+# quickplot(FEut.dft_states, x='nodes', y='states', title='Hydraulic heads', xunit='m', yunit='m')
+# quickplot(FEut.dft_nodes, x='time', y='states', title='nodes over time', xunit='t', yunit='m')
+# solverplot(FEut)
 
 # plotting
 fig, [[ax1, ax2], [ax3, ax4]] = plt.subplots(nrows=2, ncols=2)
