@@ -70,10 +70,21 @@ FE_ut.transient_dataframeify(nodes=[0, -20, -50, -80, -100], print_times=50)
 
 FE_ut.save(dirname='unsat_transient')
 
-quickplot(FE_ut.dft_states, x='states', y='nodes', title='Hydraulic heads over time (d)', xunit='cm', yunit='cm')
-quickplot(FE_ut.dft_nodes, x='time', y='states', title='Hydraulic heads at specific nodes over time (d)', xunit='days', yunit='cm')
-quickplot(FE_ut.dft_solved_times, x='time', y='dt', title='Solver', xunit='d', yunit='d', y2='iter')
-quickplot(FE_ut.dft_balance_summary, x='time', y='spat-storage_change', xunit='d', yunit='', title='storage change')
+
+fig, ax = plt.subplots()
+for i in FE_ut.dft_states.keys():
+    quickplot(FE_ut.dft_states[i], x='states', y=['nodes'], ax=ax, title='Hydraulic heads over time (d)',
+              xlabel='states [cm]', ylabel='nodes [cm]', legend=False, grid=True)
+
+fig, ax = plt.subplots()
+for i in FE_ut.dft_nodes.keys():
+    quickplot(FE_ut.dft_nodes[i], x='time', y=['states'], ax=ax, title='Hydraulic heads at specific nodes over time (d)', legend=False)
+
+fig, ax = plt.subplots()
+quickplot(FE_ut.dft_solved_times, x='time', y=['dt'], ax=ax, title='Solver')
+
+fig, ax = plt.subplots()
+quickplot(FE_ut.dft_balance_summary, x='time', y=['spat-storage_change'], ax=ax, title='storage change', legend=False)
 
 solverplot(FE_ut)
 plt.show()
