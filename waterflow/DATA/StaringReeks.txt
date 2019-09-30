@@ -1,4 +1,4 @@
-soiltype	theta.res	theta.sat	ksat	alpha	lambda	n	name
+soiltype	t_res	t_sat	ksat	alpha	Lambda	n	name
 B1	0.02	0.43	23.41	0.0234	0.000	1.801	Non-loamy sand
 B2	0.02	0.42	12.52	0.0276	-1.060	1.491	Loamy sand
 B3	0.02	0.46	15.42	0.0144	-0.215	1.534	Very loamy sand

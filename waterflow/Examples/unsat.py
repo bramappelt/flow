@@ -2,69 +2,46 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from waterflow.flow1d.flowFE1d import Flow1DFE
-from waterflow.utility import conductivityfunctions as CF
+from waterflow.utility import conductivityfunctions as condf
+from waterflow.utility import fluxfunctions as fluxf
+from waterflow.utility.helper import initializer
 from waterflow.utility.plotting import quickplot, solverplot
-from waterflow.utility.spacing import spacing
+from waterflow.utility.spacing import biasedspacing
 
 
 # ############################# MODEL INPUT ##################################
 
 
-SOIL = CF.select_soil('B13')
+soil = condf.soilselector('B13')
+soiltype, theta_r, theta_s, ksat, alpha, Lambda, n, name = soil
+
 L = 100
 nx = 101
-xsp, _ = spacing(nx, L)
-xsp = xsp - 100
+xsp = biasedspacing(nx, power=3, length=100) - L
 initial_states = np.repeat(0, nx)
-# initial_states = np.linspace(0, -100, 101)
 
-theta_r = SOIL['theta.res']
-theta_s = SOIL['theta.sat']
-a = SOIL['alpha']
-n = SOIL['n']
-ksat = SOIL['ksat']
-name = SOIL['name']
-
-
-def VG_pressureh(h, theta_r=theta_r, theta_s=theta_s, a=a, n=n):
-    # to theta
-    if h >= 0:
-        return theta_s
-    m = 1-1/n
-    return theta_r + (theta_s-theta_r) / (1+(a*-h)**n)**m
-
-
-def VG_conductivity(x, h, ksat=ksat, a=a, n=n):
-    if h >= 0:
-        return ksat
-    m = 1-1/n
-    h_up = (1 - (a * -h)**(n-1) * (1 + (a * -h)**n)**-m)**2
-    h_down = (1 + (a * -h)**n)**(m / 2)
-    return (h_up / h_down) * ksat
-
-
-def richards_equation(x, s, gradient, kfun):
-    return -kfun(x, s) * (gradient + 1)
-
-
-def storage_change(x, s, prevstate, dt, fun=VG_pressureh, S=1):
-    return - S * (fun(s) - fun(prevstate(x))) / dt
+theta_h = initializer(condf.VG_pressureh, theta_r=theta_r, theta_s=theta_s,
+                      a=alpha, n=n)
+conductivity_func = initializer(condf.VG_conductivity, ksat=ksat, a=alpha, n=n)
+storage_change = initializer(fluxf.storage_change, fun=theta_h)
 
 
 # ########################### SOLVE TRANSIENT ################################
 
 FE_ut = Flow1DFE('Unsaturated transient model')
-FE_ut.scheme = 'quintic'
+FE_ut.scheme = 'linear'
 FE_ut.set_field1d(array=xsp)
 FE_ut.set_initial_states(initial_states)
-FE_ut.set_systemfluxfunction(richards_equation, kfun=VG_conductivity)
-FE_ut.add_dirichlet_BC(-0.5, 'west')
-FE_ut.add_neumann_BC(-0.1, 'east')
-FE_ut.tfun = VG_pressureh
+FE_ut.set_systemfluxfunction(fluxf.richards_equation, kfun=conductivity_func)
+FE_ut.add_dirichlet_BC(0.0, 'west')
+FE_ut.add_neumann_BC(-0.5, 'east')
+FE_ut.tfun = theta_h
 
 FE_ut.add_spatialflux(storage_change)
 
-FE_ut.solve(dt_min=0.01, dt_max=2, end_time=10, maxiter=500)
+FE_ut.solve(dt_min=0.01, dt_max=5, end_time=20, maxiter=500, 
+            dtitlow=1.5, dtithigh=0.5, itermin=5, itermax=10,
+            verbosity=False)
 
 FE_ut.transient_dataframeify(nodes=[0, -20, -50, -80, -100], print_times=50)
 

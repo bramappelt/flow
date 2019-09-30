@@ -38,6 +38,7 @@
 </div>
 <div class="section" id="module-waterflow.flow1d.flowFE1d">
 <span id="waterflow-flow1d-flowfe1d-module"></span><h2>waterflow.flow1d.flowFE1d module<a class="headerlink" href="#module-waterflow.flow1d.flowFE1d" title="Permalink to this headline">¶</a></h2>
+<p>One dimensional finite elements flow module</p>
 <dl class="class">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE">
 <em class="property">class </em><code class="sig-prename descclassname">waterflow.flow1d.flowFE1d.</code><code class="sig-name descname">Flow1DFE</code><span class="sig-paren">(</span><em class="sig-param">id_</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE" title="Permalink to this definition">¶</a></dt>
@@ -54,18 +55,30 @@
 
 <dl class="method">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.add_pointflux">
-<code class="sig-name descname">add_pointflux</code><span class="sig-paren">(</span><em class="sig-param">rate</em>, <em class="sig-param">pos</em>, <em class="sig-param">name</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.add_pointflux" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">add_pointflux</code><span class="sig-paren">(</span><em class="sig-param">rate</em>, <em class="sig-param">pos</em>, <em class="sig-param">name=None</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.add_pointflux" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.add_spatialflux">
-<code class="sig-name descname">add_spatialflux</code><span class="sig-paren">(</span><em class="sig-param">q</em>, <em class="sig-param">name</em>, <em class="sig-param">exact=False</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.add_spatialflux" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">add_spatialflux</code><span class="sig-paren">(</span><em class="sig-param">q</em>, <em class="sig-param">name=None</em>, <em class="sig-param">exact=False</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.add_spatialflux" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.calcbalance">
 <code class="sig-name descname">calcbalance</code><span class="sig-paren">(</span><em class="sig-param">print_=False</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.calcbalance" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="waterflow.flow1d.flowFE1d.Flow1DFE.dataframeify">
+<code class="sig-name descname">dataframeify</code><span class="sig-paren">(</span><em class="sig-param">invert</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.dataframeify" title="Permalink to this definition">¶</a></dt>
+<dd><p>write current static model to dataframe</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="waterflow.flow1d.flowFE1d.Flow1DFE.dt_solve">
+<code class="sig-name descname">dt_solve</code><span class="sig-paren">(</span><em class="sig-param">dt</em>, <em class="sig-param">maxiter=500</em>, <em class="sig-param">threshold=0.001</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.dt_solve" title="Permalink to this definition">¶</a></dt>
+<dd><p>solve the system for one specific time step</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.remove_BC">
@@ -80,6 +93,11 @@
 <dl class="method">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.remove_spatialflux">
 <code class="sig-name descname">remove_spatialflux</code><span class="sig-paren">(</span><em class="sig-param">*args</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.remove_spatialflux" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="waterflow.flow1d.flowFE1d.Flow1DFE.save">
+<code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param">dirname=None</em>, <em class="sig-param">savepath='C:\\Users\\bramb\\Documents\\thesis\\output'</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.save" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -105,13 +123,27 @@
 
 <dl class="method">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.solve">
-<code class="sig-name descname">solve</code><span class="sig-paren">(</span><em class="sig-param">maxiter=1000</em>, <em class="sig-param">rmse_threshold=1e-16</em>, <em class="sig-param">mae_threshold=1e-16</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.solve" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-name descname">solve</code><span class="sig-paren">(</span><em class="sig-param">dt_min=0.01</em>, <em class="sig-param">dt_max=0.5</em>, <em class="sig-param">end_time=1</em>, <em class="sig-param">maxiter=500</em>, <em class="sig-param">dtitlow=1.5</em>, <em class="sig-param">dtithigh=0.5</em>, <em class="sig-param">itermin=5</em>, <em class="sig-param">itermax=10</em>, <em class="sig-param">threshold=0.001</em>, <em class="sig-param">verbosity=True</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.solve" title="Permalink to this definition">¶</a></dt>
+<dd><p>solve the system for a given period of time</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.states_to_function">
 <code class="sig-name descname">states_to_function</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.states_to_function" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>gives a continuous function of states in the domain</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="waterflow.flow1d.flowFE1d.Flow1DFE.summary">
+<code class="sig-name descname">summary</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>FIX THIS</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="waterflow.flow1d.flowFE1d.Flow1DFE.transient_dataframeify">
+<code class="sig-name descname">transient_dataframeify</code><span class="sig-paren">(</span><em class="sig-param">print_times=None</em>, <em class="sig-param">include_maxima=True</em>, <em class="sig-param">nodes=None</em>, <em class="sig-param">invert=True</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.transient_dataframeify" title="Permalink to this definition">¶</a></dt>
+<dd><p>write transient solve data to dataframe</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.wrap_bf_linear">

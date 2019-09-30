@@ -1,12 +1,17 @@
+""" One dimensional finite elements flow module """
+
+
 from inspect import signature
 from functools import partial
 from copy import deepcopy
-import time
+import time as Time
 import os
 
 import numpy as np
 import pandas as pd
 from scipy.integrate import quad
+
+from waterflow.conf import OUTPUT_DIR
 
 
 '''
@@ -36,6 +41,7 @@ class Flow1DFE(object):
         self.stats = {"rmse": [], "mae": []}  # ## ??
         self.isinitial = True
         self.solve_data = None
+        self.runtime = None
         # dataframes
         self.df_states = None
         self.df_balance = None
@@ -615,7 +621,8 @@ class Flow1DFE(object):
         return itercount
 
     def solve(self, dt_min=0.01, dt_max=0.5, end_time=1, maxiter=500,
-              threshold=1e-3, verbosity=True):
+              dtitlow=1.5, dtithigh=0.5, itermin=5, itermax=10, threshold=1e-3,
+              verbosity=True):
         ''' solve the system for a given period of time '''
 
         solved_objs = [deepcopy(self)]
@@ -626,6 +633,7 @@ class Flow1DFE(object):
         dt = dt_min
         time = dt
 
+        t0 = Time.clock()
         while time <= end_time:
             # solve for given dt
             iters = self.dt_solve(dt, maxiter, threshold)
@@ -637,7 +645,7 @@ class Flow1DFE(object):
                     break
                 else:
                     print(f'Maxiter {iters} reached, dt {dt} is lowered...')
-                    dt *= 0.5
+                    dt *= dtithigh
                     if dt < dt_min:
                         dt = dt_min
                     # revert back to previous model state
@@ -666,12 +674,12 @@ class Flow1DFE(object):
             iter_data.append(iters)
 
             # adapt dt as function of iterations of previous step
-            if iters <= 5:
-                dt *= 1.5
+            if iters <= itermin:
+                dt *= dtitlow
                 if dt > dt_max:
                     dt = dt_max
-            elif iters >= 10:
-                dt *= 0.5
+            elif iters >= itermax:
+                dt *= dtithigh
                 if dt < dt_min:
                     dt = dt_min
 
@@ -684,6 +692,8 @@ class Flow1DFE(object):
 
             # increment time
             time += dt
+
+        self.runtime = Time.clock() - t0
 
         # attach all solve data to last created object
         solve_data = {}
@@ -890,17 +900,13 @@ class Flow1DFE(object):
         dft_bal_sum.insert(0, timedf.time.name, timedf.time)
         self.dft_balance_summary = dft_bal_sum
 
-    def build_static_dataframes(self):
-        # replace this for _calc_theta_k
-        pass
-
-    def save(self, dirname=None, savepath='C:/Users/bramb/Documents/thesis/output'):
+    def save(self, dirname=None, savepath=OUTPUT_DIR):
         if not os.path.isdir(savepath):
             os.mkdir(savepath)
 
         # new dir for current run
         if not dirname:
-            dirname = time.strftime('%d%b%Y_%H%M%S', time.gmtime(time.time()))
+            dirname = Time.strftime('%d%b%Y_%H%M%S', Time.gmtime(Time.time()))
             runpath = os.path.join(savepath, dirname)
             os.mkdir(runpath)
         else:
