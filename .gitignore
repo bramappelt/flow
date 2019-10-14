@@ -108,4 +108,4 @@ venv.bak/
 
 # waterflow documentation
 ./docs/*
- !./docs/html/
+ !./docs/build/html/
