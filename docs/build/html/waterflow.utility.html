@@ -1,0 +1,480 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>waterflow.utility package &#8212; Flow v1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="waterflow.flow1d package" href="waterflow.flow1d.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="waterflow-utility-package">
+<h1>waterflow.utility package<a class="headerlink" href="#waterflow-utility-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-waterflow.utility.conductivityfunctions">
+<span id="waterflow-utility-conductivityfunctions-module"></span><h2>waterflow.utility.conductivityfunctions module<a class="headerlink" href="#module-waterflow.utility.conductivityfunctions" title="Permalink to this headline">¶</a></h2>
+<p>This package contains several conductivity functions
+and a soil selector function</p>
+<dl class="function">
+<dt id="waterflow.utility.conductivityfunctions.VG_conductivity">
+<code class="sig-prename descclassname">waterflow.utility.conductivityfunctions.</code><code class="sig-name descname">VG_conductivity</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">h</em>, <em class="sig-param">ksat</em>, <em class="sig-param">a</em>, <em class="sig-param">n</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.conductivityfunctions.VG_conductivity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="waterflow.utility.conductivityfunctions.VG_pressureh">
+<code class="sig-prename descclassname">waterflow.utility.conductivityfunctions.</code><code class="sig-name descname">VG_pressureh</code><span class="sig-paren">(</span><em class="sig-param">h</em>, <em class="sig-param">theta_r</em>, <em class="sig-param">theta_s</em>, <em class="sig-param">a</em>, <em class="sig-param">n</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.conductivityfunctions.VG_pressureh" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="waterflow.utility.conductivityfunctions.VG_theta">
+<code class="sig-prename descclassname">waterflow.utility.conductivityfunctions.</code><code class="sig-name descname">VG_theta</code><span class="sig-paren">(</span><em class="sig-param">theta</em>, <em class="sig-param">theta_r</em>, <em class="sig-param">theta_s</em>, <em class="sig-param">a</em>, <em class="sig-param">n</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.conductivityfunctions.VG_theta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="waterflow.utility.conductivityfunctions.soilselector">
+<code class="sig-prename descclassname">waterflow.utility.conductivityfunctions.</code><code class="sig-name descname">soilselector</code><span class="sig-paren">(</span><em class="sig-param">soils</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.conductivityfunctions.soilselector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select soil(s) from the Staringreeks</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-waterflow.utility.fluxfunctions">
+<span id="waterflow-utility-fluxfunctions-module"></span><h2>waterflow.utility.fluxfunctions module<a class="headerlink" href="#module-waterflow.utility.fluxfunctions" title="Permalink to this headline">¶</a></h2>
+<p>This package contains several one dimensional flux functions
+and a storage change function</p>
+<dl class="function">
+<dt id="waterflow.utility.fluxfunctions.fluxfunction">
+<code class="sig-prename descclassname">waterflow.utility.fluxfunctions.</code><code class="sig-name descname">fluxfunction</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">s</em>, <em class="sig-param">gradient</em>, <em class="sig-param">ksat=1</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.fluxfunctions.fluxfunction" title="Permalink to this definition">¶</a></dt>
+<dd><p>flux function for saturated flow</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="waterflow.utility.fluxfunctions.fluxfunction_s">
+<code class="sig-prename descclassname">waterflow.utility.fluxfunctions.</code><code class="sig-name descname">fluxfunction_s</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">s</em>, <em class="sig-param">gradient</em>, <em class="sig-param">ksat=1</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.fluxfunctions.fluxfunction_s" title="Permalink to this definition">¶</a></dt>
+<dd><p>flux function for saturated flow</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="waterflow.utility.fluxfunctions.fluxfunction_var_k">
+<code class="sig-prename descclassname">waterflow.utility.fluxfunctions.</code><code class="sig-name descname">fluxfunction_var_k</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">s</em>, <em class="sig-param">gradient</em>, <em class="sig-param">kfun=&lt;function &lt;lambda&gt;&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.fluxfunctions.fluxfunction_var_k" title="Permalink to this definition">¶</a></dt>
+<dd><p>flux function for saturated flow</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="waterflow.utility.fluxfunctions.fluxfunction_var_k_s">
+<code class="sig-prename descclassname">waterflow.utility.fluxfunctions.</code><code class="sig-name descname">fluxfunction_var_k_s</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">s</em>, <em class="sig-param">gradient</em>, <em class="sig-param">kfun=&lt;function &lt;lambda&gt;&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.fluxfunctions.fluxfunction_var_k_s" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="waterflow.utility.fluxfunctions.richards_equation">
+<code class="sig-prename descclassname">waterflow.utility.fluxfunctions.</code><code class="sig-name descname">richards_equation</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">s</em>, <em class="sig-param">gradient</em>, <em class="sig-param">kfun</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.fluxfunctions.richards_equation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Richards equation</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="waterflow.utility.fluxfunctions.storage_change">
+<code class="sig-prename descclassname">waterflow.utility.fluxfunctions.</code><code class="sig-name descname">storage_change</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">s</em>, <em class="sig-param">prevstate</em>, <em class="sig-param">dt</em>, <em class="sig-param">fun=&lt;function &lt;lambda&gt;&gt;</em>, <em class="sig-param">S=1</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.fluxfunctions.storage_change" title="Permalink to this definition">¶</a></dt>
+<dd><p>General storage change function for both saturated and
+unsaturated flow simulations</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-waterflow.utility.forcingfunctions">
+<span id="waterflow-utility-forcingfunctions-module"></span><h2>waterflow.utility.forcingfunctions module<a class="headerlink" href="#module-waterflow.utility.forcingfunctions" title="Permalink to this headline">¶</a></h2>
+<p>This package contains several forcing functions that can describe point
+and spatial forcing</p>
+<dl class="function">
+<dt id="waterflow.utility.forcingfunctions.block">
+<code class="sig-prename descclassname">waterflow.utility.forcingfunctions.</code><code class="sig-name descname">block</code><span class="sig-paren">(</span><em class="sig-param">t</em>, <em class="sig-param">t0=2</em>, <em class="sig-param">t1=7</em>, <em class="sig-param">Rmin=0.0</em>, <em class="sig-param">Rmax=0.006</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.forcingfunctions.block" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="waterflow.utility.forcingfunctions.polynomial">
+<code class="sig-prename descclassname">waterflow.utility.forcingfunctions.</code><code class="sig-name descname">polynomial</code><span class="sig-paren">(</span><em class="sig-param">pts</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.forcingfunctions.polynomial" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="waterflow.utility.forcingfunctions.rain_generator">
+<code class="sig-prename descclassname">waterflow.utility.forcingfunctions.</code><code class="sig-name descname">rain_generator</code><span class="sig-paren">(</span><em class="sig-param">t=0</em>, <em class="sig-param">maxtime=300</em>, <em class="sig-param">mu=0</em>, <em class="sig-param">std=0.7</em>, <em class="sig-param">seed=9999</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.forcingfunctions.rain_generator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="waterflow.utility.forcingfunctions.sinusoidal">
+<code class="sig-prename descclassname">waterflow.utility.forcingfunctions.</code><code class="sig-name descname">sinusoidal</code><span class="sig-paren">(</span><em class="sig-param">t</em>, <em class="sig-param">xtrans=0.7853981633974483</em>, <em class="sig-param">ytrans=1</em>, <em class="sig-param">amp=1</em>, <em class="sig-param">period=50.26548245743669</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.forcingfunctions.sinusoidal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="waterflow.utility.forcingfunctions.sinusoidal2">
+<code class="sig-prename descclassname">waterflow.utility.forcingfunctions.</code><code class="sig-name descname">sinusoidal2</code><span class="sig-paren">(</span><em class="sig-param">t</em>, <em class="sig-param">xtrans=0.7853981633974483</em>, <em class="sig-param">ytrans=1</em>, <em class="sig-param">amp=1</em>, <em class="sig-param">period=9.42477796076938</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.forcingfunctions.sinusoidal2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="waterflow.utility.forcingfunctions.switch">
+<code class="sig-prename descclassname">waterflow.utility.forcingfunctions.</code><code class="sig-name descname">switch</code><span class="sig-paren">(</span><em class="sig-param">t</em>, <em class="sig-param">t_on=5</em>, <em class="sig-param">t_off=10</em>, <em class="sig-param">value=-0.04</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.forcingfunctions.switch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-waterflow.utility.helper">
+<span id="waterflow-utility-helper-module"></span><h2>waterflow.utility.helper module<a class="headerlink" href="#module-waterflow.utility.helper" title="Permalink to this headline">¶</a></h2>
+<p>Module with helper functions</p>
+<dl class="function">
+<dt id="waterflow.utility.helper.initializer">
+<code class="sig-prename descclassname">waterflow.utility.helper.</code><code class="sig-name descname">initializer</code><span class="sig-paren">(</span><em class="sig-param">func</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.helper.initializer" title="Permalink to this definition">¶</a></dt>
+<dd><p>prepare a function with specific default arguments</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-waterflow.utility.plotting">
+<span id="waterflow-utility-plotting-module"></span><h2>waterflow.utility.plotting module<a class="headerlink" href="#module-waterflow.utility.plotting" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="waterflow.utility.plotting.quickplot">
+<code class="sig-prename descclassname">waterflow.utility.plotting.</code><code class="sig-name descname">quickplot</code><span class="sig-paren">(</span><em class="sig-param">df</em>, <em class="sig-param">x</em>, <em class="sig-param">y</em>, <em class="sig-param">ax=None</em>, <em class="sig-param">ax_sec=None</em>, <em class="sig-param">xlabel=None</em>, <em class="sig-param">ylabel=None</em>, <em class="sig-param">title=None</em>, <em class="sig-param">legend=True</em>, <em class="sig-param">grid=True</em>, <em class="sig-param">save=False</em>, <em class="sig-param">savepath='C:\\Users\\bramb\\Documents\\thesis\\output'</em>, <em class="sig-param">filename=None</em>, <em class="sig-param">**kw</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.plotting.quickplot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="waterflow.utility.plotting.scale">
+<code class="sig-prename descclassname">waterflow.utility.plotting.</code><code class="sig-name descname">scale</code><span class="sig-paren">(</span><em class="sig-param">xi</em>, <em class="sig-param">n</em>, <em class="sig-param">min_</em>, <em class="sig-param">max_</em>, <em class="sig-param">invert=False</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.plotting.scale" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="waterflow.utility.plotting.solutionspace">
+<code class="sig-prename descclassname">waterflow.utility.plotting.</code><code class="sig-name descname">solutionspace</code><span class="sig-paren">(</span><em class="sig-param">soils</em>, <em class="sig-param">indices</em>, <em class="sig-param">pltopts=None</em>, <em class="sig-param">lspace=None</em>, <em class="sig-param">rspace=None</em>, <em class="sig-param">show=True</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.plotting.solutionspace" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="waterflow.utility.plotting.solverplot">
+<code class="sig-prename descclassname">waterflow.utility.plotting.</code><code class="sig-name descname">solverplot</code><span class="sig-paren">(</span><em class="sig-param">model</em>, <em class="sig-param">save=False</em>, <em class="sig-param">savepath='C:\\Users\\bramb\\Documents\\thesis\\output'</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.plotting.solverplot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-waterflow.utility.spacing">
+<span id="waterflow-utility-spacing-module"></span><h2>waterflow.utility.spacing module<a class="headerlink" href="#module-waterflow.utility.spacing" title="Permalink to this headline">¶</a></h2>
+<p>This package contains functions for the generation of nodal
+distributions</p>
+<dl class="function">
+<dt id="waterflow.utility.spacing.biasedspacing">
+<code class="sig-prename descclassname">waterflow.utility.spacing.</code><code class="sig-name descname">biasedspacing</code><span class="sig-paren">(</span><em class="sig-param">numnodes</em>, <em class="sig-param">power</em>, <em class="sig-param">lb=0</em>, <em class="sig-param">rb=1</em>, <em class="sig-param">maxdist=None</em>, <em class="sig-param">length=1</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.spacing.biasedspacing" title="Permalink to this definition">¶</a></dt>
+<dd><p>One dimensional nodal spacing function</p>
+<p>Returns an array that contains a biased nodal distribution in
+which distances increase from left to right.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>numnodes</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>) – Total number of nodes that is used for the nodal spacing.</p></li>
+<li><p><strong>power</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>) – Degree of nodal shifting to the left of the domain.</p></li>
+<li><p><strong>lb</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, default is 0) – Left bound of the domain.</p></li>
+<li><p><strong>rb</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, default = 1) – Right bound of the domain.</p></li>
+<li><p><strong>maxdist</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, default is None) – Maximum distance allowed between two nodes. The value
+is absolute and does not depend on <cite>length</cite>.</p></li>
+<li><p><strong>length</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, default is 1) – Multiplier to scale the nodal positions.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>x-dim</strong> – Positions of the nodes.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The following formula is implemented</p>
+<div class="math notranslate nohighlight">
+\[S_{i+1} = \frac{R - S_{i}}{(P * (N - 2 - i))} + S{i}\]</div>
+<div class="math notranslate nohighlight">
+\[N - 2 - i &gt; 0\]</div>
+<p class="rubric">Examples</p>
+<p>Linear spacing with scaling</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">biasedspacing</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="go">array([ 0.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9., 10.])</span>
+</pre></div>
+</div>
+<p>Non-linear spacing without scaling</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">biasedspacing</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="go">array([0.        , 0.03703704, 0.07716049, 0.12110523, 0.16993272,</span>
+<span class="go">       0.22527054, 0.28983133, 0.36873896, 0.47394913, 0.64929942,</span>
+<span class="go">       1.        ])</span>
+</pre></div>
+</div>
+<p>Non-linear spacing with scaling and custom domain boundaries</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">biasedspacing</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">lb</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">rb</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="go">array([-10.        ,  -8.88888889,  -7.70833333,  -6.44345238,</span>
+<span class="go">        -5.07316468,  -3.56584821,  -1.87011719,   0.10823568,</span>
+<span class="go">         2.58117676,   6.29058838,  10.        ])</span>
+</pre></div>
+</div>
+<p>Non-linear spacing with maximum nodal distance limitation</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">biasedspacing</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">maxdist</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="go">array([0.        , 0.04815903, 0.09747244, 0.15250051, 0.21499075,</span>
+<span class="go">       0.29019617, 0.4       , 0.8       , 1.2       , 1.6       ,</span>
+<span class="go">       2.        ])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="waterflow.utility.spacing.spacing">
+<code class="sig-prename descclassname">waterflow.utility.spacing.</code><code class="sig-name descname">spacing</code><span class="sig-paren">(</span><em class="sig-param">nx</em>, <em class="sig-param">Lx</em>, <em class="sig-param">ny=0</em>, <em class="sig-param">Ly=0</em>, <em class="sig-param">linear=True</em>, <em class="sig-param">loc=None</em>, <em class="sig-param">power=None</em>, <em class="sig-param">weight=None</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.spacing.spacing" title="Permalink to this definition">¶</a></dt>
+<dd><p>One and two dimensional nodal spacing function.</p>
+<p>Return two arrays that contain a discretization which may be focussed on
+selected locations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nx</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>) – Number of nodes in the x-direction.</p></li>
+<li><p><strong>Lx</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>) – Total length in the x-direction.</p></li>
+<li><p><strong>ny</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>) – Number of nodes in the y-direction.</p></li>
+<li><p><strong>Ly</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>) – Total length in the y-direction.</p></li>
+<li><p><strong>linear</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code>, default is True) – Distinguish between linear and non-linear nodal distributions.</p></li>
+<li><p><strong>loc</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code>, default is None) – A list of nodes or coördinate tuples on which to concentrate nodal
+discretization.</p></li>
+<li><p><strong>power</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>, default is None) – The number of nodes that are influenced by the nodal concentrations
+given at the <cite>loc</cite> parameter.</p></li>
+<li><p><strong>weight</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>) – The degree of nodal concentration around a given <cite>loc</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>x-dim</strong> (<em>numpy.ndarray</em>) – Numpy Array that contains nodal positions in the x-direction.</p></li>
+<li><p><strong>y-dim</strong> (<em>numpy.ndarray</em>) – Numpy Array that contains nodal positions in the y-direction.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Make sure that the <cite>power</cite> argument does not collide with
+adjacent nodes or boundary nodes that define the domain.
+Improper use will result in wrongly defined domains.</p>
+<p class="rubric">Examples</p>
+<p>One dimensional linear example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">nx</span><span class="p">,</span> <span class="n">Lx</span> <span class="o">=</span> <span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">spacing</span><span class="p">(</span><span class="n">nx</span><span class="p">,</span> <span class="n">Lx</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span>
+<span class="go">array([ 0.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9., 10.])</span>
+</pre></div>
+</div>
+<p>One dimensional non-linear example, 1 node around the locations of
+interest are influenced by a factor weight</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">spacing</span><span class="p">(</span><span class="n">nx</span><span class="p">,</span> <span class="n">Lx</span><span class="p">,</span> <span class="n">linear</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span> <span class="n">power</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span>
+<span class="go">array([ 0.        ,  1.22222222,  2.44444444,  3.66666667,  4.        ,</span>
+<span class="go">        4.33333333,  6.66666667,  7.        ,  7.33333333,  8.66666667,</span>
+<span class="go">       10.        ])</span>
+</pre></div>
+</div>
+<p>Two dimensional non-linear example, 2 nodes around the location of interest
+are influenced by a factor weight.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ny</span><span class="p">,</span> <span class="n">Ly</span> <span class="o">=</span> <span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">spacing</span><span class="p">(</span><span class="n">nx</span><span class="p">,</span> <span class="n">Lx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">Ly</span><span class="p">,</span> <span class="n">linear</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="p">[(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">)],</span> <span class="n">power</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span>
+<span class="go">array([ 0.      ,  1.65625 ,  3.3125  ,  3.75    ,  4.      ,  4.25    ,</span>
+<span class="go">        4.6875  ,  6.015625,  7.34375 ,  8.671875, 10.      ])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span>
+<span class="go">array([ 0.    ,  1.4375,  2.875 ,  4.3125,  4.75  ,  5.    ,  5.25  ,</span>
+<span class="go">        5.6875,  7.125 ,  8.5625, 10.    ])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="module-waterflow.utility.statistics">
+<span id="waterflow-utility-statistics-module"></span><h2>waterflow.utility.statistics module<a class="headerlink" href="#module-waterflow.utility.statistics" title="Permalink to this headline">¶</a></h2>
+<p>This module contains some functions which allow for the calculation of
+certain statistical measures.</p>
+<dl class="function">
+<dt id="waterflow.utility.statistics.MAE">
+<code class="sig-prename descclassname">waterflow.utility.statistics.</code><code class="sig-name descname">MAE</code><span class="sig-paren">(</span><em class="sig-param">*args</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.statistics.MAE" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Mean Absolute Error.</p>
+<p>Returns the Mean Absolute Error based on two individual arrays or the
+last two entries of a dataframe.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pandas.core.frame.DataFrame</em>) – A dataframe with 2 columns and at least 2 rows. The columns in the
+daraframe should be of equal length.</p></li>
+<li><p><strong>arr1</strong> (<em>list/numpy.ndarray</em>) – An 1-dimensional array.</p></li>
+<li><p><strong>arr2</strong> (<em>list/numpy.ndarray</em>) – An 1-dimensional array.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>MAE</strong> – Floating point value of the Mean Absolute Error.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.float64</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Notes about the implementad algorithm.</p>
+<p>The formula implemented:</p>
+<div class="math notranslate nohighlight">
+\[MAE=\sqrt{\frac{\lvert X_i -X_j\rvert}{N}}\]</div>
+<p class="rubric">Examples</p>
+<p>Create a dataframe and populate with random values. Note: The data
+arrays can also be passed to the function as separate arguments.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataframe</span><span class="p">[</span><span class="s2">&quot;col1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">3</span><span class="p">]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataframe</span><span class="p">[</span><span class="s2">&quot;col2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mae</span> <span class="o">=</span> <span class="n">MAE</span><span class="p">(</span><span class="n">dataframe</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">mae</span><span class="p">)</span>
+<span class="go">2.0</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="waterflow.utility.statistics.RMSE">
+<code class="sig-prename descclassname">waterflow.utility.statistics.</code><code class="sig-name descname">RMSE</code><span class="sig-paren">(</span><em class="sig-param">*args</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.statistics.RMSE" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Root Mean Square Error.</p>
+<p>Returns the Root Mean Square Error based on two individual arrays or the
+last two entries of a dataframe.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pandas.core.frame.DataFrame</em>) – A dataframe with 2 columns and at least 2 rows. The columns in the
+dataframe should be of equal length.</p></li>
+<li><p><strong>arr1</strong> (<em>list/numpy.ndarray</em>) – An 1-dimensional array.</p></li>
+<li><p><strong>arr2</strong> (<em>list/numpy.ndarray</em>) – An 1-dimensional array.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Floating point value of the Root Mean Square Error.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.float64</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Notes about the implementation algorithm.</p>
+<p>The formula implemented:</p>
+<div class="math notranslate nohighlight">
+\[RMSE=\sqrt{\frac{\sum{(X_i -X_j)^2}}{N}}\]</div>
+<p class="rubric">Examples</p>
+<p>Create a dataframe and populate it with random values. Note: The data
+arrays can also be passed to the function as separate arguments.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataframe</span><span class="p">[</span><span class="s2">&quot;col1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">3</span><span class="p">]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataframe</span><span class="p">[</span><span class="s2">&quot;col2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rmse</span> <span class="o">=</span> <span class="n">RMSE</span><span class="p">(</span><span class="n">dataframe</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">rmse</span><span class="p">)</span>
+<span class="go">2.23606797749979</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="module-waterflow.utility">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-waterflow.utility" title="Permalink to this headline">¶</a></h2>
+<p>This module contains helper functions for the flow problems. Below some examples are given.</p>
+<ul class="simple">
+<li><p>Forcing functions (External input for the flow models)</p></li>
+<li><p>Grid spacing functions (create different discretizations)</p></li>
+<li><p>Some statistical measures (Root Mean Square &amp; Mean Absolute Error)</p></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Flow</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">flow</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="waterflow.html">waterflow package</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">flow</a><ul>
+  <li><a href="waterflow.html">waterflow package</a><ul>
+      <li>Previous: <a href="waterflow.flow1d.html" title="previous chapter">waterflow.flow1d package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Bram Berendsen.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/waterflow.utility.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
