@@ -28,6 +28,22 @@ waterflow.utility.forcingfunctions module
    :undoc-members:
    :show-inheritance:
 
+waterflow.utility.helper module
+-------------------------------
+
+.. automodule:: waterflow.utility.helper
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+waterflow.utility.plotting module
+---------------------------------
+
+.. automodule:: waterflow.utility.plotting
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 waterflow.utility.spacing module
 --------------------------------
 

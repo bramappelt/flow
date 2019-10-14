@@ -40,6 +40,7 @@ class Flow1DFE(object):
         self.moisture = []
         self.stats = {"rmse": [], "mae": []}  # ## ??
         self.isinitial = True
+        self.isconverged = False
         self.solve_data = None
         self.runtime = None
         # dataframes
@@ -429,7 +430,7 @@ class Flow1DFE(object):
             if name:
                 self.pointflux[name] = [np.array(f)]
             else:
-                name = str(time.time())
+                name = str(Time.time())
                 self.pointflux[name] = [np.array(f)]
 
         # add state dependent pointflux
@@ -463,7 +464,7 @@ class Flow1DFE(object):
                 self.spatflux[name] = [np.array(f)]
             else:
                 # unique key for unnamed forcing
-                name = str(time.time())
+                name = str(Time.time())
                 self.spatflux[name] = [np.array(f)]
 
         else:
@@ -620,7 +621,7 @@ class Flow1DFE(object):
         self.isinitial = False
         return itercount
 
-    def solve(self, dt_min=0.01, dt_max=0.5, end_time=1, maxiter=500,
+    def solve(self, dt=0.001, dt_min=1e-5, dt_max=0.5, end_time=1, maxiter=500,
               dtitlow=1.5, dtithigh=0.5, itermin=5, itermax=10, threshold=1e-3,
               verbosity=True):
         ''' solve the system for a given period of time '''
@@ -630,7 +631,6 @@ class Flow1DFE(object):
         dt_data = [None]
         iter_data = [None]
 
-        dt = dt_min
         time = dt
 
         t0 = Time.clock()
@@ -642,6 +642,7 @@ class Flow1DFE(object):
             if iters > maxiter:
                 if dt == dt_min:
                     print(f'Maxiter {iters} at dt_min {dt_min} reached')
+                    self.isconverged = False
                     break
                 else:
                     print(f'Maxiter {iters} reached, dt {dt} is lowered...')
@@ -651,6 +652,8 @@ class Flow1DFE(object):
                     # revert back to previous model state
                     self.states = solved_objs[-1].states
                     continue
+
+            self.isconverged = True
 
             if verbosity:
                 if self.Sspatflux.get('storage_change', None):

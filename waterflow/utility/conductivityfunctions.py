@@ -2,6 +2,7 @@
 and a soil selector function """
 
 import os
+from collections import namedtuple
 
 import numpy as np
 import pandas as pd
@@ -9,14 +10,20 @@ import pandas as pd
 from waterflow.conf import DATA_DIR
 
 
-def soilselector(soiltype):
-    """ Select a soil from the Staringreeks """
+def soilselector(soils):
+    """ Select soil(s) from the Staringreeks """
     staringreeks = pd.read_table(os.path.join(DATA_DIR, "StaringReeks.txt"),
                                  delimiter="\t")
-    # select row
-    soildata = staringreeks.loc[staringreeks['soiltype'] == soiltype]
-    # turn row to namedtuple
-    return list(soildata.itertuples(name='soil', index=False))[0]
+    soildata = staringreeks.iloc[[s-1 for s in soils]]
+
+    # useful for a plotting domain
+    minima = namedtuple('min', staringreeks.columns)(*soildata.min())
+    maxima = namedtuple('max', staringreeks.columns)(*soildata.max())
+    extrema = (minima, maxima)
+
+    # turn row(s) to namedtuple
+    rows = list(soildata.itertuples(name='soil', index=False))
+    return rows, soildata, extrema
 
 
 # Van Genuchten (theta)

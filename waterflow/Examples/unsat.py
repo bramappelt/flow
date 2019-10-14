@@ -12,12 +12,12 @@ from waterflow.utility.spacing import biasedspacing
 # ############################# MODEL INPUT ##################################
 
 
-soil = condf.soilselector('B13')
-soiltype, theta_r, theta_s, ksat, alpha, Lambda, n, name = soil
+soil, *_ = condf.soilselector([13])[0]
+theta_r, theta_s, ksat, alpha, n = (soil.t_res, soil.t_sat, soil.ksat, soil.alpha, soil.n)
 
 L = 100
-nx = 101
-xsp = biasedspacing(nx, power=3, length=100) - L
+nx = 201
+xsp = biasedspacing(nx, power=1, rb=-L)[::-1]
 initial_states = np.repeat(0, nx)
 
 theta_h = initializer(condf.VG_pressureh, theta_r=theta_r, theta_s=theta_s,
@@ -34,16 +34,16 @@ FE_ut.set_field1d(array=xsp)
 FE_ut.set_initial_states(initial_states)
 FE_ut.set_systemfluxfunction(fluxf.richards_equation, kfun=conductivity_func)
 FE_ut.add_dirichlet_BC(0.0, 'west')
-FE_ut.add_neumann_BC(-0.5, 'east')
+FE_ut.add_neumann_BC(-0.3, 'east')
 FE_ut.tfun = theta_h
 
 FE_ut.add_spatialflux(storage_change)
 
-FE_ut.solve(dt_min=0.01, dt_max=5, end_time=20, maxiter=500, 
-            dtitlow=1.5, dtithigh=0.5, itermin=5, itermax=10,
-            verbosity=False)
+FE_ut.solve(dt_min=1e-5, dt_max=5, end_time=100, maxiter=500, 
+            dtitlow=1.5, dtithigh=0.5, itermin=3, itermax=7,
+            verbosity=True)
 
-FE_ut.transient_dataframeify(nodes=[0, -20, -50, -80, -100], print_times=50)
+FE_ut.transient_dataframeify(nodes=[0, -20, -50, -80, -100])
 
 FE_ut.save(dirname='unsat_transient')
 
@@ -51,7 +51,8 @@ FE_ut.save(dirname='unsat_transient')
 fig, ax = plt.subplots()
 for i in FE_ut.dft_states.keys():
     quickplot(FE_ut.dft_states[i], x='states', y=['nodes'], ax=ax, title='Hydraulic heads over time (d)',
-              xlabel='states [cm]', ylabel='nodes [cm]', legend=False, grid=True)
+              xlabel='states [cm]', ylabel='nodes [cm]', legend=False,
+              grid=True, save=True, filename='quickplot.png', marker='o')
 
 fig, ax = plt.subplots()
 for i in FE_ut.dft_nodes.keys():
@@ -63,5 +64,5 @@ quickplot(FE_ut.dft_solved_times, x='time', y=['dt'], ax=ax, title='Solver')
 fig, ax = plt.subplots()
 quickplot(FE_ut.dft_balance_summary, x='time', y=['spat-storage_change'], ax=ax, title='storage change', legend=False)
 
-solverplot(FE_ut)
+solverplot(FE_ut, save=True, filename='test.png')
 plt.show()

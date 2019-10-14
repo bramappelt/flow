@@ -127,17 +127,25 @@ def spacing(nx, Lx, ny=0, Ly=0, linear=True, loc=None, power=None, weight=None):
     return axes[0], axes[1]
 
 
-def biasedspacing(numnodes, power, length=1):
+def biasedspacing(numnodes, power, lb=0, rb=1, maxdist=None, length=1):
     """ One dimensional nodal spacing function
 
-    Returns an array which contains a biased nodal distribution.
+    Returns an array that contains a biased nodal distribution in 
+    which distances increase from left to right.
 
     Parameters
     ----------
     numnodes : :obj:`int`
         Total number of nodes that is used for the nodal spacing.
-    power : :obj:`int`
+    power : :obj:`int` or :obj:`float`
         Degree of nodal shifting to the left of the domain.
+    lb : :obj:`int` or :obj:`float`, default is 0
+        Left bound of the domain.
+    rb : :obj:`int` or :obj:`float`, default = 1
+        Right bound of the domain.
+    maxdist : :obj:`int` or :obj:`float`, default is None
+        Maximum distance allowed between two nodes. The value
+        is absolute and does not depend on `length`.
     length : :obj:`int` or :obj:`float`, default is 1
         Multiplier to scale the nodal positions.
 
@@ -157,7 +165,7 @@ def biasedspacing(numnodes, power, length=1):
     --------
     Linear spacing with scaling
 
-    >>> biasedspacing(11, 1, 10)
+    >>> biasedspacing(11, 1, length=10)
     array([ 0.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9., 10.])
 
     Non-linear spacing without scaling
@@ -167,24 +175,53 @@ def biasedspacing(numnodes, power, length=1):
            0.22527054, 0.28983133, 0.36873896, 0.47394913, 0.64929942,
            1.        ])
 
+    Non-linear spacing with scaling and custom domain boundaries
+
+    >>> biasedspacing(11, 2, lb=-1, rb=1, length=10)
+    array([-10.        ,  -8.88888889,  -7.70833333,  -6.44345238,
+            -5.07316468,  -3.56584821,  -1.87011719,   0.10823568,
+             2.58117676,   6.29058838,  10.        ])
+
+    Non-linear spacing with maximum nodal distance limitation
+
+    >>> biasedspacing(11, 5, maxdist=0.4, length=2)
+    array([0.        , 0.04815903, 0.09747244, 0.15250051, 0.21499075,
+           0.29019617, 0.4       , 0.8       , 1.2       , 1.6       ,
+           2.        ])
+
     """
-    left, right = (0, 1)
 
     # at least two nodes are needed to define a domain
     if numnodes <= 2:
-        return np.array([left, right]) * length
+        return np.array([lb, rb]) * length
     # equal spacing
     if power <= 1:
-        return np.linspace(0, 1, numnodes) * length
+        return np.linspace(lb, rb, numnodes) * length
 
-    arr = [left]
+    arr = [lb]
     # build discretization iteratively
-    for n in range(numnodes-2, 0, -1):
-        i = (right - left) / (power * n)
+    for n in range(numnodes - 2, 0, -1):
+        i = (rb - lb) / (power * n)
         arr.append(i + arr[-1])
-        left = arr[-1]
-    arr.append(right)
-    return np.array(arr) * length
+        lb = arr[-1]
+    arr.append(rb)
+    arr = np.array(arr) * length
+
+    # if maxdist is exceeded, shift nodes proportionally
+    if maxdist:
+        fraction_prev = 0
+        for i in range(numnodes - 2):
+            idxl, idxr = numnodes - i - 2, numnodes - i - 1
+            dist = arr[idxr] - arr[idxl]
+            fraction = (dist - maxdist) / dist
+            if fraction >= 0:
+                fraction_prev = fraction
+                arr[idxl] += fraction * dist
+            else:
+                diff = arr[2:idxr+1] - arr[1:idxr]
+                arr[1:idxr] += diff * fraction_prev
+                break
+    return arr
 
 
 if __name__ == "__main__":
