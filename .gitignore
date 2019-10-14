@@ -106,6 +106,3 @@ venv.bak/
 #vscode project settings
 .vscode
 
-# waterflow documentation
-./docs/*
- !./docs/build/html/
