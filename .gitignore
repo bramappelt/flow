@@ -102,3 +102,7 @@ venv.bak/
 #vscode project settings
 .vscode
 
+# sphinx documentation
+/docs/build/latex/
+
+

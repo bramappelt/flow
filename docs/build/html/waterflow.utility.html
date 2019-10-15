@@ -1,37 +1,169 @@
 
-<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta charset="utf-8" />
-    <title>waterflow.utility package &#8212; Flow v1.0 documentation</title>
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/language_data.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>waterflow.utility package &mdash; Flow v1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="waterflow.flow1d package" href="waterflow.flow1d.html" />
+    <link rel="prev" title="waterflow.flow1d package" href="waterflow.flow1d.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
    
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
-
-  </head><body>
-  
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
           
 
-          <div class="body" role="main">
+          
+            <a href="index.html" class="icon icon-home"> Flow
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">flow</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="waterflow.html">waterflow package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="waterflow.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="waterflow.flow1d.html">waterflow.flow1d package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">waterflow.utility package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="waterflow.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="waterflow.html#module-waterflow.conf">waterflow.conf module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="waterflow.html#module-waterflow">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Flow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="modules.html">flow</a> &raquo;</li>
+        
+          <li><a href="waterflow.html">waterflow package</a> &raquo;</li>
+        
+      <li>waterflow.utility package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/waterflow.utility.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="waterflow-utility-package">
 <h1>waterflow.utility package<a class="headerlink" href="#waterflow-utility-package" title="Permalink to this headline">¶</a></h1>
@@ -45,17 +177,39 @@ and a soil selector function</p>
 <dl class="function">
 <dt id="waterflow.utility.conductivityfunctions.VG_conductivity">
 <code class="sig-prename descclassname">waterflow.utility.conductivityfunctions.</code><code class="sig-name descname">VG_conductivity</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">h</em>, <em class="sig-param">ksat</em>, <em class="sig-param">a</em>, <em class="sig-param">n</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.conductivityfunctions.VG_conductivity" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>k-h relation as described by Van Genuchten</p>
+<p class="rubric">Notes</p>
+<div class="math notranslate nohighlight" id="equation-waterflow-utility-0">
+<span class="eqno">(1)<a class="headerlink" href="#equation-waterflow-utility-0" title="Permalink to this equation">¶</a></span>\[k(h) = \frac{\left(1 - (a*-h)^{n-1}*(1+(a*-h)^{n})^{-m}\right)^{2}}
+{(1 + (a*-h)^{n})^{\frac{m}{2}}} * ksat\]</div>
+<div class="math notranslate nohighlight" id="equation-waterflow-utility-1">
+<span class="eqno">(2)<a class="headerlink" href="#equation-waterflow-utility-1" title="Permalink to this equation">¶</a></span>\[m = 1 - \frac{1}{n}\]</div>
+</dd></dl>
 
 <dl class="function">
 <dt id="waterflow.utility.conductivityfunctions.VG_pressureh">
 <code class="sig-prename descclassname">waterflow.utility.conductivityfunctions.</code><code class="sig-name descname">VG_pressureh</code><span class="sig-paren">(</span><em class="sig-param">h</em>, <em class="sig-param">theta_r</em>, <em class="sig-param">theta_s</em>, <em class="sig-param">a</em>, <em class="sig-param">n</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.conductivityfunctions.VG_pressureh" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Theta-h relation as described by Van Genuchten</p>
+<p class="rubric">Notes</p>
+<div class="math notranslate nohighlight" id="equation-waterflow-utility-2">
+<span class="eqno">(3)<a class="headerlink" href="#equation-waterflow-utility-2" title="Permalink to this equation">¶</a></span>\[\theta(h) = \theta_{r} + \frac{\theta_{s} - \theta_{r}}
+{(1+(a*-h)^{n})^m}\]</div>
+<div class="math notranslate nohighlight" id="equation-waterflow-utility-3">
+<span class="eqno">(4)<a class="headerlink" href="#equation-waterflow-utility-3" title="Permalink to this equation">¶</a></span>\[m = 1-\frac{1}{n}\]</div>
+</dd></dl>
 
 <dl class="function">
 <dt id="waterflow.utility.conductivityfunctions.VG_theta">
 <code class="sig-prename descclassname">waterflow.utility.conductivityfunctions.</code><code class="sig-name descname">VG_theta</code><span class="sig-paren">(</span><em class="sig-param">theta</em>, <em class="sig-param">theta_r</em>, <em class="sig-param">theta_s</em>, <em class="sig-param">a</em>, <em class="sig-param">n</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.conductivityfunctions.VG_theta" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>h-theta relation as described by Van Genuchten</p>
+<p class="rubric">Notes</p>
+<div class="math notranslate nohighlight" id="equation-waterflow-utility-4">
+<span class="eqno">(5)<a class="headerlink" href="#equation-waterflow-utility-4" title="Permalink to this equation">¶</a></span>\[h(\theta) = \left(\frac{(\theta_{s} - \theta_r) /
+(\theta - \theta_{r})^{\frac{1}{m}} - 1}
+{a^{n}}\right)^{\frac{1}{n}}\]</div>
+<div class="math notranslate nohighlight" id="equation-waterflow-utility-5">
+<span class="eqno">(6)<a class="headerlink" href="#equation-waterflow-utility-5" title="Permalink to this equation">¶</a></span>\[m = 1 - \frac{1}{n}\]</div>
+</dd></dl>
 
 <dl class="function">
 <dt id="waterflow.utility.conductivityfunctions.soilselector">
@@ -204,10 +358,10 @@ is absolute and does not depend on <cite>length</cite>.</p></li>
 </dl>
 <p class="rubric">Notes</p>
 <p>The following formula is implemented</p>
-<div class="math notranslate nohighlight">
-\[S_{i+1} = \frac{R - S_{i}}{(P * (N - 2 - i))} + S{i}\]</div>
-<div class="math notranslate nohighlight">
-\[N - 2 - i &gt; 0\]</div>
+<div class="math notranslate nohighlight" id="equation-waterflow-utility-6">
+<span class="eqno">(7)<a class="headerlink" href="#equation-waterflow-utility-6" title="Permalink to this equation">¶</a></span>\[S_{i+1} = \frac{R - S_{i}}{(P * (N - 2 - i))} + S{i}\]</div>
+<div class="math notranslate nohighlight" id="equation-waterflow-utility-7">
+<span class="eqno">(8)<a class="headerlink" href="#equation-waterflow-utility-7" title="Permalink to this equation">¶</a></span>\[N - 2 - i &gt; 0\]</div>
 <p class="rubric">Examples</p>
 <p>Linear spacing with scaling</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">biasedspacing</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
@@ -234,6 +388,10 @@ is absolute and does not depend on <cite>length</cite>.</p></li>
 <span class="go">       0.29019617, 0.4       , 0.8       , 1.2       , 1.6       ,</span>
 <span class="go">       2.        ])</span>
 </pre></div>
+</div>
+<p>(<a class="reference external" href=".//waterflow-utility-1.py">Source code</a>, <a class="reference external" href=".//waterflow-utility-1.png">png</a>, <a class="reference external" href=".//waterflow-utility-1.hires.png">hires.png</a>, <a class="reference external" href=".//waterflow-utility-1.pdf">pdf</a>)</p>
+<div class="figure align-default">
+<img alt="_images/waterflow-utility-1.png" src="_images/waterflow-utility-1.png" />
 </div>
 </dd></dl>
 
@@ -287,6 +445,10 @@ interest are influenced by a factor weight</p>
 <span class="go">       10.        ])</span>
 </pre></div>
 </div>
+<p>(<a class="reference external" href=".//waterflow-utility-2.py">Source code</a>, <a class="reference external" href=".//waterflow-utility-2.png">png</a>, <a class="reference external" href=".//waterflow-utility-2.hires.png">hires.png</a>, <a class="reference external" href=".//waterflow-utility-2.pdf">pdf</a>)</p>
+<div class="figure align-default">
+<img alt="_images/waterflow-utility-2.png" src="_images/waterflow-utility-2.png" />
+</div>
 <p>Two dimensional non-linear example, 2 nodes around the location of interest
 are influenced by a factor weight.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ny</span><span class="p">,</span> <span class="n">Ly</span> <span class="o">=</span> <span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
@@ -298,6 +460,10 @@ are influenced by a factor weight.</p>
 <span class="go">array([ 0.    ,  1.4375,  2.875 ,  4.3125,  4.75  ,  5.    ,  5.25  ,</span>
 <span class="go">        5.6875,  7.125 ,  8.5625, 10.    ])</span>
 </pre></div>
+</div>
+<p>(<a class="reference external" href=".//waterflow-utility-3.py">Source code</a>, <a class="reference external" href=".//waterflow-utility-3.png">png</a>, <a class="reference external" href=".//waterflow-utility-3.hires.png">hires.png</a>, <a class="reference external" href=".//waterflow-utility-3.pdf">pdf</a>)</p>
+<div class="figure align-default">
+<img alt="_images/waterflow-utility-3.png" src="_images/waterflow-utility-3.png" />
 </div>
 </dd></dl>
 
@@ -331,8 +497,8 @@ daraframe should be of equal length.</p></li>
 <p class="rubric">Notes</p>
 <p>Notes about the implementad algorithm.</p>
 <p>The formula implemented:</p>
-<div class="math notranslate nohighlight">
-\[MAE=\sqrt{\frac{\lvert X_i -X_j\rvert}{N}}\]</div>
+<div class="math notranslate nohighlight" id="equation-waterflow-utility-8">
+<span class="eqno">(9)<a class="headerlink" href="#equation-waterflow-utility-8" title="Permalink to this equation">¶</a></span>\[MAE=\sqrt{\frac{\lvert X_i -X_j\rvert}{N}}\]</div>
 <p class="rubric">Examples</p>
 <p>Create a dataframe and populate with random values. Note: The data
 arrays can also be passed to the function as separate arguments.</p>
@@ -373,8 +539,8 @@ dataframe should be of equal length.</p></li>
 <p class="rubric">Notes</p>
 <p>Notes about the implementation algorithm.</p>
 <p>The formula implemented:</p>
-<div class="math notranslate nohighlight">
-\[RMSE=\sqrt{\frac{\sum{(X_i -X_j)^2}}{N}}\]</div>
+<div class="math notranslate nohighlight" id="equation-waterflow-utility-9">
+<span class="eqno">(10)<a class="headerlink" href="#equation-waterflow-utility-9" title="Permalink to this equation">¶</a></span>\[RMSE=\sqrt{\frac{\sum{(X_i -X_j)^2}}{N}}\]</div>
 <p class="rubric">Examples</p>
 <p>Create a dataframe and populate it with random values. Note: The data
 arrays can also be passed to the function as separate arguments.</p>
@@ -403,78 +569,50 @@ arrays can also be passed to the function as separate arguments.</p>
 </div>
 
 
+           </div>
+           
           </div>
-          
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="index.html">Flow</a></h1>
-
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="modules.html">flow</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="waterflow.html">waterflow package</a></li>
-</ul>
-</li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-  <li><a href="modules.html">flow</a><ul>
-  <li><a href="waterflow.html">waterflow package</a><ul>
-      <li>Previous: <a href="waterflow.flow1d.html" title="previous chapter">waterflow.flow1d package</a></li>
-  </ul></li>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="waterflow.flow1d.html" class="btn btn-neutral float-left" title="waterflow.flow1d package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
     </div>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+  
 
+  <hr/>
 
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Bram Berendsen
 
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
-
-
-
+</footer>
 
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2019, Bram Berendsen.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="_sources/waterflow.utility.rst.txt"
-          rel="nofollow">Page source</a>
-    </div>
 
-    
+    </section>
 
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
     
-  </body>
+   
+
+</body>
 </html>

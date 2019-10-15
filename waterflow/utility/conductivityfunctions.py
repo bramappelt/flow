@@ -28,6 +28,22 @@ def soilselector(soils):
 
 # Van Genuchten (theta)
 def VG_theta(theta, theta_r, theta_s, a, n):
+    """ h-theta relation as described by Van Genuchten
+
+    Notes
+    -----
+
+    .. math::
+
+        h(\\theta) = \\left(\\frac{(\\theta_{s} - \\theta_r) /
+        (\\theta - \\theta_{r})^{\\frac{1}{m}} - 1}
+        {a^{n}}\\right)^{\\frac{1}{n}}
+
+    .. math::
+
+        m = 1 - \\frac{1}{n}
+
+    """
     m = 1-1/n
     THETA = (theta_s - theta_r) / (theta - theta_r)
     return ((THETA**(1/m) - 1) / a**n)**(1/n)
@@ -35,6 +51,22 @@ def VG_theta(theta, theta_r, theta_s, a, n):
 
 # Van Genuchten (h)
 def VG_pressureh(h, theta_r, theta_s, a, n):
+    """ theta-h relation as described by Van Genuchten
+
+    Notes
+    -----
+
+    .. math ::
+
+        \\theta(h) = \\theta_{r} + \\frac{\\theta_{s} - \\theta_{r}}
+        {(1+(a*-h)^{n})^m}
+
+    .. math ::
+
+        m = 1-\\frac{1}{n}
+
+    """
+
     # to theta
     if h >= 0:
         return theta_s
@@ -44,6 +76,21 @@ def VG_pressureh(h, theta_r, theta_s, a, n):
 
 # Van Genuchten (x, h)
 def VG_conductivity(x, h, ksat, a, n):
+    """ k-h relation as described by Van Genuchten
+
+    Notes
+    -----
+    .. math ::
+
+        k(h) = \\frac{\\left(1 - (a*-h)^{n-1}*(1+(a*-h)^{n})^{-m}\\right)^{2}}
+        {(1 + (a*-h)^{n})^{\\frac{m}{2}}} * ksat
+
+    .. math ::
+
+        m = 1 - \\frac{1}{n}
+
+    """
+
     if h >= 0:
         return ksat
     m = 1-1/n

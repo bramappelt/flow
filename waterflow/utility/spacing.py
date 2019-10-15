@@ -62,6 +62,18 @@ def spacing(nx, Lx, ny=0, Ly=0, linear=True, loc=None, power=None, weight=None):
             4.33333333,  6.66666667,  7.        ,  7.33333333,  8.66666667,
            10.        ])
 
+    .. plot::
+
+        import matplotlib.pyplot as plt
+        from waterflow.utility.spacing import spacing
+
+        fig, ax = plt.subplots(figsize=(9.0, 2))
+        fig.suptitle('Nodal discretization of 1D spacing function')
+        x, _ = spacing(10, 10, linear=False, loc=[4, 7], power=1, weight=3)
+        ax.scatter(x, [0 for i in range(len(x))], marker='*', color='blue')
+        ax.set_xlabel('Distance (x)')
+        ax.grid()
+
     Two dimensional non-linear example, 2 nodes around the location of interest
     are influenced by a factor weight.
 
@@ -73,6 +85,22 @@ def spacing(nx, Lx, ny=0, Ly=0, linear=True, loc=None, power=None, weight=None):
     >>> y
     array([ 0.    ,  1.4375,  2.875 ,  4.3125,  4.75  ,  5.    ,  5.25  ,
             5.6875,  7.125 ,  8.5625, 10.    ])
+
+    .. plot::
+
+        import matplotlib.pyplot as plt
+        from waterflow.utility.spacing import spacing
+
+        x, y = spacing(11, 10, 11, 10, linear=False, loc=[(4, 5)], power=2, weight=4)
+
+        fig, ax = plt.subplots(figsize=(9, 9))
+        for i in y:
+            ax.scatter(x, [i for _ in range(len(x))], marker='*', color='blue')
+
+        ax.set_title('Nodal discretization of 2D spacing function')
+        ax.set_xlabel('Distance (x)')
+        ax.set_ylabel('Distance (y)')
+        ax.grid()
 
     """
     axes_args = np.linspace(0, Lx, nx), np.linspace(0, Ly, ny)
@@ -130,7 +158,7 @@ def spacing(nx, Lx, ny=0, Ly=0, linear=True, loc=None, power=None, weight=None):
 def biasedspacing(numnodes, power, lb=0, rb=1, maxdist=None, length=1):
     """ One dimensional nodal spacing function
 
-    Returns an array that contains a biased nodal distribution in 
+    Returns an array that contains a biased nodal distribution in
     which distances increase from left to right.
 
     Parameters
@@ -188,6 +216,29 @@ def biasedspacing(numnodes, power, lb=0, rb=1, maxdist=None, length=1):
     array([0.        , 0.04815903, 0.09747244, 0.15250051, 0.21499075,
            0.29019617, 0.4       , 0.8       , 1.2       , 1.6       ,
            2.        ])
+
+    .. plot::
+
+        import matplotlib.pyplot as plt
+        from waterflow.utility.spacing import spacing, biasedspacing
+
+        fig, [ax1, ax2] = plt.subplots(figsize=(9, 9), nrows=2, ncols=1, sharex=True)
+        powers = list(range(1, 7))
+        maxdists = [0.10 + 0.03 * i for i in range(len(powers))]
+        for i, j in zip(powers, maxdists):
+            a1, a2 = biasedspacing(11, i), biasedspacing(11, powers[-1], maxdist=j)
+            ax1.scatter(a1, [i for _ in range(len(a1))], marker='*', color='blue')
+            ax2.scatter(a2, [j for _ in range(len(a2))], marker='*', color='blue')
+
+        ax1.set_title('Nodal discretization of 1D biasedspacing function')
+        ax1.set_yticks(powers)
+        ax1.set_ylabel('variable power, no maxdist')
+        ax1.grid()
+        ax2.set_yticks(maxdists)
+        ax2.set_xlabel('Distance (x)')
+        ax2.set_ylabel(f'Variable maxdist, fixed power({powers[-1]})')
+        ax2.grid()
+        plt.show()
 
     """
 
