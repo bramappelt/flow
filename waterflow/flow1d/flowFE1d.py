@@ -38,6 +38,7 @@ class Flow1DFE(object):
         self.scheme = "linear"
         self.conductivities = []
         self.moisture = []
+        self.fluxes = []
         self.stats = {"rmse": [], "mae": []}  # ## ??
         self.isinitial = True
         self.isconverged = False
@@ -124,7 +125,12 @@ class Flow1DFE(object):
             if type_ == "Neumann":
                 self.forcing[idx] += val
 
-    def _internal_forcing(self, calcbal=False):
+    def _internal_forcing(self, calcflux=False, calcbal=False):
+        """ Internal fluxes for model convergence,
+        flux calculation or balance calculation. Only one calculation
+        at a time, when both arguments are truthy, the first argument
+        in the method signature is calculated.
+        """
         # internal fluxes from previous iteration
         pos, weight = self.gausquad[self.scheme]
         f = [0.0 for x in range(len(self.nodes))]
@@ -135,13 +141,18 @@ class Flow1DFE(object):
                 s = self.states[i] * pos[-idx-1] + self.states[i+1] * pos[idx]
                 grad = (self.states[i+1] - self.states[i]) / L
                 flux = self.systemfluxfunc(x, s, grad)
-                f[i] -= flux * weight[-idx-1]
+
+                if not calcflux:
+                    f[i] -= flux * weight[-idx-1]
                 f[i+1] += flux * weight[idx]
 
-        self.internal_forcing["internal_forcing"] = [None, np.array(f)]
-        # if balance calculation, dont assign to forcing again
-        if not calcbal:
-            self.forcing = self.forcing + np.array(f)
+        if calcflux:
+            self.fluxes = np.array(f)
+        else:
+            # if balance calculation, dont assign to forcing again
+            if not calcbal:
+                self.forcing = self.forcing + np.array(f)
+            self.internal_forcing["internal_forcing"] = [None, np.array(f)]
 
     def _statedep_forcing(self):
         # point state dependent forcing
@@ -706,10 +717,11 @@ class Flow1DFE(object):
         solve_data['iter'] = iter_data
         self.solve_data = solve_data
 
-    def calcbalance(self, print_=False):
+    def calcbalance(self, print_=False, invert=True):
         data = {}
         # internal fluxes
         self._internal_forcing(calcbal=True)
+        self._internal_forcing(calcflux=True)
         internalfluxes = self.internal_forcing['internal_forcing'][-1]
 
         # add all point fluxes
@@ -759,22 +771,33 @@ class Flow1DFE(object):
             data.update({"spat-"+str(key): spatialfluxes[key][-1]})
 
         # flow over boundaries
-        leftb = internalfluxes[0] + (spat[0] + pnt[0])
-        rightb = internalfluxes[-1] + (spat[-1] + pnt[-1])
-        bnd = (leftb + rightb)
+        fill = np.repeat(0.0, (len(self.nodes) - 1,))
+        leftb = np.insert(fill, 0, internalfluxes[0] + (spat[0] + pnt[0])) * -1
+        rightb = np.append(fill, internalfluxes[-1] + (spat[-1] + pnt[-1])) * -1
 
         # net flow
-        net = pnt + spat
-        net[0] -= leftb
-        net[-1] -= rightb
+        net = pnt + spat + internalfluxes
+        net[0] += leftb[0]
+        net[-1] += rightb[-1]
+
+        # fluxes
+        self.fluxes[0] = leftb[0]
+        self.fluxes[-1] = -rightb[-1]
 
         # dump waterbalance & summary to dataframe
         data.update({'internal': internalfluxes, 'all-spatial': spat,
                      'all-points': pnt, 'all-external': pnt + spat,
-                     'lbound': leftb, 'rbound': rightb, 'net': net})
+                     'lbound': leftb, 'rbound': rightb, 'net': net,
+                     'fluxes': self.fluxes})
+
         df_balance = pd.DataFrame(data)
-        df_balance_summary = df_balance.sum().transpose()
+        df_balance.insert(0, 'nodes', self.nodes)
+
+        if invert:
+            df_balance = df_balance.iloc[::-1].reset_index(drop=True)
+
         self.df_balance = df_balance
+        df_balance_summary = df_balance.sum().transpose().drop(['nodes', 'fluxes'])
         self.df_balance_summary = df_balance_summary
 
         if print_:
@@ -872,7 +895,7 @@ class Flow1DFE(object):
             dft_states.update({t: obj.df_states})
 
             # balance dataframes
-            obj.calcbalance()
+            obj.calcbalance(invert=invert)
             dft_balance.update({t: obj.df_balance})
             dft_bal_sum = dft_bal_sum.append(obj.df_balance_summary,
                                              ignore_index=True)

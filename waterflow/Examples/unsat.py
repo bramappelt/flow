@@ -15,8 +15,8 @@ from waterflow.utility.spacing import biasedspacing
 soil, *_ = condf.soilselector([13])[0]
 theta_r, theta_s, ksat, alpha, n = (soil.t_res, soil.t_sat, soil.ksat, soil.alpha, soil.n)
 
-L = 100
-nx = 201
+L = 10
+nx = 11
 xsp = biasedspacing(nx, power=1, rb=-L)[::-1]
 initial_states = np.repeat(0, nx)
 
@@ -37,15 +37,17 @@ FE_ut.add_dirichlet_BC(0.0, 'west')
 FE_ut.add_neumann_BC(-0.3, 'east')
 FE_ut.tfun = theta_h
 
+FE_ut.add_spatialflux(-0.001, 'extraction')
+
 FE_ut.add_spatialflux(storage_change)
 
-FE_ut.solve(dt_min=1e-5, dt_max=5, end_time=100, maxiter=500, 
+FE_ut.solve(dt_min=1e-5, dt_max=5, end_time=100, maxiter=500,
             dtitlow=1.5, dtithigh=0.5, itermin=3, itermax=7,
             verbosity=True)
 
-FE_ut.transient_dataframeify(nodes=[0, -20, -50, -80, -100])
+FE_ut.transient_dataframeify(nodes=[0, -2, -5, -8, -10])
 
-FE_ut.save(dirname='unsat_transient')
+FE_ut.save(dirname='wbal_testing')
 
 
 fig, ax = plt.subplots()
@@ -63,6 +65,10 @@ quickplot(FE_ut.dft_solved_times, x='time', y=['dt'], ax=ax, title='Solver')
 
 fig, ax = plt.subplots()
 quickplot(FE_ut.dft_balance_summary, x='time', y=['spat-storage_change'], ax=ax, title='storage change', legend=False)
+
+fig, ax = plt.subplots()
+for k, v in FE_ut.dft_balance.items():
+    quickplot(v, x='fluxes', y=['nodes'], ax=ax, legend=False)
 
 solverplot(FE_ut, save=True, filename='test.png')
 plt.show()
