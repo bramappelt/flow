@@ -4,10 +4,9 @@ and a soil selector function """
 import os
 from collections import namedtuple
 
-import numpy as np
 import pandas as pd
 
-from waterflow.conf import DATA_DIR
+from waterflow import DATA_DIR
 
 
 def soilselector(soils):
@@ -35,13 +34,13 @@ def VG_theta(theta, theta_r, theta_s, a, n):
 
     .. math::
 
-        h(\\theta) = \\left(\\frac{(\\theta_{s} - \\theta_r) /
-        (\\theta - \\theta_{r})^{\\frac{1}{m}} - 1}
-        {a^{n}}\\right)^{\\frac{1}{n}}
+        m = 1 - \\frac{1}{n}
 
     .. math::
 
-        m = 1 - \\frac{1}{n}
+        h(\\theta) = \\left(\\frac{(\\theta_{s} - \\theta_r) /
+        (\\theta - \\theta_{r})^{\\frac{1}{m}} - 1}
+        {a^{n}}\\right)^{\\frac{1}{n}}
 
     """
     m = 1-1/n
@@ -58,12 +57,16 @@ def VG_pressureh(h, theta_r, theta_s, a, n):
 
     .. math ::
 
-        \\theta(h) = \\theta_{r} + \\frac{\\theta_{s} - \\theta_{r}}
-        {(1+(a*-h)^{n})^m}
+        m = 1-\\frac{1}{n}
 
     .. math ::
 
-        m = 1-\\frac{1}{n}
+            \\theta(h) =
+        \\begin{cases}
+            \\theta_{r} + \\frac{\\theta_{s} - \\theta_{r}}{(1+(a*-h)^{n})^m},
+            & \\text{if } h < 0\\\\
+            \\theta_s, & \\text{otherwise}
+        \\end{cases}
 
     """
 
@@ -80,14 +83,19 @@ def VG_conductivity(x, h, ksat, a, n):
 
     Notes
     -----
-    .. math ::
-
-        k(h) = \\frac{\\left(1 - (a*-h)^{n-1}*(1+(a*-h)^{n})^{-m}\\right)^{2}}
-        {(1 + (a*-h)^{n})^{\\frac{m}{2}}} * ksat
 
     .. math ::
 
         m = 1 - \\frac{1}{n}
+
+    .. math ::
+
+            k(h) =
+        \\begin{cases}
+            \\frac{\\left(1 - (a*-h)^{n-1}*(1+(a*-h)^{n})^{-m}\\right)^{2}}
+            {(1 + (a*-h)^{n})^{\\frac{m}{2}}} * ksat, & \\text{if } h<0\\\\
+            ksat, & \\text{otherwise}
+        \\end{cases}
 
     """
 

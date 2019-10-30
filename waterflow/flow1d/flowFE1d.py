@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 from scipy.integrate import quad
 
-from waterflow.conf import OUTPUT_DIR
+from waterflow import OUTPUT_DIR
 
 
 '''

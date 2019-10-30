@@ -69,3 +69,7 @@ html_static_path = ['_static']
 
 # Math settings
 math_number_all = True
+
+# Theme settings
+html_logo = './_static/drop.png'
+html_favicon = './_static/drop.bmp'

@@ -13,6 +13,8 @@
 
   
   
+    <link rel="shortcut icon" href="_static/drop.bmp"/>
+  
   
   
 
@@ -54,6 +56,9 @@
             <a href="index.html" class="icon icon-home"> Flow
           
 
+          
+            
+            <img src="_static/drop.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -180,22 +185,30 @@ and a soil selector function</p>
 <dd><p>k-h relation as described by Van Genuchten</p>
 <p class="rubric">Notes</p>
 <div class="math notranslate nohighlight" id="equation-waterflow-utility-0">
-<span class="eqno">(1)<a class="headerlink" href="#equation-waterflow-utility-0" title="Permalink to this equation">¶</a></span>\[k(h) = \frac{\left(1 - (a*-h)^{n-1}*(1+(a*-h)^{n})^{-m}\right)^{2}}
-{(1 + (a*-h)^{n})^{\frac{m}{2}}} * ksat\]</div>
+<span class="eqno">(1)<a class="headerlink" href="#equation-waterflow-utility-0" title="Permalink to this equation">¶</a></span>\[m = 1 - \frac{1}{n}\]</div>
 <div class="math notranslate nohighlight" id="equation-waterflow-utility-1">
-<span class="eqno">(2)<a class="headerlink" href="#equation-waterflow-utility-1" title="Permalink to this equation">¶</a></span>\[m = 1 - \frac{1}{n}\]</div>
+<span class="eqno">(2)<a class="headerlink" href="#equation-waterflow-utility-1" title="Permalink to this equation">¶</a></span>\[\begin{split}    k(h) =
+\begin{cases}
+    \frac{\left(1 - (a*-h)^{n-1}*(1+(a*-h)^{n})^{-m}\right)^{2}}
+    {(1 + (a*-h)^{n})^{\frac{m}{2}}} * ksat, &amp; \text{if } h&lt;0\\
+    ksat, &amp; \text{otherwise}
+\end{cases}\end{split}\]</div>
 </dd></dl>
 
 <dl class="function">
 <dt id="waterflow.utility.conductivityfunctions.VG_pressureh">
 <code class="sig-prename descclassname">waterflow.utility.conductivityfunctions.</code><code class="sig-name descname">VG_pressureh</code><span class="sig-paren">(</span><em class="sig-param">h</em>, <em class="sig-param">theta_r</em>, <em class="sig-param">theta_s</em>, <em class="sig-param">a</em>, <em class="sig-param">n</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.conductivityfunctions.VG_pressureh" title="Permalink to this definition">¶</a></dt>
-<dd><p>Theta-h relation as described by Van Genuchten</p>
+<dd><p>theta-h relation as described by Van Genuchten</p>
 <p class="rubric">Notes</p>
 <div class="math notranslate nohighlight" id="equation-waterflow-utility-2">
-<span class="eqno">(3)<a class="headerlink" href="#equation-waterflow-utility-2" title="Permalink to this equation">¶</a></span>\[\theta(h) = \theta_{r} + \frac{\theta_{s} - \theta_{r}}
-{(1+(a*-h)^{n})^m}\]</div>
+<span class="eqno">(3)<a class="headerlink" href="#equation-waterflow-utility-2" title="Permalink to this equation">¶</a></span>\[m = 1-\frac{1}{n}\]</div>
 <div class="math notranslate nohighlight" id="equation-waterflow-utility-3">
-<span class="eqno">(4)<a class="headerlink" href="#equation-waterflow-utility-3" title="Permalink to this equation">¶</a></span>\[m = 1-\frac{1}{n}\]</div>
+<span class="eqno">(4)<a class="headerlink" href="#equation-waterflow-utility-3" title="Permalink to this equation">¶</a></span>\[\begin{split}    \theta(h) =
+\begin{cases}
+    \theta_{r} + \frac{\theta_{s} - \theta_{r}}{(1+(a*-h)^{n})^m},
+    &amp; \text{if } h &lt; 0\\
+    \theta_s, &amp; \text{otherwise}
+\end{cases}\end{split}\]</div>
 </dd></dl>
 
 <dl class="function">
@@ -204,11 +217,11 @@ and a soil selector function</p>
 <dd><p>h-theta relation as described by Van Genuchten</p>
 <p class="rubric">Notes</p>
 <div class="math notranslate nohighlight" id="equation-waterflow-utility-4">
-<span class="eqno">(5)<a class="headerlink" href="#equation-waterflow-utility-4" title="Permalink to this equation">¶</a></span>\[h(\theta) = \left(\frac{(\theta_{s} - \theta_r) /
+<span class="eqno">(5)<a class="headerlink" href="#equation-waterflow-utility-4" title="Permalink to this equation">¶</a></span>\[m = 1 - \frac{1}{n}\]</div>
+<div class="math notranslate nohighlight" id="equation-waterflow-utility-5">
+<span class="eqno">(6)<a class="headerlink" href="#equation-waterflow-utility-5" title="Permalink to this equation">¶</a></span>\[h(\theta) = \left(\frac{(\theta_{s} - \theta_r) /
 (\theta - \theta_{r})^{\frac{1}{m}} - 1}
 {a^{n}}\right)^{\frac{1}{n}}\]</div>
-<div class="math notranslate nohighlight" id="equation-waterflow-utility-5">
-<span class="eqno">(6)<a class="headerlink" href="#equation-waterflow-utility-5" title="Permalink to this equation">¶</a></span>\[m = 1 - \frac{1}{n}\]</div>
 </dd></dl>
 
 <dl class="function">
@@ -225,30 +238,51 @@ and a storage change function</p>
 <dl class="function">
 <dt id="waterflow.utility.fluxfunctions.fluxfunction">
 <code class="sig-prename descclassname">waterflow.utility.fluxfunctions.</code><code class="sig-name descname">fluxfunction</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">s</em>, <em class="sig-param">gradient</em>, <em class="sig-param">ksat=1</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.fluxfunctions.fluxfunction" title="Permalink to this definition">¶</a></dt>
-<dd><p>flux function for saturated flow</p>
+<dd><p>Flux function for saturated flow</p>
+<p class="rubric">Notes</p>
+<div class="math notranslate nohighlight" id="equation-waterflow-utility-6">
+<span class="eqno">(7)<a class="headerlink" href="#equation-waterflow-utility-6" title="Permalink to this equation">¶</a></span>\[q(x, s, \frac{\delta s}{\delta x}) =
+-\frac{\delta s}{\delta x} * ksat\]</div>
 </dd></dl>
 
 <dl class="function">
 <dt id="waterflow.utility.fluxfunctions.fluxfunction_s">
 <code class="sig-prename descclassname">waterflow.utility.fluxfunctions.</code><code class="sig-name descname">fluxfunction_s</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">s</em>, <em class="sig-param">gradient</em>, <em class="sig-param">ksat=1</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.fluxfunctions.fluxfunction_s" title="Permalink to this definition">¶</a></dt>
-<dd><p>flux function for saturated flow</p>
+<dd><p>Flux function for saturated flow</p>
+<p class="rubric">Notes</p>
+<div class="math notranslate nohighlight" id="equation-waterflow-utility-7">
+<span class="eqno">(8)<a class="headerlink" href="#equation-waterflow-utility-7" title="Permalink to this equation">¶</a></span>\[q(x, s, \frac{\delta s}{\delta x}) =
+-s * \frac{\delta s}{\delta x} * ksat\]</div>
 </dd></dl>
 
 <dl class="function">
 <dt id="waterflow.utility.fluxfunctions.fluxfunction_var_k">
 <code class="sig-prename descclassname">waterflow.utility.fluxfunctions.</code><code class="sig-name descname">fluxfunction_var_k</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">s</em>, <em class="sig-param">gradient</em>, <em class="sig-param">kfun=&lt;function &lt;lambda&gt;&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.fluxfunctions.fluxfunction_var_k" title="Permalink to this definition">¶</a></dt>
-<dd><p>flux function for saturated flow</p>
+<dd><p>Flux function for saturated flow</p>
+<p class="rubric">Notes</p>
+<div class="math notranslate nohighlight" id="equation-waterflow-utility-8">
+<span class="eqno">(9)<a class="headerlink" href="#equation-waterflow-utility-8" title="Permalink to this equation">¶</a></span>\[q(x, s, \frac{\delta s}{\delta x}) =
+-kfun(x) * \frac{\delta s}{\delta x}\]</div>
 </dd></dl>
 
 <dl class="function">
 <dt id="waterflow.utility.fluxfunctions.fluxfunction_var_k_s">
 <code class="sig-prename descclassname">waterflow.utility.fluxfunctions.</code><code class="sig-name descname">fluxfunction_var_k_s</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">s</em>, <em class="sig-param">gradient</em>, <em class="sig-param">kfun=&lt;function &lt;lambda&gt;&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.fluxfunctions.fluxfunction_var_k_s" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Flux function for saturated flow</p>
+<p class="rubric">Notes</p>
+<div class="math notranslate nohighlight" id="equation-waterflow-utility-9">
+<span class="eqno">(10)<a class="headerlink" href="#equation-waterflow-utility-9" title="Permalink to this equation">¶</a></span>\[q(x, s, \frac{\delta s}{\delta x}) =
+-kfun(x) * s * \frac{\delta s}{\delta x}\]</div>
+</dd></dl>
 
 <dl class="function">
 <dt id="waterflow.utility.fluxfunctions.richards_equation">
 <code class="sig-prename descclassname">waterflow.utility.fluxfunctions.</code><code class="sig-name descname">richards_equation</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">s</em>, <em class="sig-param">gradient</em>, <em class="sig-param">kfun</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.fluxfunctions.richards_equation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Richards equation</p>
+<dd><p>Richards equation, for unsaturated flow</p>
+<p class="rubric">Notes</p>
+<div class="math notranslate nohighlight" id="equation-waterflow-utility-10">
+<span class="eqno">(11)<a class="headerlink" href="#equation-waterflow-utility-10" title="Permalink to this equation">¶</a></span>\[q(x, s, \frac{\delta s}{\delta x}) =
+-kfun(x, s) * \left(\frac{\delta s}{\delta x} + 1\right)\]</div>
 </dd></dl>
 
 <dl class="function">
@@ -256,6 +290,9 @@ and a storage change function</p>
 <code class="sig-prename descclassname">waterflow.utility.fluxfunctions.</code><code class="sig-name descname">storage_change</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">s</em>, <em class="sig-param">prevstate</em>, <em class="sig-param">dt</em>, <em class="sig-param">fun=&lt;function &lt;lambda&gt;&gt;</em>, <em class="sig-param">S=1</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.fluxfunctions.storage_change" title="Permalink to this definition">¶</a></dt>
 <dd><p>General storage change function for both saturated and
 unsaturated flow simulations</p>
+<p class="rubric">Notes</p>
+<div class="math notranslate nohighlight" id="equation-waterflow-utility-11">
+<span class="eqno">(12)<a class="headerlink" href="#equation-waterflow-utility-11" title="Permalink to this equation">¶</a></span>\[q(x, s, dt) = - S * \frac{fun(s) - fun(pressure(x))}{dt}\]</div>
 </dd></dl>
 
 </div>
@@ -358,10 +395,10 @@ is absolute and does not depend on <cite>length</cite>.</p></li>
 </dl>
 <p class="rubric">Notes</p>
 <p>The following formula is implemented</p>
-<div class="math notranslate nohighlight" id="equation-waterflow-utility-6">
-<span class="eqno">(7)<a class="headerlink" href="#equation-waterflow-utility-6" title="Permalink to this equation">¶</a></span>\[S_{i+1} = \frac{R - S_{i}}{(P * (N - 2 - i))} + S{i}\]</div>
-<div class="math notranslate nohighlight" id="equation-waterflow-utility-7">
-<span class="eqno">(8)<a class="headerlink" href="#equation-waterflow-utility-7" title="Permalink to this equation">¶</a></span>\[N - 2 - i &gt; 0\]</div>
+<div class="math notranslate nohighlight" id="equation-waterflow-utility-12">
+<span class="eqno">(13)<a class="headerlink" href="#equation-waterflow-utility-12" title="Permalink to this equation">¶</a></span>\[S_{i+1} = \frac{R - S_{i}}{(P * (N - 2 - i))} + S{i}\]</div>
+<div class="math notranslate nohighlight" id="equation-waterflow-utility-13">
+<span class="eqno">(14)<a class="headerlink" href="#equation-waterflow-utility-13" title="Permalink to this equation">¶</a></span>\[N - 2 - i &gt; 0\]</div>
 <p class="rubric">Examples</p>
 <p>Linear spacing with scaling</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">biasedspacing</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
@@ -497,8 +534,8 @@ daraframe should be of equal length.</p></li>
 <p class="rubric">Notes</p>
 <p>Notes about the implementad algorithm.</p>
 <p>The formula implemented:</p>
-<div class="math notranslate nohighlight" id="equation-waterflow-utility-8">
-<span class="eqno">(9)<a class="headerlink" href="#equation-waterflow-utility-8" title="Permalink to this equation">¶</a></span>\[MAE=\sqrt{\frac{\lvert X_i -X_j\rvert}{N}}\]</div>
+<div class="math notranslate nohighlight" id="equation-waterflow-utility-14">
+<span class="eqno">(15)<a class="headerlink" href="#equation-waterflow-utility-14" title="Permalink to this equation">¶</a></span>\[MAE=\sqrt{\frac{\lvert X_i -X_j\rvert}{N}}\]</div>
 <p class="rubric">Examples</p>
 <p>Create a dataframe and populate with random values. Note: The data
 arrays can also be passed to the function as separate arguments.</p>
@@ -539,8 +576,8 @@ dataframe should be of equal length.</p></li>
 <p class="rubric">Notes</p>
 <p>Notes about the implementation algorithm.</p>
 <p>The formula implemented:</p>
-<div class="math notranslate nohighlight" id="equation-waterflow-utility-9">
-<span class="eqno">(10)<a class="headerlink" href="#equation-waterflow-utility-9" title="Permalink to this equation">¶</a></span>\[RMSE=\sqrt{\frac{\sum{(X_i -X_j)^2}}{N}}\]</div>
+<div class="math notranslate nohighlight" id="equation-waterflow-utility-15">
+<span class="eqno">(16)<a class="headerlink" href="#equation-waterflow-utility-15" title="Permalink to this equation">¶</a></span>\[RMSE=\sqrt{\frac{\sum{(X_i -X_j)^2}}{N}}\]</div>
 <p class="rubric">Examples</p>
 <p>Create a dataframe and populate it with random values. Note: The data
 arrays can also be passed to the function as separate arguments.</p>

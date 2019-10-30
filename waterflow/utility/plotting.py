@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-from waterflow.conf import OUTPUT_DIR
+from waterflow import OUTPUT_DIR
 from waterflow.utility.conductivityfunctions import soilselector
 
 
