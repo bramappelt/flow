@@ -96,7 +96,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="waterflow.html#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="waterflow.html#module-waterflow.conf">waterflow.conf module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="waterflow.html#waterflow-conf-module">waterflow.conf module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="waterflow.html#module-waterflow">Module contents</a></li>
 </ul>
 </li>
@@ -340,6 +340,12 @@ and spatial forcing</p>
 <dd><p>prepare a function with specific default arguments</p>
 </dd></dl>
 
+<dl class="function">
+<dt id="waterflow.utility.helper.newdir">
+<code class="sig-prename descclassname">waterflow.utility.helper.</code><code class="sig-name descname">newdir</code><span class="sig-paren">(</span><em class="sig-param">basepath</em>, <em class="sig-param">dirname</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.helper.newdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>checks and/or creates new directory</p>
+</dd></dl>
+
 </div>
 <div class="section" id="module-waterflow.utility.plotting">
 <span id="waterflow-utility-plotting-module"></span><h2>waterflow.utility.plotting module<a class="headerlink" href="#module-waterflow.utility.plotting" title="Permalink to this headline">¶</a></h2>
@@ -381,8 +387,8 @@ which distances increase from left to right.</p>
 <li><p><strong>power</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>) – Degree of nodal shifting to the left of the domain.</p></li>
 <li><p><strong>lb</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, default is 0) – Left bound of the domain.</p></li>
 <li><p><strong>rb</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, default = 1) – Right bound of the domain.</p></li>
-<li><p><strong>maxdist</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, default is None) – Maximum distance allowed between two nodes. The value
-is absolute and does not depend on <cite>length</cite>.</p></li>
+<li><p><strong>maxdist</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, default is None) – Maximum distance allowed between two nodes. The value of
+the <cite>length</cite> argument should be accounted for if given.</p></li>
 <li><p><strong>length</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, default is 1) – Multiplier to scale the nodal positions.</p></li>
 </ul>
 </dd>
@@ -394,11 +400,15 @@ is absolute and does not depend on <cite>length</cite>.</p></li>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
-<p>The following formula is implemented</p>
-<div class="math notranslate nohighlight" id="equation-waterflow-utility-12">
-<span class="eqno">(13)<a class="headerlink" href="#equation-waterflow-utility-12" title="Permalink to this equation">¶</a></span>\[S_{i+1} = \frac{R - S_{i}}{(P * (N - 2 - i))} + S{i}\]</div>
-<div class="math notranslate nohighlight" id="equation-waterflow-utility-13">
-<span class="eqno">(14)<a class="headerlink" href="#equation-waterflow-utility-13" title="Permalink to this equation">¶</a></span>\[N - 2 - i &gt; 0\]</div>
+<p>The nodal discretization is calculated iteratively. Note that
+aliases of the function arguments are used.</p>
+<p class="centered">
+<strong><span class="math notranslate nohighlight">\(N = numnodes\)</span> ; <span class="math notranslate nohighlight">\(p = power\)</span> ; <span class="math notranslate nohighlight">\(x_{N} = rb\)</span></strong></p><div class="math notranslate nohighlight" id="equation-waterflow-utility-12">
+<span class="eqno">(13)<a class="headerlink" href="#equation-waterflow-utility-12" title="Permalink to this equation">¶</a></span>\[x_{i + 1} = \frac{x_{N} - x_{i}}{p * \left(N - 2 - i\right)}
+\text{ for } i = 1, 2, \dots ,N - 1\]</div>
+<p>When <cite>maxdist</cite> is given and any of the nodal distances exceed this limit
+the nodes are shifted towards the right boundary of the domain until
+the <cite>maxdist</cite> condition is met. Shifting occurs proportionally.</p>
 <p class="rubric">Examples</p>
 <p>Linear spacing with scaling</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">biasedspacing</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
@@ -534,8 +544,8 @@ daraframe should be of equal length.</p></li>
 <p class="rubric">Notes</p>
 <p>Notes about the implementad algorithm.</p>
 <p>The formula implemented:</p>
-<div class="math notranslate nohighlight" id="equation-waterflow-utility-14">
-<span class="eqno">(15)<a class="headerlink" href="#equation-waterflow-utility-14" title="Permalink to this equation">¶</a></span>\[MAE=\sqrt{\frac{\lvert X_i -X_j\rvert}{N}}\]</div>
+<div class="math notranslate nohighlight" id="equation-waterflow-utility-13">
+<span class="eqno">(14)<a class="headerlink" href="#equation-waterflow-utility-13" title="Permalink to this equation">¶</a></span>\[MAE=\sqrt{\frac{\lvert X_i -X_j\rvert}{N}}\]</div>
 <p class="rubric">Examples</p>
 <p>Create a dataframe and populate with random values. Note: The data
 arrays can also be passed to the function as separate arguments.</p>
@@ -576,8 +586,8 @@ dataframe should be of equal length.</p></li>
 <p class="rubric">Notes</p>
 <p>Notes about the implementation algorithm.</p>
 <p>The formula implemented:</p>
-<div class="math notranslate nohighlight" id="equation-waterflow-utility-15">
-<span class="eqno">(16)<a class="headerlink" href="#equation-waterflow-utility-15" title="Permalink to this equation">¶</a></span>\[RMSE=\sqrt{\frac{\sum{(X_i -X_j)^2}}{N}}\]</div>
+<div class="math notranslate nohighlight" id="equation-waterflow-utility-14">
+<span class="eqno">(15)<a class="headerlink" href="#equation-waterflow-utility-14" title="Permalink to this equation">¶</a></span>\[RMSE=\sqrt{\frac{\sum{(X_i -X_j)^2}}{N}}\]</div>
 <p class="rubric">Examples</p>
 <p>Create a dataframe and populate it with random values. Note: The data
 arrays can also be passed to the function as separate arguments.</p>

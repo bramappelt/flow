@@ -20,8 +20,9 @@ documentation !!
 
 
 class Flow1DFE(object):
-    def __init__(self, id_):
+    def __init__(self, id_, savepath=OUTPUT_DIR):
         self.id = id_
+        self.savepath = savepath
         self.systemfluxfunc = None
         self.nodes = None
         self.states = None
@@ -65,21 +66,20 @@ class Flow1DFE(object):
         self._wgaus = None
         self.gausquad = None
         self.xintegration = None
-
         self._calcgaussianquadrature()
 
     def __repr__(self):
         return "Flow1DFE(" + str(self.id) + ")"
 
-    def summary(self):
-        ''' FIX THIS '''
-        id_ = "{}".format(self.id)
+    def summary(self, show=True):
+        id_ = f"{self.id}"
         if self.nodes is not None:
-            len_ = "System lenght: {}".format(self.nodes[-1] - self.nodes[0])
-            num_nodes = "Number of nodes: {}".format(len(self.nodes))
+            len_ = str(self.nodes[-1] - self.nodes[0])
+            num_nodes = str(len(self.nodes))
         else:
             len_ = None
             num_nodes = None
+        scheme = self.scheme
         bcs = [[k, self.BCs[k][0], self.BCs[k][1]] for k in self.BCs.keys()]
         bcs = ["{} value: {} and of type {}".format(*bc) for bc in bcs]
         bcs = ", ".join(i for i in bcs)
@@ -87,15 +87,27 @@ class Flow1DFE(object):
         skeys = list(self.spatflux.keys()) + list(self.Sspatflux.keys())
         pointflux = ", ".join(i for i in pkeys)
         spatflux = ", ".join(i for i in skeys)
+        runtime = self.runtime
 
-        if 'net' in self.balance:
-            netbalance = sum(self.balance['net'])
-        else:
-            netbalance = "Not yet solved"
+        k = ['Id', 'System lenght', 'Number of nodes', 'Scheme',
+             'BCs', 'Pointflux', 'Spatflux', 'Runtime (s)']
+        v = (id_, len_, num_nodes, scheme, bcs, pointflux, spatflux, runtime)
+        sumstring = ""
+        for i, j in zip(k, v):
+            if j:
+                sumstring += f"{i}: {j}\n"
 
-        return "id: {}\n{}\n{}\nBCs: {}\nPointflux: {}\nSpatial flux: {}\
-               \nNet balance: {}\n".format(id_, len_, num_nodes, bcs,
-                                           pointflux, spatflux, netbalance)
+        if show:
+            for s in sumstring.split('\n'):
+                print(s)
+
+            try:
+                self.calcbalance()
+                print(self.df_balance_summary)
+            except Exception:
+                pass
+
+        self.summarystring = sumstring
 
     def _calcgaussianquadrature(self):
         ''' Calculate gaussian quadrature points '''
@@ -926,16 +938,29 @@ class Flow1DFE(object):
         dft_bal_sum.insert(0, timedf.time.name, timedf.time)
         self.dft_balance_summary = dft_bal_sum
 
-    def save(self, dirname=None, savepath=OUTPUT_DIR):
+    def save(self, savepath=None, dirname=None):
+        """ Save model metadata and dataframes
+
+        Parameters
+        ----------
+        savepath: :obj:`str`, default is `OUTDIR`
+            A base path to which runs will be saved.
+        dirname : :obj:`str`, default is a chronological name
+            Name of save directory that is appended to savepath.
+
+        """
+        savepath = savepath or self.savepath
         if not os.path.isdir(savepath):
             os.mkdir(savepath)
 
-        # new dir for current run
+        # save directory
         if not dirname:
+            # chronological name
             dirname = Time.strftime('%d%b%Y_%H%M%S', Time.gmtime(Time.time()))
             runpath = os.path.join(savepath, dirname)
             os.mkdir(runpath)
         else:
+            # given name
             runpath = os.path.join(savepath, dirname)
             if not os.path.isdir(runpath):
                 os.mkdir(runpath)

@@ -38,11 +38,7 @@ def quickplot(df, x, y, ax=None, ax_sec=None, xlabel=None, ylabel=None,
     ax.set_title(title or ax.get_title())
 
     if save:
-        plotdir = os.path.join(savepath, 'plots')
-        if not os.path.isdir(plotdir):
-            os.mkdir(plotdir)
-
-        plt.savefig(os.path.join(plotdir, filename))
+        plt.savefig(os.path.join(savepath, filename))
 
     return ax, ax_sec
 
@@ -77,11 +73,7 @@ def solverplot(model, save=False, savepath=OUTPUT_DIR, filename=None):
     ax4.grid(True)
 
     if save:
-        plotdir = os.path.join(savepath, 'plots')
-        if not os.path.isdir(plotdir):
-            os.mkdir(plotdir)
-
-        plt.savefig(os.path.join(plotdir, filename))
+        plt.savefig(os.path.join(savepath, filename))
 
 
 def scale(xi, n, min_, max_, invert=False):

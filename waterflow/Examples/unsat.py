@@ -72,3 +72,4 @@ for k, v in FE_ut.dft_balance.items():
 
 solverplot(FE_ut, save=True, filename='test.png')
 plt.show()
+

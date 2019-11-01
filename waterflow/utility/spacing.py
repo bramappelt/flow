@@ -172,8 +172,8 @@ def biasedspacing(numnodes, power, lb=0, rb=1, maxdist=None, length=1):
     rb : :obj:`int` or :obj:`float`, default = 1
         Right bound of the domain.
     maxdist : :obj:`int` or :obj:`float`, default is None
-        Maximum distance allowed between two nodes. The value
-        is absolute and does not depend on `length`.
+        Maximum distance allowed between two nodes. The value of
+        the `length` argument should be accounted for if given.
     length : :obj:`int` or :obj:`float`, default is 1
         Multiplier to scale the nodal positions.
 
@@ -184,10 +184,19 @@ def biasedspacing(numnodes, power, lb=0, rb=1, maxdist=None, length=1):
 
     Notes
     -----
-    The following formula is implemented
+    The nodal discretization is calculated iteratively. Note that
+    aliases of the function arguments are used.
 
-    .. math:: S_{i+1} = \\frac{R - S_{i}}{(P * (N - 2 - i))} + S{i}
-    .. math:: N - 2 - i > 0
+    .. centered::
+            :math:`N = numnodes` ; :math:`p = power` ; :math:`x_{N} = rb`
+
+    .. math::
+            x_{i + 1} = \\frac{x_{N} - x_{i}}{p * \\left(N - 2 - i\\right)}
+            \\text{ for } i = 0, 1, \\dots ,N - 1
+
+    When `maxdist` is given and any of the nodal distances exceed this limit
+    the nodes are shifted towards the right boundary of the domain until
+    the `maxdist` condition is met. Shifting occurs proportionally.
 
     Examples
     --------
@@ -260,14 +269,15 @@ def biasedspacing(numnodes, power, lb=0, rb=1, maxdist=None, length=1):
 
     # if maxdist is exceeded, shift nodes proportionally
     if maxdist:
+        sign = np.sign(rb - lb)
         fraction_prev = 0
         for i in range(numnodes - 2):
             idxl, idxr = numnodes - i - 2, numnodes - i - 1
-            dist = arr[idxr] - arr[idxl]
+            dist = abs(arr[idxr] - arr[idxl])
             fraction = (dist - maxdist) / dist
             if fraction >= 0:
                 fraction_prev = fraction
-                arr[idxl] += fraction * dist
+                arr[idxl] += fraction * dist * sign
             else:
                 diff = arr[2:idxr+1] - arr[1:idxr]
                 arr[1:idxr] += diff * fraction_prev
@@ -278,3 +288,5 @@ def biasedspacing(numnodes, power, lb=0, rb=1, maxdist=None, length=1):
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
+
+    biasedspacing(11, 4, rb=-10, maxdist=4)
