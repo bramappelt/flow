@@ -183,6 +183,203 @@
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE">
 <em class="property">class </em><code class="sig-prename descclassname">waterflow.flow1d.flowFE1d.</code><code class="sig-name descname">Flow1DFE</code><span class="sig-paren">(</span><em class="sig-param">id_</em>, <em class="sig-param">savepath='C:\Users\bramb\Documents\thesis\output'</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for solving flow problems numerically</p>
+<p>This class represents an object that can be used to solve
+(un)saturated 1-dimensional flow problems using finite elements.
+To increase the accuracy of numerical solutions the Gaussian
+Quadrature method is used for integration.</p>
+<p>Most of the methods applied on the object will change its internal
+state rather than returning a value. The change of the system is
+saved in any of its public attributes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_</strong> (<cite>str</cite>) – Name of the model object.</p></li>
+<li><p><strong>savepath</strong> (<cite>str</cite>, optional) – Directory to which model data will be saved.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="waterflow.flow1d.flowFE1d.Flow1DFE.id_">
+<code class="sig-name descname">id_</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.id_" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of the model object as passed to the class constructor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><cite>str</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="waterflow.flow1d.flowFE1d.Flow1DFE.savepath">
+<code class="sig-name descname">savepath</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.savepath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model’s save directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><cite>str</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="waterflow.flow1d.flowFE1d.Flow1DFE.systemfluxfunc">
+<code class="sig-name descname">systemfluxfunc</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.systemfluxfunc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Holds the selected flux function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><cite>function</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="waterflow.flow1d.flowFE1d.Flow1DFE.nodes">
+<code class="sig-name descname">nodes</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Nodal positions at which the system will be solved.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><cite>numpy.ndarray</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="waterflow.flow1d.flowFE1d.Flow1DFE.states">
+<code class="sig-name descname">states</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.states" title="Permalink to this definition">¶</a></dt>
+<dd><p>State solutions at the nodal positions as defined in <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.nodes" title="waterflow.flow1d.flowFE1d.Flow1DFE.nodes"><code class="xref py py-attr docutils literal notranslate"><span class="pre">nodes</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><cite>numpy.ndarray</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="waterflow.flow1d.flowFE1d.Flow1DFE.nframe">
+<code class="sig-name descname">nframe</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.nframe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Two dimensional array that contains the midpoints and the lengths of
+the nodal discretization in its columns respectively.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><cite>numpy.ndarray</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="waterflow.flow1d.flowFE1d.Flow1DFE.lengths">
+<code class="sig-name descname">lengths</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.lengths" title="Permalink to this definition">¶</a></dt>
+<dd><p>The same data as in the seconds column of <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.nframe" title="waterflow.flow1d.flowFE1d.Flow1DFE.nframe"><code class="xref py py-attr docutils literal notranslate"><span class="pre">nframe</span></code></a> but
+in a different representation. This representation has the same length
+as <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.nodes" title="waterflow.flow1d.flowFE1d.Flow1DFE.nodes"><code class="xref py py-attr docutils literal notranslate"><span class="pre">nodes</span></code></a> which is more convenient for certain forcing
+calculations at the nodal positions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><cite>numpy.ndarray</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="waterflow.flow1d.flowFE1d.Flow1DFE.coefmatr">
+<code class="sig-name descname">coefmatr</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.coefmatr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Square jacobian matrix used in the finite elements solution procedure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><cite>numpy.ndarray</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="waterflow.flow1d.flowFE1d.Flow1DFE.BCs">
+<code class="sig-name descname">BCs</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.BCs" title="Permalink to this definition">¶</a></dt>
+<dd><p>This defines the system’s boundary conditions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><cite>dict</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="waterflow.flow1d.flowFE1d.Flow1DFE.spatflux">
+<code class="sig-name descname">spatflux</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.spatflux" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains the spatial fluxes on the model domain. # !! explain form</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><cite>dict</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="waterflow.flow1d.flowFE1d.Flow1DFE.pointflux">
+<code class="sig-name descname">pointflux</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.pointflux" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains the point fluxes on the model domain. # !! explain form</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><cite>dict</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="waterflow.flow1d.flowFE1d.Flow1DFE.Spointflux">
+<code class="sig-name descname">Spointflux</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.Spointflux" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains state dependent point fluxes on the model domain. # !! explain form</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><cite>dict</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="waterflow.flow1d.flowFE1d.Flow1DFE.Sspatialflux">
+<code class="sig-name descname">Sspatialflux</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.Sspatialflux" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains state dependent spatial fluxes on the model domain. # !! explain form</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><cite>dict</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="waterflow.flow1d.flowFE1d.Flow1DFE.internal_forcing">
+<code class="sig-name descname">internal_forcing</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.internal_forcing" title="Permalink to this definition">¶</a></dt>
+<dd><p>The internal forcing of the system as calculated with the
+system flux function as saved in <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.systemfluxfunc" title="waterflow.flow1d.flowFE1d.Flow1DFE.systemfluxfunc"><code class="xref py py-attr docutils literal notranslate"><span class="pre">systemfluxfunc</span></code></a>,
+using the selected Gaussian Quadrature <code class="xref py py-attr docutils literal notranslate"><span class="pre">scheme</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><cite>dict</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="waterflow.flow1d.flowFE1d.Flow1DFE._calcgaussianquadrature">
+<code class="sig-name descname">_calcgaussianquadrature</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE._calcgaussianquadrature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate gaussian quadrature points</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="waterflow.flow1d.flowFE1d.Flow1DFE._internal_forcing">
+<code class="sig-name descname">_internal_forcing</code><span class="sig-paren">(</span><em class="sig-param">calcflux=False</em>, <em class="sig-param">calcbal=False</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE._internal_forcing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Internal fluxes for model convergence,
+flux calculation or balance calculation. Only one calculation
+at a time, when both arguments are truthy, the first argument
+in the method signature is calculated.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="waterflow.flow1d.flowFE1d.Flow1DFE._update_storage_change">
+<code class="sig-name descname">_update_storage_change</code><span class="sig-paren">(</span><em class="sig-param">prevstate</em>, <em class="sig-param">dt</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE._update_storage_change" title="Permalink to this definition">¶</a></dt>
+<dd><p>feed new previous states function and timestep</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.add_dirichlet_BC">
 <code class="sig-name descname">add_dirichlet_BC</code><span class="sig-paren">(</span><em class="sig-param">value</em>, <em class="sig-param">where</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.add_dirichlet_BC" title="Permalink to this definition">¶</a></dt>
@@ -307,6 +504,14 @@
 <dt id="waterflow.flow1d.flowFV1d.Flow1DFV">
 <em class="property">class </em><code class="sig-prename descclassname">waterflow.flow1d.flowFV1d.</code><code class="sig-name descname">Flow1DFV</code><span class="sig-paren">(</span><em class="sig-param">id_</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFV1d.Flow1DFV" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="waterflow.flow1d.flowFV1d.Flow1DFV._FV_precalc">
+<code class="sig-name descname">_FV_precalc</code><span class="sig-paren">(</span><em class="sig-param">nodes</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFV1d.Flow1DFV._FV_precalc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assigns middle points between the nodes and the distance between
+the nodes to the nframe class attribute. Secondly, the lenght of each
+finite volumes element is assigned to the lengths attribute</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="waterflow.flow1d.flowFV1d.Flow1DFV.add_dirichlet_BC">
 <code class="sig-name descname">add_dirichlet_BC</code><span class="sig-paren">(</span><em class="sig-param">value</em>, <em class="sig-param">where</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFV1d.Flow1DFV.add_dirichlet_BC" title="Permalink to this definition">¶</a></dt>

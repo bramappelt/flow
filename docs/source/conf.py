@@ -73,3 +73,8 @@ math_number_all = True
 # Theme settings
 html_logo = './_static/drop.png'
 html_favicon = './_static/drop.bmp'
+
+# Napoleon settings
+napoleon_include_init_with_doc = True
+napoleon_include_private_with_doc = True
+napoleon_include_special_with_doc = True

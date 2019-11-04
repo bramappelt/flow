@@ -29,7 +29,6 @@ storage_change = initializer(fluxf.storage_change, fun=theta_h)
 # ########################### SOLVE TRANSIENT ################################
 
 FE_ut = Flow1DFE('Unsaturated transient model')
-FE_ut.scheme = 'linear'
 FE_ut.set_field1d(array=xsp)
 FE_ut.set_initial_states(initial_states)
 FE_ut.set_systemfluxfunction(fluxf.richards_equation, kfun=conductivity_func)

@@ -405,7 +405,7 @@ aliases of the function arguments are used.</p>
 <p class="centered">
 <strong><span class="math notranslate nohighlight">\(N = numnodes\)</span> ; <span class="math notranslate nohighlight">\(p = power\)</span> ; <span class="math notranslate nohighlight">\(x_{N} = rb\)</span></strong></p><div class="math notranslate nohighlight" id="equation-waterflow-utility-12">
 <span class="eqno">(13)<a class="headerlink" href="#equation-waterflow-utility-12" title="Permalink to this equation">¶</a></span>\[x_{i + 1} = \frac{x_{N} - x_{i}}{p * \left(N - 2 - i\right)}
-\text{ for } i = 1, 2, \dots ,N - 1\]</div>
+\text{ for } i = 0, 1, \dots ,N - 1\]</div>
 <p>When <cite>maxdist</cite> is given and any of the nodal distances exceed this limit
 the nodes are shifted towards the right boundary of the domain until
 the <cite>maxdist</cite> condition is met. Shifting occurs proportionally.</p>

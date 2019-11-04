@@ -19,7 +19,79 @@ documentation !!
 '''
 
 
-class Flow1DFE(object):
+class Flow1DFE:
+    """ Class for solving flow problems numerically
+
+    This class represents an object that can be used to solve
+    (un)saturated 1-dimensional flow problems using finite elements.
+    To increase the accuracy of numerical solutions the Gaussian
+    Quadrature method is used for integration.
+
+    Most of the methods applied on the object will change its internal
+    state rather than returning a value. The change of the system is
+    saved in any of its public attributes.
+
+    Parameters
+    ----------
+    id_ : `str`
+        Name of the model object.
+
+    savepath : `str`, optional
+        Directory to which model data will be saved.
+
+    Attributes
+    ----------
+    id_ : `str`
+        Name of the model object as passed to the class constructor.
+    savepath: `str`
+        Model's save directory.
+    systemfluxfunc : `function`
+        Holds the selected flux function.
+    nodes : `numpy.ndarray`
+        Nodal positions at which the system will be solved.
+    states : `numpy.ndarray`
+        State solutions at the nodal positions as defined in :py:attr:`~nodes`.
+    nframe : `numpy.ndarray`
+        Two dimensional array that contains the midpoints and the lengths of
+        the nodal discretization in its columns respectively.
+    lengths : `numpy.ndarray`
+        The same data as in the seconds column of :py:attr:`~nframe` but
+        in a different representation. This representation has the same length
+        as :py:attr:`~nodes` which is more convenient for certain forcing
+        calculations at the nodal positions.
+    coefmatr : `numpy.ndarray`
+        Square jacobian matrix used in the finite elements solution procedure.
+    BCs : `dict`
+        This defines the system's boundary conditions.
+    spatflux : `dict`
+        Contains the spatial fluxes on the model domain. # !! explain form
+    pointflux : `dict`
+        Contains the point fluxes on the model domain. # !! explain form
+    Spointflux : `dict`
+        Contains state dependent point fluxes on the model domain. # !! explain form
+    Sspatialflux : `dict`
+        Contains state dependent spatial fluxes on the model domain. # !! explain form
+    internal_forcing : `dict`
+        The internal forcing of the system as calculated with the
+        system flux function as saved in :py:attr:`~systemfluxfunc`,
+        using the selected Gaussian Quadrature :py:attr:`~scheme`.
+    forcing : `numpy.ndarray`
+        pass
+    conductivities : `numpy.ndarray`
+        pass
+    moisture : `numpy.ndarray`
+        pass
+    fluxes : `numpy.ndarray`
+        pass
+    isinitial : `bool`, default is True
+        pass
+    isconverged : `bool`, default is False
+        pass
+    scheme : `str`
+        pass
+
+    """
+
     def __init__(self, id_, savepath=OUTPUT_DIR):
         self.id = id_
         self.savepath = savepath
@@ -30,13 +102,12 @@ class Flow1DFE(object):
         self.lengths = None
         self.coefmatr = None
         self.BCs = {}
-        self.spatflux = {}
         self.pointflux = {}
-        self.internal_forcing = {}
+        self.spatflux = {}
         self.Spointflux = {}
         self.Sspatflux = {}
+        self.internal_forcing = {}
         self.forcing = None
-        self.scheme = "linear"
         self.conductivities = []
         self.moisture = []
         self.fluxes = []
@@ -61,6 +132,7 @@ class Flow1DFE(object):
         self._delta = 1e-5
 
         # specific
+        self.scheme = "linear"
         self._schemes = ["linear", "quadratic", "cubic", "quartic", "quintic"]
         self._xgaus = None
         self._wgaus = None
@@ -280,7 +352,7 @@ class Flow1DFE(object):
             middle.append((nodes[i] + nodes[i+1]) / 2)
             nodal_distances.append(nodes[i+1] - nodes[i])
 
-        # calculate the lenght of each 1d finite element
+        # calculate the length of each 1d finite element
         length = []
         length.append(middle[0] - nodes[0])
         for i in range(1, len(nodes) - 1):
@@ -371,7 +443,10 @@ class Flow1DFE(object):
                 break
 
     def set_scheme(self, scheme):
-        self.scheme = scheme
+        if scheme.lower() in self._schemes:
+            self.scheme = scheme.lower()
+        else:
+            raise ValueError(f"Select any of these schemes: {self._schemes}")
 
     def set_systemfluxfunction(self, function, **kwargs):
         for k, v in kwargs.items():
