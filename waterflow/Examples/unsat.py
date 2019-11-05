@@ -44,7 +44,7 @@ FE_ut.solve(dt_min=1e-5, dt_max=5, end_time=100, maxiter=500,
             dtitlow=1.5, dtithigh=0.5, itermin=3, itermax=7,
             verbosity=True)
 
-FE_ut.transient_dataframeify(nodes=[0, -2, -5, -8, -10])
+FE_ut.transient_dataframeify(nodes=[0, -2, -5, -8, -10], print_times=10)
 
 FE_ut.save(dirname='wbal_testing')
 

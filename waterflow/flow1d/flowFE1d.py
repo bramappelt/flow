@@ -43,52 +43,149 @@ class Flow1DFE:
     ----------
     id_ : `str`
         Name of the model object as passed to the class constructor.
+
     savepath: `str`
         Model's save directory.
+
     systemfluxfunc : `function`
         Holds the selected flux function.
+
     nodes : `numpy.ndarray`
         Nodal positions at which the system will be solved.
+
     states : `numpy.ndarray`
         State solutions at the nodal positions as defined in :py:attr:`~nodes`.
+
     nframe : `numpy.ndarray`
         Two dimensional array that contains the midpoints and the lengths of
         the nodal discretization in its columns respectively.
+
     lengths : `numpy.ndarray`
         The same data as in the seconds column of :py:attr:`~nframe` but
         in a different representation. This representation has the same length
         as :py:attr:`~nodes` which is more convenient for certain forcing
         calculations at the nodal positions.
+
     coefmatr : `numpy.ndarray`
         Square jacobian matrix used in the finite elements solution procedure.
+
     BCs : `dict`
         This defines the system's boundary conditions.
+
     spatflux : `dict`
         Contains the spatial fluxes on the model domain. # !! explain form
+
     pointflux : `dict`
         Contains the point fluxes on the model domain. # !! explain form
+
     Spointflux : `dict`
         Contains state dependent point fluxes on the model domain. # !! explain form
+
     Sspatialflux : `dict`
         Contains state dependent spatial fluxes on the model domain. # !! explain form
+
     internal_forcing : `dict`
         The internal forcing of the system as calculated with the
         system flux function as saved in :py:attr:`~systemfluxfunc`,
         using the selected Gaussian Quadrature :py:attr:`~scheme`.
+
     forcing : `numpy.ndarray`
         pass
+
     conductivities : `numpy.ndarray`
         pass
+
     moisture : `numpy.ndarray`
         pass
+
     fluxes : `numpy.ndarray`
         pass
+
     isinitial : `bool`, default is True
-        pass
+        No calculations are performed on the input data yet.
+
     isconverged : `bool`, default is False
+        The system has converged to a solution.
+
+    solve_data : `dict`
+        Holds the solve information of the system if :py:attr:`~isinitial`
+        equals False including the following key-value pairs:
+
+        * solved_objects - A `list` of Flow1DFE objects at solved time steps.
+
+        * time - A `list` of times at which the model states are calculated.
+
+        * dt - A `list` of time step sizes between consecutive model solutions.
+
+        * | iter - A `list` containing the number of iterations needed for
+          | consecutive model solutions to converge.
+
+    runtime : `float`
+        The total time it takes for :py:meth:`~solve` to find a solution.
+
+    df_states : `pandas.core.frame.DataFrame`
+        Current information about the static model solution.
+
+    df_balance : `pandas.core.frame.DataFrame`
+        Current static information about the water balance.
+
+    df_balance_summary : `pandas.core.frame.DataFrame`
+        Sum of the columns as saved in :py:attr:`~df_balance`.
+
+    dft_solved_times : `pandas.core.frame.DataFrame`
+        Dataframe version of :py:attr:`~solve_data`.
+
+    dft_print_times : `pandas.core.frame.DataFrame`
+        Objects that contain a solution to the model at specific times,
+        calculated with :py:meth:`~transient_dataframify`.
+
+    dft_states : `dict`
+        Collection of all :py:attr:`~df_states` dataframes at
+        :py:attr:`~solved_times` or at :py:attr:~`print_times` if not `None`.
+
+    dft_nodes : `dict`
+        Nodes that are selected in :py:meth:`~transient_dataframify` are
+        saved at :py:attr:`~solved_times` or at :py:attr:~`print_times`
+        if not `None`.
+
+    dft_balance : `dict`
+        Collection of all :py:attr:`~df_balance` dataframes at
+        :py:attr:`~solved_times` or at :py:attr:~`print_times` if not `None`.
+
+    dft_balance_summary : `pandas.core.frame.DataFrame`
+        Collection of all :py:attr:`~df_balance_summary` dataframes at
+        :py:attr:`~solved_times` or at :py:attr:~`print_times` if not `None`.
+
+    _west : `int`
         pass
+
+    _east : `int`
+        pass
+
+    _delta : `float`
+        pass
+
     scheme : `str`
-        pass
+        Selected scheme used in the Gaussian Quadrature procedure. The
+        available schemes are documented in :py:meth:`~set_scheme`.
+
+    _schemes : `list`
+        Available schemes for the Gaussian Quadrature procedure.
+
+    _xgaus : `tuple`
+        Relative positions of the Gaussian quadrature points on the
+        interval [0, 1].
+
+    _wgaus : `tuple`
+        Weights that correspond to :py:attr:`~_xgaus`.
+
+    gausquad : `dict`
+        Combination of corresponding values of :py:attr:`~_xgaus` and
+        :py:attr:`~wgaus` into a single data structure.
+
+    xintegration : `list`
+        Absolute positions of the Gaussian quadrature points in the domain
+        :py:attr:`~nodes` calculated using :py:meth:`~_FE_precalc`.
 
     """
 
@@ -123,14 +220,13 @@ class Flow1DFE:
         self.dft_solved_times = None
         self.dft_print_times = None
         self.dft_states = None
+        self.dft_nodes = None
         self.dft_balance = None
         self.dft_balance_summary = None
-        self.dft_nodes = None
         # private attributes
         self._west = None
         self._east = None
         self._delta = 1e-5
-
         # specific
         self.scheme = "linear"
         self._schemes = ["linear", "quadratic", "cubic", "quartic", "quintic"]
@@ -141,9 +237,24 @@ class Flow1DFE:
         self._calcgaussianquadrature()
 
     def __repr__(self):
+        """ Representation of the object as shown to the user """
         return "Flow1DFE(" + str(self.id) + ")"
 
     def summary(self, show=True):
+        """ Description of the object
+
+        Parameters
+        ----------
+        show : `bool`, default is True
+            Print object description to the console
+
+        .. note::
+            The dataframe that might be included is based on
+            :py:attr:`~df_balance_summary` and is only included if the model
+            has been solved for.
+
+        """
+
         id_ = f"{self.id}"
         if self.nodes is not None:
             len_ = str(self.nodes[-1] - self.nodes[0])
@@ -161,7 +272,7 @@ class Flow1DFE:
         spatflux = ", ".join(i for i in skeys)
         runtime = self.runtime
 
-        k = ['Id', 'System lenght', 'Number of nodes', 'Scheme',
+        k = ['Id', 'System length', 'Number of nodes', 'Scheme',
              'BCs', 'Pointflux', 'Spatflux', 'Runtime (s)']
         v = (id_, len_, num_nodes, scheme, bcs, pointflux, spatflux, runtime)
         sumstring = ""
@@ -442,7 +553,28 @@ class Flow1DFE:
                 self._FE_precalc(self.nodes)
                 break
 
-    def set_scheme(self, scheme):
+    def set_scheme(self, scheme='linear'):
+        """ Select the Gaussian Quadrature scheme
+
+        The selection of the scheme is saved in :py:attr:`~scheme` internally.
+
+        Parameters
+        ---------
+        scheme : `str`, default='linear'
+            Any of the following schemes:
+
+            * linear
+
+            * quadratic
+
+            * cubic
+
+            * quartic
+
+            * quintic
+
+        """
+
         if scheme.lower() in self._schemes:
             self.scheme = scheme.lower()
         else:
