@@ -13,7 +13,7 @@ from waterflow.utility.spacing import spacing
 
 L = 20
 nx = 11
-domain = [L, nx]
+domain = (0, L, nx)
 S = 1.0
 dt = 1.0
 runs = 1
@@ -75,7 +75,7 @@ def stateposfunc(x, s):
 # ################################ STRUCTURED #################################
 
 FE = Flow1DFE("structured")
-FE.set_field1d(linear=domain)
+FE.set_field1d(nodes=domain)
 FE.set_systemfluxfunction(fluxfunction_var_k, kfun=kfun)
 FE.set_initial_states(4.90)
 
@@ -116,7 +116,7 @@ ax.grid()
 
 FEu = Flow1DFE("unstructured")
 xsp, _ = spacing(nx, L, linear=False, loc=[4, 7], power=2, weight=10)
-FEu.set_field1d(array=xsp)
+FEu.set_field1d(nodes=xsp)
 FEu.set_systemfluxfunction(fluxfunction_var_k, kfun=kfun)
 FEu.set_initial_states(4.90)
 
@@ -156,9 +156,8 @@ ax.grid()
 # ################################ TRANSIENT ##################################
 
 FEut = Flow1DFE("unstructured & transient")
-FEut.scheme = 'linear'
 xsp, _ = spacing(nx, L, linear=False, loc=[4, 7], power=2, weight=10)
-FEut.set_field1d(array=xsp)
+FEut.set_field1d(nodes=xsp)
 FEut.set_systemfluxfunction(fluxfunction_var_k, kfun=kfun)
 FEut.set_initial_states(4.9)
 

@@ -10,13 +10,9 @@ import os
 import numpy as np
 import pandas as pd
 from scipy.integrate import quad
+from scipy.special import legendre
 
 from waterflow import OUTPUT_DIR
-
-
-'''
-documentation !!
-'''
 
 
 class Flow1DFE:
@@ -25,7 +21,7 @@ class Flow1DFE:
     This class represents an object that can be used to solve
     (un)saturated 1-dimensional flow problems using finite elements.
     To increase the accuracy of numerical solutions the Gaussian
-    Quadrature method is used for integration.
+    quadrature method is used for integration approximation.
 
     Most of the methods applied on the object will change its internal
     state rather than returning a value. The change of the system is
@@ -42,7 +38,7 @@ class Flow1DFE:
     Attributes
     ----------
     id_ : `str`
-        Name of the model object as passed to the class constructor.
+        Name of the model object.
 
     savepath: `str`
         Model's save directory.
@@ -87,7 +83,7 @@ class Flow1DFE:
     internal_forcing : `dict`
         The internal forcing of the system as calculated with the
         system flux function as saved in :py:attr:`~systemfluxfunc`,
-        using the selected Gaussian Quadrature :py:attr:`~scheme`.
+        using the selected Gaussian quadrature :py:attr:`~degree_degree`.
 
     forcing : `numpy.ndarray`
         pass
@@ -165,27 +161,24 @@ class Flow1DFE:
     _delta : `float`
         pass
 
-    scheme : `str`
-        Selected scheme used in the Gaussian Quadrature procedure. The
-        available schemes are documented in :py:meth:`~set_scheme`.
+    gauss_degree : `str`
+        Degree or number of points used in the Gaussian quadrature procedure
+        for integral approximation.
 
-    _schemes : `list`
-        Available schemes for the Gaussian Quadrature procedure.
+    _xgauss : `tuple`
+        Roots of Legendre polynomial on the interval [0, 1] for the selected
+        :py:attr:~`gauss_degree`.
 
-    _xgaus : `tuple`
-        Relative positions of the Gaussian quadrature points on the
-        interval [0, 1].
+    _wgauss : `tuple`
+        Weights that correspond to :py:attr:`~_xgauss`.
 
-    _wgaus : `tuple`
-        Weights that correspond to :py:attr:`~_xgaus`.
-
-    gausquad : `dict`
-        Combination of corresponding values of :py:attr:`~_xgaus` and
-        :py:attr:`~wgaus` into a single data structure.
+    gaussquad : `list`
+        Combination of corresponding values of :py:attr:`~_xgauss` and
+        :py:attr:`~wgauss` into a single data structure.
 
     xintegration : `list`
         Absolute positions of the Gaussian quadrature points in the domain
-        :py:attr:`~nodes` calculated using :py:meth:`~_FE_precalc`.
+        :py:attr:`~nodes`.
 
     """
 
@@ -228,13 +221,11 @@ class Flow1DFE:
         self._east = None
         self._delta = 1e-5
         # specific
-        self.scheme = "linear"
-        self._schemes = ["linear", "quadratic", "cubic", "quartic", "quintic"]
-        self._xgaus = None
-        self._wgaus = None
-        self.gausquad = None
+        self.gauss_degree = 1
+        self._xgauss = None
+        self._wgauss = None
+        self.gaussquad = None
         self.xintegration = None
-        self._calcgaussianquadrature()
 
     def __repr__(self):
         """ Representation of the object as shown to the user """
@@ -249,6 +240,7 @@ class Flow1DFE:
             Print object description to the console
 
         .. note::
+
             The dataframe that might be included is based on
             :py:attr:`~df_balance_summary` and is only included if the model
             has been solved for.
@@ -262,7 +254,7 @@ class Flow1DFE:
         else:
             len_ = None
             num_nodes = None
-        scheme = self.scheme
+        degree = self.gauss_degree
         bcs = [[k, self.BCs[k][0], self.BCs[k][1]] for k in self.BCs.keys()]
         bcs = ["{} value: {} and of type {}".format(*bc) for bc in bcs]
         bcs = ", ".join(i for i in bcs)
@@ -272,9 +264,9 @@ class Flow1DFE:
         spatflux = ", ".join(i for i in skeys)
         runtime = self.runtime
 
-        k = ['Id', 'System length', 'Number of nodes', 'Scheme',
+        k = ['Id', 'System length', 'Number of nodes', 'Gauss degree',
              'BCs', 'Pointflux', 'Spatflux', 'Runtime (s)']
-        v = (id_, len_, num_nodes, scheme, bcs, pointflux, spatflux, runtime)
+        v = (id_, len_, num_nodes, degree, bcs, pointflux, spatflux, runtime)
         sumstring = ""
         for i, j in zip(k, v):
             if j:
@@ -292,20 +284,57 @@ class Flow1DFE:
 
         self.summarystring = sumstring
 
-    def _calcgaussianquadrature(self):
-        ''' Calculate gaussian quadrature points '''
-        pos = []
-        weights = []
-        for i in range(1, len(self._schemes) + 1):
-            # calculate gaussian quadrature points for degree i
-            p, w = np.polynomial.legendre.leggauss(i)
-            # shift points from domain [-1, 1] to [0, 1]
-            pos.append(tuple(np.array(p) / 2 + 0.5))
-            weights.append(tuple(np.array(w) / 2))
-        # assign data to class attributes
-        self._xgaus = tuple(pos)
-        self._wgaus = tuple(weights)
-        self.gausquad = dict(zip(self._schemes, zip(pos, weights)))
+    def set_gaussian_quadrature(self, degree=1):
+        """ Calculates Gaussian quadrature roots and weights
+
+        The values calculated with this method are stored in the object's
+        :py:attr:`~_xgauss` and :py:attr:`~_wgauss` attributes.
+
+        Parameters
+        ----------
+        degree : `int`, default is 1
+            Number of points used in the Gaussian quadrature procedure.
+
+        Notes
+        -----
+
+        .. math::
+                P_{n}(x) = \\text{Legendre polynomials of degree n}
+
+        .. math::
+                w_{i} = \\frac{2}{\\left(\\left(1 - x_{i}^{2}\\right) *
+                (P_{n}^{'}(x_{i})^{2}\\right)}
+
+
+        See :cite:`Strunk1979` for an introduction to stylish blah, blah...
+
+        .. bibliography:: bibliography.bib
+
+        """
+        # calculate roots of Legendre polynomial for degree n
+        legn = legendre(degree)
+        roots = np.sort(legn.r)
+
+        # calculate corresponding weights
+        weights = 2 / ((1 - roots**2) * (legn.deriv()(roots)) ** 2)
+
+        # shift roots and weights from domain [-1, 1] to [0, 1]
+        roots = tuple(roots / 2 + 0.5)
+        weights = tuple(weights / 2)
+
+        # Calculate absolute positions of Gaussian quadrature roots
+        xintegration = [[] for x in range(len(self.nodes) - 1)]
+        for i in range(len(self.nodes) - 1):
+            for j in range(len(roots)):
+                xij = (self.nodes[i+1] - self.nodes[i]) * roots[j] + \
+                       self.nodes[i]
+                xintegration[i].append(xij)
+
+        self._xgauss = roots
+        self._wgauss = weights
+        self.gaussquad = [self._xgauss, self._wgauss]
+        self.xintegration = xintegration
+        self.gauss_degree = degree
 
     def _aggregate_forcing(self):
         self.forcing = np.repeat(0.0, len(self.nodes))
@@ -327,7 +356,7 @@ class Flow1DFE:
         in the method signature is calculated.
         """
         # internal fluxes from previous iteration
-        pos, weight = self.gausquad[self.scheme]
+        pos, weight = self.gaussquad
         f = [0.0 for x in range(len(self.nodes))]
         for i in range(len(self.nodes) - 1):
             L = self.nframe[i, 1]
@@ -364,7 +393,7 @@ class Flow1DFE:
             self.Spointflux[key][1] = np.array(f)
 
         # spatial state dependent forcing
-        pos, weight = self.gausquad[self.scheme]
+        pos, weight = self.gaussquad
         for key in self.Sspatflux.keys():
             f = [0.0 for x in range(len(self.nodes))]
             Sfunc = self.Sspatflux[key][0]
@@ -446,18 +475,11 @@ class Flow1DFE:
             self._internal_forcing()
             self._update_storage_change(self.states_to_function(), dt=1)
 
-    def _FE_precalc(self, nodes):
-        # calculate the x positions of each integration point between nodes
-        xintegration = [[] for x in range(len(nodes) - 1)]
-        pos, weight = self.gausquad[self.scheme]
-        for i in range(len(nodes) - 1):
-            for j in range(len(pos)):
-                xij = nodes[i] + (nodes[i+1] - nodes[i]) * pos[j]
-                xintegration[i].append(xij)
-        self.xintegration = xintegration
-
+    def _FE_precalc(self):
+        nodes = self.nodes
         middle = []
         nodal_distances = []
+
         # calculate positions of midpoints and nodal distances
         for i in range(0, len(nodes) - 1):
             middle.append((nodes[i] + nodes[i+1]) / 2)
@@ -486,7 +508,7 @@ class Flow1DFE:
             grad = (stateright - stateleft) / L
 
             totflux = np.array([0, 0, 0], dtype=np.float64)
-            pos, weight = self.gausquad[self.scheme]
+            pos, weight = self.gaussquad
             Svall = 0
             Svalr = 0
             # calculates the selected integral approximation
@@ -539,46 +561,15 @@ class Flow1DFE:
                 return (x - n[node]) / (n[node + 1] - n[node])
         return basis_function
 
-    def set_field1d(self, **kwargs):
-        ''' Define the nodal structure '''
-        for key in kwargs.keys():
-            if key == "linear":
-                self.nodes = np.linspace(0, kwargs[key][0], kwargs[key][1])
-                self.states = np.repeat(0, len(self.nodes))
-                self._FE_precalc(self.nodes)
-                break
-            elif key == "array":
-                self.nodes = np.array(kwargs[key])
-                self.states = np.repeat(0, len(self.nodes))
-                self._FE_precalc(self.nodes)
-                break
-
-    def set_scheme(self, scheme='linear'):
-        """ Select the Gaussian Quadrature scheme
-
-        The selection of the scheme is saved in :py:attr:`~scheme` internally.
-
-        Parameters
-        ---------
-        scheme : `str`, default='linear'
-            Any of the following schemes:
-
-            * linear
-
-            * quadratic
-
-            * cubic
-
-            * quartic
-
-            * quintic
-
-        """
-
-        if scheme.lower() in self._schemes:
-            self.scheme = scheme.lower()
+    def set_field1d(self, nodes, degree=1):
+        if isinstance(nodes, tuple):
+            self.nodes = np.linspace(*nodes)
         else:
-            raise ValueError(f"Select any of these schemes: {self._schemes}")
+            self.nodes = np.array(nodes)
+
+        self.states = np.repeat(0, len(self.nodes))
+        self.set_gaussian_quadrature(degree=degree)
+        self._FE_precalc()
 
     def set_systemfluxfunction(self, function, **kwargs):
         for k, v in kwargs.items():
@@ -712,7 +703,7 @@ class Flow1DFE:
             if nargs == 1:
                 # linear appoximation integral
                 if not exact:
-                    pos, weight = self.gausquad[self.scheme]
+                    pos, weight = self.gaussquad
                     for i in range(len(self.nodes) - 1):
                         # distance between nodes
                         L = self.nframe[i, 1]
@@ -811,7 +802,7 @@ class Flow1DFE:
             return partial(np.interp, xp=self.nodes, fp=states)
 
     def dt_solve(self, dt, maxiter=500, threshold=1e-3):
-        ''' solve the system for one specific time step '''
+        """ solve the system for one specific time step """
         self._check_boundaries()
         west = self._west
         east = self._east
@@ -854,7 +845,7 @@ class Flow1DFE:
     def solve(self, dt=0.001, dt_min=1e-5, dt_max=0.5, end_time=1, maxiter=500,
               dtitlow=1.5, dtithigh=0.5, itermin=5, itermax=10, threshold=1e-3,
               verbosity=True):
-        ''' solve the system for a given period of time '''
+        """ solve the system for a given period of time """
 
         solved_objs = [deepcopy(self)]
         time_data = [0]
@@ -970,7 +961,7 @@ class Flow1DFE:
         for key in spatialfluxes.keys():
             # if state dependent, calculate new forcing for new states
             if key in self.Sspatflux.keys():
-                pos, weight = self.gausquad[self.scheme]
+                pos, weight = self.gaussquad
                 f = [0.0 for x in range(len(self.nodes))]
                 Sfunc = self.Sspatflux[key][0]
                 for i in range(len(self.nodes) - 1):
@@ -1186,3 +1177,8 @@ class Flow1DFE:
                     with pd.ExcelWriter(save_file) as fw:
                         for k, df in v.items():
                             df.to_excel(fw, sheet_name=str(k))
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

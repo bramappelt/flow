@@ -181,8 +181,6 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE.__repr__">__repr__() (waterflow.flow1d.flowFE1d.Flow1DFE method)</a>
 </li>
-      <li><a href="waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE._calcgaussianquadrature">_calcgaussianquadrature() (waterflow.flow1d.flowFE1d.Flow1DFE method)</a>
-</li>
       <li><a href="waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE._delta">_delta (waterflow.flow1d.flowFE1d.Flow1DFE attribute)</a>
 </li>
       <li><a href="waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE._east">_east (waterflow.flow1d.flowFE1d.Flow1DFE attribute)</a>
@@ -193,15 +191,13 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE._internal_forcing">_internal_forcing() (waterflow.flow1d.flowFE1d.Flow1DFE method)</a>
 </li>
-      <li><a href="waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE._schemes">_schemes (waterflow.flow1d.flowFE1d.Flow1DFE attribute)</a>
-</li>
       <li><a href="waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE._update_storage_change">_update_storage_change() (waterflow.flow1d.flowFE1d.Flow1DFE method)</a>
 </li>
       <li><a href="waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE._west">_west (waterflow.flow1d.flowFE1d.Flow1DFE attribute)</a>
 </li>
-      <li><a href="waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE._wgaus">_wgaus (waterflow.flow1d.flowFE1d.Flow1DFE attribute)</a>
+      <li><a href="waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE._wgauss">_wgauss (waterflow.flow1d.flowFE1d.Flow1DFE attribute)</a>
 </li>
-      <li><a href="waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE._xgaus">_xgaus (waterflow.flow1d.flowFE1d.Flow1DFE attribute)</a>
+      <li><a href="waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE._xgauss">_xgauss (waterflow.flow1d.flowFE1d.Flow1DFE attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -327,7 +323,11 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE.gausquad">gausquad (waterflow.flow1d.flowFE1d.Flow1DFE attribute)</a>
+      <li><a href="waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE.gauss_degree">gauss_degree (waterflow.flow1d.flowFE1d.Flow1DFE attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE.gaussquad">gaussquad (waterflow.flow1d.flowFE1d.Flow1DFE attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -447,22 +447,20 @@
 </li>
       <li><a href="waterflow.utility.html#waterflow.utility.plotting.scale">scale() (in module waterflow.utility.plotting)</a>
 </li>
-      <li><a href="waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE.scheme">scheme (waterflow.flow1d.flowFE1d.Flow1DFE attribute)</a>
-</li>
       <li><a href="waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE.set_field1d">set_field1d() (waterflow.flow1d.flowFE1d.Flow1DFE method)</a>
 
       <ul>
         <li><a href="waterflow.flow1d.html#waterflow.flow1d.flowFV1d.Flow1DFV.set_field1d">(waterflow.flow1d.flowFV1d.Flow1DFV method)</a>
 </li>
       </ul></li>
+      <li><a href="waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE.set_gaussian_quadrature">set_gaussian_quadrature() (waterflow.flow1d.flowFE1d.Flow1DFE method)</a>
+</li>
       <li><a href="waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE.set_initial_states">set_initial_states() (waterflow.flow1d.flowFE1d.Flow1DFE method)</a>
 
       <ul>
         <li><a href="waterflow.flow1d.html#waterflow.flow1d.flowFV1d.Flow1DFV.set_initial_states">(waterflow.flow1d.flowFV1d.Flow1DFV method)</a>
 </li>
       </ul></li>
-      <li><a href="waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE.set_scheme">set_scheme() (waterflow.flow1d.flowFE1d.Flow1DFE method)</a>
-</li>
       <li><a href="waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE.set_systemfluxfunction">set_systemfluxfunction() (waterflow.flow1d.flowFE1d.Flow1DFE method)</a>
 
       <ul>

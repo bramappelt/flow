@@ -43,8 +43,8 @@ extensions = ['sphinx.ext.autodoc',
               'matplotlib.sphinxext.plot_directive',
               'IPython.sphinxext.ipython_directive',
               'IPython.sphinxext.ipython_console_highlighting',
-              'sphinx.ext.inheritance_diagram'
-]
+              'sphinx.ext.inheritance_diagram',
+              'sphinxcontrib.bibtex']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -68,7 +68,7 @@ html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 
 # Math settings
-math_number_all = True
+# math_number_all = True
 
 # Theme settings
 html_logo = './_static/drop.png'

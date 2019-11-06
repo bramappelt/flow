@@ -288,5 +288,3 @@ def biasedspacing(numnodes, power, lb=0, rb=1, maxdist=None, length=1):
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
-
-    biasedspacing(11, 4, rb=-10, maxdist=4)

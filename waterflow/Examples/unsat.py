@@ -29,7 +29,8 @@ storage_change = initializer(fluxf.storage_change, fun=theta_h)
 # ########################### SOLVE TRANSIENT ################################
 
 FE_ut = Flow1DFE('Unsaturated transient model')
-FE_ut.set_field1d(array=xsp)
+FE_ut.set_field1d(nodes=xsp, degree=4)
+# FE_ut.set_gaussian_quadrature(2)
 FE_ut.set_initial_states(initial_states)
 FE_ut.set_systemfluxfunction(fluxf.richards_equation, kfun=conductivity_func)
 FE_ut.add_dirichlet_BC(0.0, 'west')
@@ -40,11 +41,11 @@ FE_ut.add_spatialflux(-0.001, 'extraction')
 
 FE_ut.add_spatialflux(storage_change)
 
-FE_ut.solve(dt_min=1e-5, dt_max=5, end_time=100, maxiter=500,
+FE_ut.solve(dt_min=1e-5, dt_max=2, end_time=10, maxiter=500,
             dtitlow=1.5, dtithigh=0.5, itermin=3, itermax=7,
             verbosity=True)
 
-FE_ut.transient_dataframeify(nodes=[0, -2, -5, -8, -10], print_times=10)
+FE_ut.transient_dataframeify(nodes=[0, -2, -5, -8, -10])
 
 FE_ut.save(dirname='wbal_testing')
 
@@ -71,4 +72,3 @@ for k, v in FE_ut.dft_balance.items():
 
 solverplot(FE_ut, save=True, filename='test.png')
 plt.show()
-

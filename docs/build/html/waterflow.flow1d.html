@@ -187,7 +187,7 @@
 <p>This class represents an object that can be used to solve
 (un)saturated 1-dimensional flow problems using finite elements.
 To increase the accuracy of numerical solutions the Gaussian
-Quadrature method is used for integration.</p>
+quadrature method is used for integration approximation.</p>
 <p>Most of the methods applied on the object will change its internal
 state rather than returning a value. The change of the system is
 saved in any of its public attributes.</p>
@@ -202,7 +202,7 @@ saved in any of its public attributes.</p>
 <dl class="attribute">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.id_">
 <code class="sig-name descname">id_</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.id_" title="Permalink to this definition">¶</a></dt>
-<dd><p>Name of the model object as passed to the class constructor.</p>
+<dd><p>Name of the model object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><cite>str</cite></p>
@@ -351,7 +351,7 @@ calculations at the nodal positions.</p>
 <code class="sig-name descname">internal_forcing</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.internal_forcing" title="Permalink to this definition">¶</a></dt>
 <dd><p>The internal forcing of the system as calculated with the
 system flux function as saved in <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.systemfluxfunc" title="waterflow.flow1d.flowFE1d.Flow1DFE.systemfluxfunc"><code class="xref py py-attr docutils literal notranslate"><span class="pre">systemfluxfunc</span></code></a>,
-using the selected Gaussian Quadrature <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.scheme" title="waterflow.flow1d.flowFE1d.Flow1DFE.scheme"><code class="xref py py-attr docutils literal notranslate"><span class="pre">scheme</span></code></a>.</p>
+using the selected Gaussian quadrature <code class="xref py py-attr docutils literal notranslate"><span class="pre">degree_degree</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><cite>dict</cite></p>
@@ -597,10 +597,10 @@ if not <cite>None</cite>.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="waterflow.flow1d.flowFE1d.Flow1DFE.scheme">
-<code class="sig-name descname">scheme</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.scheme" title="Permalink to this definition">¶</a></dt>
-<dd><p>Selected scheme used in the Gaussian Quadrature procedure. The
-available schemes are documented in <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.set_scheme" title="waterflow.flow1d.flowFE1d.Flow1DFE.set_scheme"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_scheme()</span></code></a>.</p>
+<dt id="waterflow.flow1d.flowFE1d.Flow1DFE.gauss_degree">
+<code class="sig-name descname">gauss_degree</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.gauss_degree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Degree or number of points used in the Gaussian quadrature procedure
+for integral approximation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><cite>str</cite></p>
@@ -609,9 +609,33 @@ available schemes are documented in <a class="reference internal" href="#waterfl
 </dd></dl>
 
 <dl class="attribute">
-<dt id="waterflow.flow1d.flowFE1d.Flow1DFE._schemes">
-<code class="sig-name descname">_schemes</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE._schemes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Available schemes for the Gaussian Quadrature procedure.</p>
+<dt id="waterflow.flow1d.flowFE1d.Flow1DFE._xgauss">
+<code class="sig-name descname">_xgauss</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE._xgauss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Roots of Legendre polynomial on the interval [0, 1] for the selected
+:py:attr:~`gauss_degree`.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><cite>tuple</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="waterflow.flow1d.flowFE1d.Flow1DFE._wgauss">
+<code class="sig-name descname">_wgauss</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE._wgauss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Weights that correspond to <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE._xgauss" title="waterflow.flow1d.flowFE1d.Flow1DFE._xgauss"><code class="xref py py-attr docutils literal notranslate"><span class="pre">_xgauss</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><cite>tuple</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="waterflow.flow1d.flowFE1d.Flow1DFE.gaussquad">
+<code class="sig-name descname">gaussquad</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.gaussquad" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combination of corresponding values of <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE._xgauss" title="waterflow.flow1d.flowFE1d.Flow1DFE._xgauss"><code class="xref py py-attr docutils literal notranslate"><span class="pre">_xgauss</span></code></a> and
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">wgauss</span></code> into a single data structure.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><cite>list</cite></p>
@@ -620,45 +644,10 @@ available schemes are documented in <a class="reference internal" href="#waterfl
 </dd></dl>
 
 <dl class="attribute">
-<dt id="waterflow.flow1d.flowFE1d.Flow1DFE._xgaus">
-<code class="sig-name descname">_xgaus</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE._xgaus" title="Permalink to this definition">¶</a></dt>
-<dd><p>Relative positions of the Gaussian quadrature points on the
-interval [0, 1].</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><cite>tuple</cite></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="waterflow.flow1d.flowFE1d.Flow1DFE._wgaus">
-<code class="sig-name descname">_wgaus</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE._wgaus" title="Permalink to this definition">¶</a></dt>
-<dd><p>Weights that correspond to <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE._xgaus" title="waterflow.flow1d.flowFE1d.Flow1DFE._xgaus"><code class="xref py py-attr docutils literal notranslate"><span class="pre">_xgaus</span></code></a>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><cite>tuple</cite></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="waterflow.flow1d.flowFE1d.Flow1DFE.gausquad">
-<code class="sig-name descname">gausquad</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.gausquad" title="Permalink to this definition">¶</a></dt>
-<dd><p>Combination of corresponding values of <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE._xgaus" title="waterflow.flow1d.flowFE1d.Flow1DFE._xgaus"><code class="xref py py-attr docutils literal notranslate"><span class="pre">_xgaus</span></code></a> and
-<code class="xref py py-attr docutils literal notranslate"><span class="pre">wgaus</span></code> into a single data structure.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><cite>dict</cite></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="attribute">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.xintegration">
 <code class="sig-name descname">xintegration</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.xintegration" title="Permalink to this definition">¶</a></dt>
 <dd><p>Absolute positions of the Gaussian quadrature points in the domain
-<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.nodes" title="waterflow.flow1d.flowFE1d.Flow1DFE.nodes"><code class="xref py py-attr docutils literal notranslate"><span class="pre">nodes</span></code></a> calculated using <code class="xref py py-meth docutils literal notranslate"><span class="pre">_FE_precalc()</span></code>.</p>
+<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.nodes" title="waterflow.flow1d.flowFE1d.Flow1DFE.nodes"><code class="xref py py-attr docutils literal notranslate"><span class="pre">nodes</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><cite>list</cite></p>
@@ -670,12 +659,6 @@ interval [0, 1].</p>
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.__repr__">
 <code class="sig-name descname">__repr__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.__repr__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Representation of the object as shown to the user</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="waterflow.flow1d.flowFE1d.Flow1DFE._calcgaussianquadrature">
-<code class="sig-name descname">_calcgaussianquadrature</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE._calcgaussianquadrature" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculate gaussian quadrature points</p>
 </dd></dl>
 
 <dl class="method">
@@ -761,34 +744,39 @@ in the method signature is calculated.</p>
 
 <dl class="method">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.set_field1d">
-<code class="sig-name descname">set_field1d</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.set_field1d" title="Permalink to this definition">¶</a></dt>
-<dd><p>Define the nodal structure</p>
+<code class="sig-name descname">set_field1d</code><span class="sig-paren">(</span><em class="sig-param">nodes</em>, <em class="sig-param">degree=1</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.set_field1d" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="waterflow.flow1d.flowFE1d.Flow1DFE.set_gaussian_quadrature">
+<code class="sig-name descname">set_gaussian_quadrature</code><span class="sig-paren">(</span><em class="sig-param">degree=1</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.set_gaussian_quadrature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates Gaussian quadrature roots and weights</p>
+<p>The values calculated with this method are stored in the object’s
+<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE._xgauss" title="waterflow.flow1d.flowFE1d.Flow1DFE._xgauss"><code class="xref py py-attr docutils literal notranslate"><span class="pre">_xgauss</span></code></a> and <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE._wgauss" title="waterflow.flow1d.flowFE1d.Flow1DFE._wgauss"><code class="xref py py-attr docutils literal notranslate"><span class="pre">_wgauss</span></code></a> attributes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>degree</strong> (<cite>int</cite>, default is 1) – Number of points used in the Gaussian quadrature procedure.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<div class="math notranslate nohighlight">
+\[P_{n}(x) = \text{Legendre polynomials of degree n}\]</div>
+<div class="math notranslate nohighlight">
+\[w_{i} = \frac{2}{\left(\left(1 - x_{i}^{2}\right) *
+(P_{n}^{'}(x_{i})^{2}\right)}\]</div>
+<p>See <a class="bibtex reference internal" href="#strunk1979" id="id1">[SW79]</a> for an introduction to stylish blah, blah…</p>
+<p id="bibtex-bibliography-waterflow.flow1d-0"><dl class="citation">
+<dt class="bibtex label" id="strunk1979"><span class="brackets"><a class="fn-backref" href="#id1">SW79</a></span></dt>
+<dd><p>William Strunk, Jr. and E. B. White. <em>The Elements of Style</em>. Macmillan, third edition, 1979.</p>
+</dd>
+</dl>
+</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.set_initial_states">
 <code class="sig-name descname">set_initial_states</code><span class="sig-paren">(</span><em class="sig-param">states</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.set_initial_states" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="method">
-<dt id="waterflow.flow1d.flowFE1d.Flow1DFE.set_scheme">
-<code class="sig-name descname">set_scheme</code><span class="sig-paren">(</span><em class="sig-param">scheme='linear'</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.set_scheme" title="Permalink to this definition">¶</a></dt>
-<dd><p>Select the Gaussian Quadrature scheme</p>
-<p>The selection of the scheme is saved in <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.scheme" title="waterflow.flow1d.flowFE1d.Flow1DFE.scheme"><code class="xref py py-attr docutils literal notranslate"><span class="pre">scheme</span></code></a> internally.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>scheme</strong> (<cite>str</cite>, default=’linear’) – <p>Any of the following schemes:</p>
-<ul class="simple">
-<li><p>linear</p></li>
-<li><p>quadratic</p></li>
-<li><p>cubic</p></li>
-<li><p>quartic</p></li>
-<li><p>quintic</p></li>
-</ul>
-</p>
-</dd>
-</dl>
-</dd></dl>
 
 <dl class="method">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.set_systemfluxfunction">
@@ -811,15 +799,14 @@ in the method signature is calculated.</p>
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.summary">
 <code class="sig-name descname">summary</code><span class="sig-paren">(</span><em class="sig-param">show=True</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.summary" title="Permalink to this definition">¶</a></dt>
 <dd><p>Description of the object</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The dataframe that might be included is based on
-<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.df_balance_summary" title="waterflow.flow1d.flowFE1d.Flow1DFE.df_balance_summary"><code class="xref py py-attr docutils literal notranslate"><span class="pre">df_balance_summary</span></code></a> and is only included if the model
-has been solved for.</p>
-</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>show</strong> (<cite>bool</cite>, default is True) – Print object description to the console</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>show</strong> (<cite>bool</cite>, default is True) – Print object description to the console</p></li>
+<li><p><strong>note::</strong> (<em>.</em>) – The dataframe that might be included is based on
+<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.df_balance_summary" title="waterflow.flow1d.flowFE1d.Flow1DFE.df_balance_summary"><code class="xref py py-attr docutils literal notranslate"><span class="pre">df_balance_summary</span></code></a> and is only included if the model
+has been solved for.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
