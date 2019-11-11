@@ -395,7 +395,8 @@ using the selected Gaussian quadrature <code class="xref py py-attr docutils lit
 <dl class="attribute">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.fluxes">
 <code class="sig-name descname">fluxes</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.fluxes" title="Permalink to this definition">¶</a></dt>
-<dd><p>pass</p>
+<dd><p>Fluxes through the <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.nodes" title="waterflow.flow1d.flowFE1d.Flow1DFE.nodes"><code class="xref py py-attr docutils literal notranslate"><span class="pre">nodes</span></code></a> are defined to be positive to the
+right.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><cite>numpy.ndarray</cite></p>
@@ -647,7 +648,8 @@ for integral approximation.</p>
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.xintegration">
 <code class="sig-name descname">xintegration</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.xintegration" title="Permalink to this definition">¶</a></dt>
 <dd><p>Absolute positions of the Gaussian quadrature points in the domain
-<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.nodes" title="waterflow.flow1d.flowFE1d.Flow1DFE.nodes"><code class="xref py py-attr docutils literal notranslate"><span class="pre">nodes</span></code></a>.</p>
+<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.nodes" title="waterflow.flow1d.flowFE1d.Flow1DFE.nodes"><code class="xref py py-attr docutils literal notranslate"><span class="pre">nodes</span></code></a>. The shape of this list is <code class="xref py py-attr docutils literal notranslate"><span class="pre">degree</span></code> by
+length :py:attr:<a href="#id1"><span class="problematic" id="id2">`</span></a>~nodes~ minus 1.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><cite>list</cite></p>
@@ -662,12 +664,101 @@ for integral approximation.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="waterflow.flow1d.flowFE1d.Flow1DFE._aggregate_forcing">
+<code class="sig-name descname">_aggregate_forcing</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE._aggregate_forcing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Aggregation of state independent forcing</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE._internal_forcing">
 <code class="sig-name descname">_internal_forcing</code><span class="sig-paren">(</span><em class="sig-param">calcflux=False</em>, <em class="sig-param">calcbal=False</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE._internal_forcing" title="Permalink to this definition">¶</a></dt>
-<dd><p>Internal fluxes for model convergence,
-flux calculation or balance calculation. Only one calculation
-at a time, when both arguments are truthy, the first argument
-in the method signature is calculated.</p>
+<dd><p>Calculate the system’s internal forcing</p>
+<p>This is a core method for the numerical finite elements scheme. The
+default behavior is to calculate the system’s internal forcing and
+assign the values to <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.forcing" title="waterflow.flow1d.flowFE1d.Flow1DFE.forcing"><code class="xref py py-attr docutils literal notranslate"><span class="pre">forcing</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>calcflux</strong> (<cite>bool</cite>, default is False) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, fluxes through the nodes are calculated and
+saved in <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.fluxes" title="waterflow.flow1d.flowFE1d.Flow1DFE.fluxes"><code class="xref py py-attr docutils literal notranslate"><span class="pre">fluxes</span></code></a>. In this case only the second
+summation in the <cite>notes</cite> section is applied.</p></li>
+<li><p><strong>calcbal</strong> (<cite>bool</cite>, default = False) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, internal forcing is saved in
+<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.internal_forcing" title="waterflow.flow1d.flowFE1d.Flow1DFE.internal_forcing"><code class="xref py py-attr docutils literal notranslate"><span class="pre">internal_forcing</span></code></a> instead of <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.forcing" title="waterflow.flow1d.flowFE1d.Flow1DFE.forcing"><code class="xref py py-attr docutils literal notranslate"><span class="pre">forcing</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This mathematical description of the internal forcing
+calculation describes how the forcing at nodes <span class="math notranslate nohighlight">\(i\)</span> and
+<span class="math notranslate nohighlight">\(i+1\)</span> is calculated. To calculate this forcing at the current
+time step <span class="math notranslate nohighlight">\(t\)</span>, states from the previous time step or initial
+states assigned through <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.set_initial_states" title="waterflow.flow1d.flowFE1d.Flow1DFE.set_initial_states"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_initial_states()</span></code></a> are needed,
+this is denoted by <span class="math notranslate nohighlight">\(t-1\)</span> in the subscripts. These functions are
+applied to all the <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.nodes" title="waterflow.flow1d.flowFE1d.Flow1DFE.nodes"><code class="xref py py-attr docutils literal notranslate"><span class="pre">nodes</span></code></a> in the domain. <span class="math notranslate nohighlight">\(j\)</span> denotes
+the indices of the Gaussian quadrature positions and weights. The
+direction of flow is defined to be positive to the right.</p>
+<div class="math notranslate nohighlight">
+\[F_{i,t} = - \sum_{j=0}^{degree-1} Q(x_{i,j}, s_{j,t-1}, grad_{j,t-1})*weight_{-j-1}\]</div>
+<div class="math notranslate nohighlight">
+\[F_{i+1,t} = \sum_{j=0}^{degree-1} Q(x_{i,j}, s_{j,t-1}, grad_{j,t-1})*weight_{j}\]</div>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(degree\)</span> corresponds to <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.gauss_degree" title="waterflow.flow1d.flowFE1d.Flow1DFE.gauss_degree"><code class="xref py py-attr docutils literal notranslate"><span class="pre">gauss_degree</span></code></a>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(weight\)</span> is described in <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE._wgauss" title="waterflow.flow1d.flowFE1d.Flow1DFE._wgauss"><code class="xref py py-attr docutils literal notranslate"><span class="pre">_wgauss</span></code></a>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(Q(x, s, grad)\)</span> is the <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.systemfluxfunc" title="waterflow.flow1d.flowFE1d.Flow1DFE.systemfluxfunc"><code class="xref py py-attr docutils literal notranslate"><span class="pre">systemfluxfunc</span></code></a>.</p></li>
+</ul>
+<p class="centered">
+<strong><span class="math notranslate nohighlight">\(Q(x_{i,j}, s_{j,t-1}, grad_{j,t-1}) =\)</span></strong></p><p class="centered">
+<strong><span class="math notranslate nohighlight">\(Q(x_{i,j},s_{i,t-1}*pos_{-j-1}+s_{i+1,t-1}*pos_{j},(s_{i+1,t-1}-s_{i,t-1})/L_{i})\)</span></strong></p><ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(x\)</span> is <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.xintegration" title="waterflow.flow1d.flowFE1d.Flow1DFE.xintegration"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xintegration</span></code></a>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(s\)</span> corresponds to <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.states" title="waterflow.flow1d.flowFE1d.Flow1DFE.states"><code class="xref py py-attr docutils literal notranslate"><span class="pre">states</span></code></a>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(pos\)</span> is described in <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE._xgauss" title="waterflow.flow1d.flowFE1d.Flow1DFE._xgauss"><code class="xref py py-attr docutils literal notranslate"><span class="pre">_xgauss</span></code></a>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(L\)</span> are the nodal distances as in <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.nframe" title="waterflow.flow1d.flowFE1d.Flow1DFE.nframe"><code class="xref py py-attr docutils literal notranslate"><span class="pre">nframe</span></code></a>.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If both of the arguments are truthy, the argument which occurs in
+the method signature first has highest precedence. The internal
+forcing is only assigned to the <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.forcing" title="waterflow.flow1d.flowFE1d.Flow1DFE.forcing"><code class="xref py py-attr docutils literal notranslate"><span class="pre">forcing</span></code></a> attribute
+when called with default arguments.</p>
+</div>
+<p class="rubric">Examples</p>
+<p>Necessary imports:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.flow1d.flowFE1d</span> <span class="k">import</span> <span class="n">Flow1DFE</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility</span> <span class="k">import</span> <span class="n">conductivityfunctions</span> <span class="k">as</span> <span class="n">condf</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.fluxfunctions</span> <span class="k">import</span> <span class="n">richards_equation</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="k">import</span> <span class="n">initializer</span>
+</pre></div>
+</div>
+<p>Select soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="#id5" id="id3">[SW79]</a>
+and prepare the conductivity function with the soil parameters.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">condf</span><span class="o">.</span><span class="n">soilselector</span><span class="p">([</span><span class="mi">13</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">kfun</span> <span class="o">=</span> <span class="n">initializer</span><span class="p">(</span><span class="n">condf</span><span class="o">.</span><span class="n">VG_conductivity</span><span class="p">,</span> <span class="n">ksat</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">ksat</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Add states for a stationary no flow situation and check the
+:py:attr:~`_forcing` attribute for the internal forcing values.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span> <span class="o">=</span> <span class="n">Flow1DFE</span><span class="p">(</span><span class="s2">&quot;Internal forcing example&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">set_systemfluxfunction</span><span class="p">(</span><span class="n">richards_equation</span><span class="p">,</span> <span class="n">kfun</span><span class="o">=</span><span class="n">kfun</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">set_field1d</span><span class="p">(</span><span class="n">nodes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">set_initial_states</span><span class="p">([</span><span class="n">i</span> <span class="o">-</span> <span class="mi">10</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">11</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">set_gaussian_quadrature</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">_internal_forcing</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">forcing</span>
+<span class="go">array([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">_internal_forcing</span><span class="p">(</span><span class="n">calcflux</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">fluxes</span>
+<span class="go">array([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.])</span>
+</pre></div>
+</div>
+<p>Both arrays should consist of zeros because of the applied
+equilibrium situation with no flow over the boundaries.</p>
+<p class="rubric">References</p>
+<p id="bibtex-bibliography-waterflow.flow1d-0"><dl class="citation">
+<dt class="bibtex label" id="strunk1979"><span class="brackets">SW79</span></dt>
+<dd><p>William Strunk, Jr. and E. B. White. <em>The Elements of Style</em>. Macmillan, third edition, 1979.</p>
+</dd>
+</dl>
+</p>
 </dd></dl>
 
 <dl class="method">
@@ -752,7 +843,9 @@ in the method signature is calculated.</p>
 <code class="sig-name descname">set_gaussian_quadrature</code><span class="sig-paren">(</span><em class="sig-param">degree=1</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.set_gaussian_quadrature" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates Gaussian quadrature roots and weights</p>
 <p>The values calculated with this method are stored in the object’s
-<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE._xgauss" title="waterflow.flow1d.flowFE1d.Flow1DFE._xgauss"><code class="xref py py-attr docutils literal notranslate"><span class="pre">_xgauss</span></code></a> and <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE._wgauss" title="waterflow.flow1d.flowFE1d.Flow1DFE._wgauss"><code class="xref py py-attr docutils literal notranslate"><span class="pre">_wgauss</span></code></a> attributes.</p>
+<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE._xgauss" title="waterflow.flow1d.flowFE1d.Flow1DFE._xgauss"><code class="xref py py-attr docutils literal notranslate"><span class="pre">_xgauss</span></code></a> and <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE._wgauss" title="waterflow.flow1d.flowFE1d.Flow1DFE._wgauss"><code class="xref py py-attr docutils literal notranslate"><span class="pre">_wgauss</span></code></a> attributes. The absolute
+positions of the Gaussian quadrature points in the <code class="xref py py-attr docutils literal notranslate"><span class="pre">domain</span></code>
+are calculated and saved in ~xintegration`.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>degree</strong> (<cite>int</cite>, default is 1) – Number of points used in the Gaussian quadrature procedure.</p>
@@ -764,9 +857,10 @@ in the method signature is calculated.</p>
 <div class="math notranslate nohighlight">
 \[w_{i} = \frac{2}{\left(\left(1 - x_{i}^{2}\right) *
 (P_{n}^{'}(x_{i})^{2}\right)}\]</div>
-<p>See <a class="bibtex reference internal" href="#strunk1979" id="id1">[SW79]</a> for an introduction to stylish blah, blah…</p>
-<p id="bibtex-bibliography-waterflow.flow1d-0"><dl class="citation">
-<dt class="bibtex label" id="strunk1979"><span class="brackets"><a class="fn-backref" href="#id1">SW79</a></span></dt>
+<p>See <a class="bibtex reference internal" href="#id5" id="id4">[SW79]</a> for an introduction to stylish blah, blah…</p>
+<p class="rubric">References</p>
+<p id="bibtex-bibliography-waterflow.flow1d-1"><dl class="citation">
+<dt class="bibtex label" id="id5"><span class="brackets">SW79</span></dt>
 <dd><p>William Strunk, Jr. and E. B. White. <em>The Elements of Style</em>. Macmillan, third edition, 1979.</p>
 </dd>
 </dl>

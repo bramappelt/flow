@@ -95,7 +95,8 @@ class Flow1DFE:
         pass
 
     fluxes : `numpy.ndarray`
-        pass
+        Fluxes through the :py:attr:`~nodes` are defined to be positive to the
+        right.
 
     isinitial : `bool`, default is True
         No calculations are performed on the input data yet.
@@ -178,7 +179,8 @@ class Flow1DFE:
 
     xintegration : `list`
         Absolute positions of the Gaussian quadrature points in the domain
-        :py:attr:`~nodes`.
+        :py:attr:`~nodes`. The shape of this list is :py:attr:`~degree` by
+        length :py:attr:`~nodes~ minus 1.
 
     """
 
@@ -288,7 +290,9 @@ class Flow1DFE:
         """ Calculates Gaussian quadrature roots and weights
 
         The values calculated with this method are stored in the object's
-        :py:attr:`~_xgauss` and :py:attr:`~_wgauss` attributes.
+        :py:attr:`~_xgauss` and :py:attr:`~_wgauss` attributes. The absolute
+        positions of the Gaussian quadrature points in the :py:attr:`~domain`
+        are calculated and saved in ~xintegration`.
 
         Parameters
         ----------
@@ -308,6 +312,8 @@ class Flow1DFE:
 
         See :cite:`Strunk1979` for an introduction to stylish blah, blah...
 
+        References
+        ----------
         .. bibliography:: bibliography.bib
 
         """
@@ -337,6 +343,7 @@ class Flow1DFE:
         self.gauss_degree = degree
 
     def _aggregate_forcing(self):
+        """ Aggregation of state independent forcing """
         self.forcing = np.repeat(0.0, len(self.nodes))
         # aggregate state independent forcing
         for flux in [self.pointflux, self.spatflux]:
@@ -350,10 +357,98 @@ class Flow1DFE:
                 self.forcing[idx] += val
 
     def _internal_forcing(self, calcflux=False, calcbal=False):
-        """ Internal fluxes for model convergence,
-        flux calculation or balance calculation. Only one calculation
-        at a time, when both arguments are truthy, the first argument
-        in the method signature is calculated.
+        """ Calculate the system's internal forcing
+
+        This is a core method for the numerical finite elements scheme. The
+        default behavior is to calculate the system's internal forcing and
+        assign the values to :py:attr:`~forcing`.
+
+        Parameters
+        ----------
+        calcflux : `bool`, default is False
+            If ``True``, fluxes through the nodes are calculated and
+            saved in :py:attr:`~fluxes`. In this case only the second
+            summation in the `notes` section is applied.
+        calcbal : `bool`, default = False
+            If ``True``, internal forcing is saved in
+            :py:attr:`~internal_forcing` instead of :py:attr:`~forcing`.
+
+        Notes
+        -----
+
+        This mathematical description of the internal forcing
+        calculation describes how the forcing at nodes :math:`i` and
+        :math:`i+1` is calculated. To calculate this forcing at the current
+        time step :math:`t`, states from the previous time step or initial
+        states assigned through :py:meth:`~set_initial_states` are needed,
+        this is denoted by :math:`t-1` in the subscripts. These functions are
+        applied to all the :py:attr:`~nodes` in the domain. :math:`j` denotes
+        the indices of the Gaussian quadrature positions and weights. The
+        direction of flow is defined to be positive to the right.
+
+        .. math::
+            F_{i,t} = - \\sum_{j=0}^{degree-1} Q(x_{i,j}, s_{j,t-1}, grad_{j,t-1})*weight_{-j-1}
+
+        .. math::
+            F_{i+1,t} = \\sum_{j=0}^{degree-1} Q(x_{i,j}, s_{j,t-1}, grad_{j,t-1})*weight_{j}
+
+        * :math:`degree` corresponds to :py:attr:`~gauss_degree`.
+        * :math:`weight` is described in :py:attr:`~_wgauss`.
+        * :math:`Q(x, s, grad)` is the :py:attr:`~systemfluxfunc`.
+
+        .. centered::
+                :math:`Q(x_{i,j}, s_{j,t-1}, grad_{j,t-1}) =`
+        .. centered::
+                :math:`Q(x_{i,j},s_{i,t-1}*pos_{-j-1}+s_{i+1,t-1}*pos_{j},(s_{i+1,t-1}-s_{i,t-1})/L_{i})`
+
+        * :math:`x` is :py:attr:`~xintegration`.
+        * :math:`s` corresponds to :py:attr:`~states`.
+        * :math:`pos` is described in :py:attr:`~_xgauss`.
+        * :math:`L` are the nodal distances as in :py:attr:`~nframe`.
+
+        .. note::
+            If both of the arguments are truthy, the argument which occurs in
+            the method signature first has highest precedence. The internal
+            forcing is only assigned to the :py:attr:`~forcing` attribute
+            when called with default arguments.
+
+        Examples
+        --------
+        Necessary imports:
+
+        >>> from waterflow.flow1d.flowFE1d import Flow1DFE
+        >>> from waterflow.utility import conductivityfunctions as condf
+        >>> from waterflow.utility.fluxfunctions import richards_equation
+        >>> from waterflow.utility.helper import initializer
+
+        Select soil 13, 'loam', from De Staringreeks :cite:`Strunk1979`
+        and prepare the conductivity function with the soil parameters.
+
+        >>> s, *_ = condf.soilselector([13])[0]
+        >>> kfun = initializer(condf.VG_conductivity, ksat=s.ksat, a=s.alpha, n=s.n)
+
+        Add states for a stationary no flow situation and check the
+        :py:attr:`~forcing` attribute for the internal forcing values.
+
+        >>> FE = Flow1DFE("Internal forcing example")
+        >>> FE.set_systemfluxfunction(richards_equation, kfun=kfun)
+        >>> FE.set_field1d(nodes=(0, -10, 11))
+        >>> FE.set_initial_states([i - 10 for i in range(11)])
+        >>> FE.set_gaussian_quadrature(3)
+        >>> FE._internal_forcing()
+        >>> FE.forcing
+        array([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.])
+        >>> FE._internal_forcing(calcflux=True)
+        >>> FE.fluxes
+        array([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.])
+
+        Both arrays should consist of zeros because of the applied
+        equilibrium situation with no flow over the boundaries.
+
+        References
+        ----------
+        .. bibliography:: bibliography.bib
+
         """
         # internal fluxes from previous iteration
         pos, weight = self.gaussquad
@@ -373,7 +468,7 @@ class Flow1DFE:
         if calcflux:
             self.fluxes = np.array(f)
         else:
-            # if balance calculation, dont assign to forcing again
+            # if balance calculation, don't assign to forcing again
             if not calcbal:
                 self.forcing = self.forcing + np.array(f)
             self.internal_forcing["internal_forcing"] = [None, np.array(f)]
@@ -562,12 +657,37 @@ class Flow1DFE:
         return basis_function
 
     def set_field1d(self, nodes, degree=1):
+        """ Initialize the system's discretization
+
+        States and forcing attributes are initialized with zeros. The Gaussian
+        quadrature degree is set and the system's discretization
+        characteristics are calculated with :py:meth:`~_FE_precalc`.
+
+        Parameters
+        ----------
+        nodes : `tuple` or `list` or `numpy.ndarray`
+            A tuple of the form (start, end, number of nodes) for a linearly
+            spaced domain or a sequence of nodes that contains the nodal
+            positions explicitly.
+
+        degree : `int`, default is 1
+            Set the Gaussian quadrature degree, this is equivalent to the
+            :py:meth`~set_gaussian_quadrature` method.
+
+        Notes
+        -----
+
+        Examples
+        --------
+
+        """
         if isinstance(nodes, tuple):
             self.nodes = np.linspace(*nodes)
         else:
             self.nodes = np.array(nodes)
 
         self.states = np.repeat(0, len(self.nodes))
+        self.forcing = np.repeat(0, len(self.nodes))
         self.set_gaussian_quadrature(degree=degree)
         self._FE_precalc()
 
