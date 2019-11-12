@@ -78,3 +78,9 @@ html_favicon = './_static/drop.bmp'
 napoleon_include_init_with_doc = True
 napoleon_include_private_with_doc = True
 napoleon_include_special_with_doc = True
+
+autodoc_default_flags = ['members',
+                         'undoc-members',
+                         'private-members',
+                         'inherited-members',
+                         'show-inheritance']

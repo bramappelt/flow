@@ -2,7 +2,7 @@
 and a storage change function """
 
 
-def fluxfunction(x, s, gradient, ksat=1):
+def darcy(x, s, gradient, ksat=1):
     """ Flux function for saturated flow
 
     Notes
@@ -17,7 +17,7 @@ def fluxfunction(x, s, gradient, ksat=1):
     return - gradient * ksat
 
 
-def fluxfunction_s(x, s, gradient, ksat=1):
+def darcy_s(x, s, gradient, ksat=1):
     """ Flux function for saturated flow
 
     Notes
@@ -33,7 +33,7 @@ def fluxfunction_s(x, s, gradient, ksat=1):
     return - gradient * ksat * s
 
 
-def fluxfunction_var_k(x, s, gradient, kfun=lambda x: 1):
+def darcy_k(x, s, gradient, kfun=lambda x: 1):
     """ Flux function for saturated flow
 
     Notes
@@ -49,7 +49,7 @@ def fluxfunction_var_k(x, s, gradient, kfun=lambda x: 1):
     return - kfun(x) * gradient
 
 
-def fluxfunction_var_k_s(x, s, gradient, kfun=lambda x: 1):
+def darcy_k_s(x, s, gradient, kfun=lambda x: 1):
     """ Flux function for saturated flow
 
     Notes

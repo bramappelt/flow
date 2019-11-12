@@ -236,8 +236,8 @@ and a soil selector function</p>
 <p>This package contains several one dimensional flux functions
 and a storage change function</p>
 <dl class="function">
-<dt id="waterflow.utility.fluxfunctions.fluxfunction">
-<code class="sig-prename descclassname">waterflow.utility.fluxfunctions.</code><code class="sig-name descname">fluxfunction</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">s</em>, <em class="sig-param">gradient</em>, <em class="sig-param">ksat=1</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.fluxfunctions.fluxfunction" title="Permalink to this definition">¶</a></dt>
+<dt id="waterflow.utility.fluxfunctions.darcy">
+<code class="sig-prename descclassname">waterflow.utility.fluxfunctions.</code><code class="sig-name descname">darcy</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">s</em>, <em class="sig-param">gradient</em>, <em class="sig-param">ksat=1</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.fluxfunctions.darcy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flux function for saturated flow</p>
 <p class="rubric">Notes</p>
 <div class="math notranslate nohighlight">
@@ -246,18 +246,8 @@ and a storage change function</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="waterflow.utility.fluxfunctions.fluxfunction_s">
-<code class="sig-prename descclassname">waterflow.utility.fluxfunctions.</code><code class="sig-name descname">fluxfunction_s</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">s</em>, <em class="sig-param">gradient</em>, <em class="sig-param">ksat=1</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.fluxfunctions.fluxfunction_s" title="Permalink to this definition">¶</a></dt>
-<dd><p>Flux function for saturated flow</p>
-<p class="rubric">Notes</p>
-<div class="math notranslate nohighlight">
-\[q(x, s, \frac{\delta s}{\delta x}) =
--s * \frac{\delta s}{\delta x} * ksat\]</div>
-</dd></dl>
-
-<dl class="function">
-<dt id="waterflow.utility.fluxfunctions.fluxfunction_var_k">
-<code class="sig-prename descclassname">waterflow.utility.fluxfunctions.</code><code class="sig-name descname">fluxfunction_var_k</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">s</em>, <em class="sig-param">gradient</em>, <em class="sig-param">kfun=&lt;function &lt;lambda&gt;&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.fluxfunctions.fluxfunction_var_k" title="Permalink to this definition">¶</a></dt>
+<dt id="waterflow.utility.fluxfunctions.darcy_k">
+<code class="sig-prename descclassname">waterflow.utility.fluxfunctions.</code><code class="sig-name descname">darcy_k</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">s</em>, <em class="sig-param">gradient</em>, <em class="sig-param">kfun=&lt;function &lt;lambda&gt;&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.fluxfunctions.darcy_k" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flux function for saturated flow</p>
 <p class="rubric">Notes</p>
 <div class="math notranslate nohighlight">
@@ -266,13 +256,23 @@ and a storage change function</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="waterflow.utility.fluxfunctions.fluxfunction_var_k_s">
-<code class="sig-prename descclassname">waterflow.utility.fluxfunctions.</code><code class="sig-name descname">fluxfunction_var_k_s</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">s</em>, <em class="sig-param">gradient</em>, <em class="sig-param">kfun=&lt;function &lt;lambda&gt;&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.fluxfunctions.fluxfunction_var_k_s" title="Permalink to this definition">¶</a></dt>
+<dt id="waterflow.utility.fluxfunctions.darcy_k_s">
+<code class="sig-prename descclassname">waterflow.utility.fluxfunctions.</code><code class="sig-name descname">darcy_k_s</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">s</em>, <em class="sig-param">gradient</em>, <em class="sig-param">kfun=&lt;function &lt;lambda&gt;&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.fluxfunctions.darcy_k_s" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flux function for saturated flow</p>
 <p class="rubric">Notes</p>
 <div class="math notranslate nohighlight">
 \[q(x, s, \frac{\delta s}{\delta x}) =
 -kfun(x) * s * \frac{\delta s}{\delta x}\]</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="waterflow.utility.fluxfunctions.darcy_s">
+<code class="sig-prename descclassname">waterflow.utility.fluxfunctions.</code><code class="sig-name descname">darcy_s</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">s</em>, <em class="sig-param">gradient</em>, <em class="sig-param">ksat=1</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.utility.fluxfunctions.darcy_s" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flux function for saturated flow</p>
+<p class="rubric">Notes</p>
+<div class="math notranslate nohighlight">
+\[q(x, s, \frac{\delta s}{\delta x}) =
+-s * \frac{\delta s}{\delta x} * ksat\]</div>
 </dd></dl>
 
 <dl class="function">

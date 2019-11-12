@@ -66,7 +66,11 @@ class Flow1DFE:
         Square jacobian matrix used in the finite elements solution procedure.
 
     BCs : `dict`
-        This defines the system's boundary conditions.
+        This contains the system's boundary conditions. The keys that indicate
+        the positions are "west" and "east". The corresponding values have the
+        following format:
+
+        * (boundary_condition_value, type, domain_index).
 
     spatflux : `dict`
         Contains the spatial fluxes on the model domain. # !! explain form
@@ -241,6 +245,9 @@ class Flow1DFE:
         show : `bool`, default is True
             Print object description to the console
 
+        Notes
+        -----
+
         .. note::
 
             The dataframe that might be included is based on
@@ -414,7 +421,6 @@ class Flow1DFE:
 
         Examples
         --------
-        Necessary imports:
 
         >>> from waterflow.flow1d.flowFE1d import Flow1DFE
         >>> from waterflow.utility import conductivityfunctions as condf
@@ -432,8 +438,8 @@ class Flow1DFE:
 
         >>> FE = Flow1DFE("Internal forcing example")
         >>> FE.set_systemfluxfunction(richards_equation, kfun=kfun)
-        >>> FE.set_field1d(nodes=(0, -10, 11))
-        >>> FE.set_initial_states([i - 10 for i in range(11)])
+        >>> FE.set_field1d(nodes=(-10, 0, 11))
+        >>> FE.set_initial_states([-1 * i for i in range(11)])
         >>> FE.set_gaussian_quadrature(3)
         >>> FE._internal_forcing()
         >>> FE.forcing
@@ -659,9 +665,10 @@ class Flow1DFE:
     def set_field1d(self, nodes, degree=1):
         """ Initialize the system's discretization
 
-        States and forcing attributes are initialized with zeros. The Gaussian
-        quadrature degree is set and the system's discretization
-        characteristics are calculated with :py:meth:`~_FE_precalc`.
+        :py:attr:`~states` and :py:attr:`~forcing` are initialized with zeros.
+        The Gaussian quadrature :py:attr:`~gauss_degree` is set and the
+        system's discretization characteristics are calculated with
+        :py:meth:`~_FE_precalc`.
 
         Parameters
         ----------
@@ -672,13 +679,39 @@ class Flow1DFE:
 
         degree : `int`, default is 1
             Set the Gaussian quadrature degree, this is equivalent to the
-            :py:meth`~set_gaussian_quadrature` method.
+            :py:meth:`~set_gaussian_quadrature` method.
 
         Notes
         -----
 
+        .. warning::
+            Make sure that the absolute positions of the nodes increase
+            towards the right of the domain.
+
         Examples
         --------
+
+        >>> from waterflow.flow1d.flowFE1d import Flow1DFE
+        >>> from waterflow.utility.spacing import biasedspacing
+
+        Linear nodal spacing with a non-default Gaussian degree.
+
+        >>> FE = Flow1DFE("Several spacings")
+        >>> FE.set_field1d((-10, 0, 11), degree=3)
+        >>> FE.nodes
+        array([-10.,  -9.,  -8.,  -7.,  -6.,  -5.,  -4.,  -3.,  -2.,  -1.,   0.])
+        >>> FE._xgauss
+        (0.1127016653792583, 0.5, 0.8872983346207417)
+
+        Unstructured nodes using the
+        :py:func:`~waterflow.utility.spacing.biasedspacing` function.
+
+        >>> unstructured_nodes = biasedspacing(numnodes=11, power=4, lb=-1, rb=0, maxdist=2, length=10)
+        >>> FE.set_field1d(unstructured_nodes)
+        >>> FE.nodes
+        array([-10.        ,  -9.61405656,  -9.29864794,  -8.94730706,
+                -8.54868046,  -8.0844499 ,  -7.12803197,  -6.        ,
+                -4.        ,  -2.        ,   0.        ])
 
         """
         if isinstance(nodes, tuple):
@@ -692,6 +725,51 @@ class Flow1DFE:
         self._FE_precalc()
 
     def set_systemfluxfunction(self, function, **kwargs):
+        """ Implement the governing flow equation
+
+        The :py:attr:`~systemfluxfunc` is set with the governing flow
+        equation.
+
+        Parameters
+        ----------
+        function : `func`
+            Flow equation that takes position, state and gradient as its
+            arguments respectively.
+        **kwargs : `keyword arguments`
+            Extra arguments for the flow equation which are implemented
+            as defaults so that the calling signature of the flow equation
+            remains the same.
+
+        Examples
+        --------
+
+        >>> from waterflow.flow1d.flowFE1d import Flow1DFE
+        >>> from waterflow.utility import fluxfunctions as fluxf
+        >>> from waterflow.utility import conductivityfunctions as condf
+        >>> from waterflow.utility.helper import initializer
+
+        Implement the Richards equation for unsturated flow, herein the
+        Van Genuchten conductivity function is used. :cite:`Strunk1979`.
+        Soil 13, 'loam', from De Staringreeks :cite:`Strunk1979` is selected.
+        See :py:func:`~waterflow.utility.fluxfunctions.richards_equation` for
+        the full definition of the fluxfunction.
+
+        >>> s, *_ = condf.soilselector([13])[0]
+        >>> kfun = initializer(condf.VG_conductivity, ksat=s.ksat, a=s.alpha, n=s.n)
+        >>> richards = fluxf.richards_equation
+        >>> FErichard = Flow1DFE("Flow equations")
+        >>> FErichard.set_systemfluxfunction(richards, kfun=kfun)
+
+        For saturated flow the Darcy equation with a constant saturated
+        conductivity can be used. :cite:`Strunk1979`. See
+        :py:func:`~waterflow.utility.fluxfunctions.darcy` for the full
+        definition of the fluxfunction.
+
+        >>> darcy = fluxf.darcy
+        >>> FEdarcy = Flow1DFE("Flow equations")
+        >>> FEdarcy.set_systemfluxfunction(darcy, ksat=s.ksat)
+
+        """
         for k, v in kwargs.items():
             setattr(self, k, v)
 
@@ -700,6 +778,40 @@ class Flow1DFE:
         self.systemfluxfunc = fluxfunction
 
     def set_initial_states(self, states):
+        """ Set the initial states
+
+        Although the main purpose of this method is to set the initial states
+        it can be used to manipulate the states at any given point in time. The
+        states are written to :py:attr:`~states`.
+
+        Parameters
+        ----------
+        states : `int` or `float` or `list` or `numpy.ndarray`
+            Set the states to an uniform value or vary the states with a
+            sequence like argument.
+
+        Notes
+        -----
+
+        .. note::
+            Note that the states can only be set when the discretization of
+            the system is known.
+
+        Examples
+        --------
+
+        Set the initial states of the system or use the default setting.
+
+        >>> from waterflow.flow1d.flowFE1d import Flow1DFE
+        >>> FE = Flow1DFE("Setting states")
+        >>> FE.set_field1d((-10, 0, 11))
+        >>> FE.states
+        array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+        >>> FE.set_initial_states([-1 * i for i in range(11)])
+        >>> FE.states
+        array([  0.,  -1.,  -2.,  -3.,  -4.,  -5.,  -6.,  -7.,  -8.,  -9., -10.])
+
+        """
         if isinstance(states, int) or isinstance(states, float):
             states = float(states)
             self.states = np.array([states for x in range(len(self.nodes))])
@@ -707,32 +819,154 @@ class Flow1DFE:
             self.states = np.array(states, dtype=np.float64)
 
     def add_dirichlet_BC(self, value, where):
+        """ Set boundary condition with fixed state
+
+        The Dirichlet boundary condition is implemented with this
+        method. The boundary condition is saved in :py:attr:`~BCs`.
+
+        Parameters
+        ----------
+        value : `int` or `float`
+            State value of the specific boundary
+        where : `str`
+            Position where the boundary condition will be set. Choose from
+            "west", "left", "down", "east", "right" or "up". This argument
+            is case insensitive.
+
+        Notes
+        -----
+        Describe how the boundary condition is implemented. !!!!!!!!!!!!!
+
+        Examples
+        --------
+        >>> from waterflow.flow1d.flowFE1d import Flow1DFE
+        >>> FE = Flow1DFE("Dirichlet boundary conditions")
+        >>> FE.set_field1d((-10, 0, 11))
+        >>> FE.BCs
+        {}
+        >>> FE.add_dirichlet_BC(-100, "Up")
+        >>> FE.add_dirichlet_BC(0, "Down")
+        >>> FE.BCs
+        {'east': (-100, 'Dirichlet', -1), 'west': (0, 'Dirichlet', 0)}
+
+        .. note::
+            Note that a new boundary condition will overwrite an existing
+            one without a warning.
+
+        """
         if isinstance(value, int) or isinstance(value, float):
             value = [value]
             where = [where]
 
         for val, pos in zip(value, where):
-            if pos.lower() in "western":
+            if pos.lower() in ["west", "left", "down"]:
                 self.BCs["west"] = (val, "Dirichlet", 0)
                 self._west = 1
-            elif pos.lower() in "eastern":
+            elif pos.lower() in ["east", "right", "up"]:
                 self.BCs["east"] = (val, "Dirichlet", -1)
                 self._east = -1
 
     def add_neumann_BC(self, value, where):
+        """ Set boundary condition with fixed flux
+
+        The Neumann boundary condition is implemented with this
+        method. The boundary condition is saved in :py:attr:`~BCs`.
+
+        Parameters
+        ----------
+        value : `int` or `float`
+            Flux value of the specific boundary
+        where : `str`
+            Position where the boundary condition will be set. Choose from
+            "west", "left", "down", "east", "right" or "up". This argument
+            is case insensitive.
+
+        Notes
+        -----
+        Describe how the boundary condition is implemented. !!!!!!!!!!!!!
+        also note that FE.set_field1d needs to be called for the _east attr
+
+        Examples
+        --------
+
+        >>> from waterflow.flow1d.flowFE1d import Flow1DFE
+        >>> FE = Flow1DFE("Neumann boundary conditions")
+        >>> FE.set_field1d((-10, 0, 11))
+        >>> FE.BCs
+        {}
+        >>> FE.add_neumann_BC(-0.1, "right")
+        >>> FE.BCs
+        {'east': (-0.1, 'Neumann', -1)}
+        >>> FE.add_neumann_BC(-0.5, "up")
+        >>> FE.BCs
+        {'east': (-0.5, 'Neumann', -1)}
+        >>> FE.add_neumann_BC(-0.8, "West")
+        >>> FE.BCs
+        {'east': (-0.5, 'Neumann', -1), 'west': (-0.8, 'Neumann', 0)}
+
+        .. note::
+            Note that a new boundary condition will overwrite an existing
+            one without a warning. This method will allow both boundaries
+            to be of type Neumann but remember that this won't be useful
+            because of the infinite amount of solutions in such a situation.
+
+        """
         if isinstance(value, int) or isinstance(value, float):
             value = [value]
             where = [where]
 
         for val, pos in zip(value, where):
-            if pos.lower() in "western":
+            if pos.lower() in ["west", "left", "down"]:
                 self.BCs["west"] = (val, "Neumann", 0)
                 self._west = 0
-            elif pos.lower() in "eastern":
+            elif pos.lower() in ["east", "right", "up"]:
                 self.BCs["east"] = (val, "Neumann", -1)
                 self._east = len(self.nodes)
 
     def remove_BC(self, *args):
+        """ Remove boundary conditions
+
+        Calling this method with default arguments will clear all boundary
+        conditions set. To clear a specific boundary condition the name
+        needs to be passed explicitly.
+
+        Parameters
+        ----------
+        *args : `str`, optional.
+            The positional arguments should contain the name of the boundary
+            conditions as saved in :py:attr:`~BCs`. This can be "west" or
+            "east".
+
+        Raises
+        -----
+        KeyError
+            This exception is raised when ``*args`` contains an invalid
+            boundary condition name.
+
+        .. note::
+            This is the safe way to remove the boundary conditions because it
+            will also handle and reset the :py:attr:`~_west` and
+            :py:attr:`~_east` attributes which are associated with the
+            implementation of the boundary conditions in the numerical scheme.
+
+        Examples
+        --------
+
+        >>> from waterflow.flow1d.flowFE1d import Flow1DFE
+        >>> FE = Flow1DFE("Boundary condition removal")
+        >>> FE.set_field1d((-10, 0, 11))
+        >>> FE.add_dirichlet_BC(-100, "up")
+        >>> FE.add_neumann_BC(0.0, "down")
+        >>> FE.BCs
+        {'east': (-100, 'Dirichlet', -1), 'west': (0.0, 'Neumann', 0)}
+        >>> FE.remove_BC("west")
+        >>> FE.BCs
+        {'east': (-100, 'Dirichlet', -1)}
+        >>> FE.remove_BC()
+        >>> FE.BCs
+        {}
+
+        """
         if len(args) == 0:
             self.BCs = {}
             self._west = None
