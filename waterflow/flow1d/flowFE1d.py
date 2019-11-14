@@ -86,7 +86,7 @@ class Flow1DFE:
 
     internal_forcing : `dict`
         The internal forcing of the system as calculated with the
-        system flux function as saved in :py:attr:`~systemfluxfunc`,
+        system flux function and saved in :py:attr:`~systemfluxfunc`,
         using the selected Gaussian quadrature :py:attr:`~degree_degree`.
 
     forcing : `numpy.ndarray`
@@ -526,12 +526,46 @@ class Flow1DFE:
         self.forcing = np.reshape(self.forcing, (len(self.nodes), 1))
 
     def _check_boundaries(self):
-        # check whether the system is circular or not
+        """ Check for proper boundary conditions
+
+        The system is checked for singularity. When a boundary condition
+        is not set explicitly a natural boundary condition (no flow) is
+        set as default.
+
+        Raises
+        ------
+        numpy.linalg.LinAlgError
+            This error is raised if the system has infinitely many solutions
+            as a consequence of two Neumann boundary conditions or when none
+            are entered.
+
+        Examples
+        --------
+
+        >>> from waterflow.flow1d.flowFE1d import Flow1DFE
+        >>> FE = Flow1DFE("Check boundaries")
+        >>> FE.set_field1d((-10, 0, 11))
+        >>> FE.add_neumann_BC(-0.3, "west")
+        >>> FE.BCs
+        {'west': (-0.3, 'Neumann', 0)}
+        >>> FE._check_boundaries()
+        Traceback (most recent call last):
+         ...
+        numpy.linalg.LinAlgError: Singular matrix
+        >>> FE.add_dirichlet_BC(-100, "west")
+        >>> FE.BCs
+        {'west': (-100, 'Dirichlet', 0)}
+        >>> FE._check_boundaries()
+        >>> FE.BCs
+        {'west': (-100, 'Dirichlet', 0), 'east': (0, 'Neumann', -1)}
+
+        """
         # no boundary conditions entered
         keys = list(self.BCs.keys())
         if len(keys) == 0:
             raise np.linalg.LinAlgError("Singular matrix")
-        # If one boundary is not entered a zero neumann boundary is set
+
+        # if one boundary is not entered a zero Neumann boundary is set
         if len(keys) == 1:
             val, type_, pos = self.BCs[keys[0]]
             if type_ == "Dirichlet" and pos == 0:
@@ -540,7 +574,8 @@ class Flow1DFE:
                 self.add_neumann_BC(value=0, where="west")
             else:
                 raise np.linalg.LinAlgError("Singular matrix")
-        # both boundaries cannot be of type neumann
+
+        # both boundaries cannot be of type Neumann
         if len(keys) == 2:
             val0, type_0, pos0 = self.BCs[keys[0]]
             val1, type_1, pos1 = self.BCs[keys[1]]
@@ -959,6 +994,10 @@ class Flow1DFE:
         >>> FE.add_neumann_BC(0.0, "down")
         >>> FE.BCs
         {'east': (-100, 'Dirichlet', -1), 'west': (0.0, 'Neumann', 0)}
+        >>> FE.remove_BC("right")
+        Traceback (most recent call last):
+         ...
+        KeyError: 'No boundary named right.'
         >>> FE.remove_BC("west")
         >>> FE.BCs
         {'east': (-100, 'Dirichlet', -1)}
@@ -983,6 +1022,21 @@ class Flow1DFE:
                     raise type(e)("No boundary named " + str(name) + ".")
 
     def add_pointflux(self, rate, pos, name=None):
+        """ Add a pointflux to the system
+
+
+        Parameters
+        ----------
+
+        Notes
+        -----
+        Describe the calculation of :math:`rfac` and :math:`lfac` here.
+
+        Examples
+        --------
+
+
+        """
         f = [x*0.0 for x in range(len(self.nodes))]
         if isinstance(rate, int) or isinstance(rate, float):
             rate = [rate]
@@ -1136,21 +1190,55 @@ class Flow1DFE:
                         raise type(e)(str(name) + " is not a spatialflux.")
 
     def states_to_function(self):
-        ''' gives a continuous function of states in the domain '''
-        circular = True
+        """ Prepare one-dimensional interpolation function
+
+        One-dimensional piecewise linearly interpolated function which returns
+        the system's states and is continiously defined on the domain
+        :py:attr:`~nodes`.
+
+        Returns
+        -------
+        `functools.partial`
+            Function that calculates the system's states for a given position.
+
+        Notes
+        -----
+        The main purpose of this method is to allow for Gaussian quadrature
+        calculations which require state values at specific positions between
+        the system's :py:attr:`~nodes`. This method also provides a tool for
+        plotting at arbitrary positions within the domain.
+
+        Examples
+        --------
+
+        >>> from waterflow.flow1d.flowFE1d import Flow1DFE
+        >>> FE = Flow1DFE("Continiously defined states")
+        >>> FE.set_field1d((-10, 0, 11))
+        >>> FE.set_initial_states([-1 * i for i in range(11)])
+        >>> continious_states = FE.states_to_function()
+        >>> # On a boundary node
+        >>> continious_states(0)
+        -10.0
+        >>> # In between two nodes
+        >>> continious_states(-8.5)
+        -1.5
+        >>> # multiple results at once
+        >>> continious_states([-0.2 * i for i in range(6)])
+        array([-10. ,  -9.8,  -9.6,  -9.4,  -9.2,  -9. ])
+
+        .. warning::
+            Be aware that the function does not raise an exception but returns
+            the value of the nearest boundary when a position outside of the
+            domain is given as argument.
+
+        """
         states = self.states.copy()
         # check if west boundary is of type Dirichlet
         if self._west == 1:
             states[0] = self.BCs["west"][0]
-            circular = False
         # check is east boundary is of type Dirichlet
         if self._east == -1:
             states[-1] = self.BCs["east"][0]
-            circular = False
-        # if none entered or both of type Neumann, return None
-        if circular:
-            print("Define the boundary conditions first")
-            return None
         # linearly interpolate between states including assigned boundaries
         else:
             return partial(np.interp, xp=self.nodes, fp=states)
@@ -1282,6 +1370,75 @@ class Flow1DFE:
         self.solve_data = solve_data
 
     def calcbalance(self, print_=False, invert=True):
+        """ Calculate the water balance for the system
+
+        The water balance values are calculated at every position
+        in the domain and will be saved to :py:attr:`~df_balance`.
+        The summary of the water balance, which is the sum of all
+        relevant columns, is saved in :py:attr:`~df_balance_summary`.
+
+        Parameters
+        ----------
+        print_ : `bool`, default is ``False``
+            Print :py:attr:`~df_balance_summary` to the console.
+        invert : `bool`, default is ``True``
+            Mirror :py:attr:`~df_balance_summary` w.r.t. the x-axis.
+
+        Notes
+        -----
+
+        The calculation of the internal forcing and the fluxes as presented
+        in the balance dataframe are calculated as described in
+        :py:meth:`~_internal_forcing`.
+
+        The external fluxes, :math:`F_{external}`, are the sum of all point
+        and spatial fluxes.
+
+        .. centered::
+                :math:`F_{external} = \\sum_{i=1}^{n} F_{p_i} +
+                \\sum_{i=1}^{m} F_{s_i}`
+
+        The calculation of the point flux, :math:`F_{p_i}`, depends on its
+        nature. If the point flux depends on position only, the accumulation is
+        straightforward. When the point flux is dependend on the state of the
+        the system, the distribution towards the surrounding nodes needs to be
+        calculated before values can be accumulated to its total. The
+        distribution to the nearest nodes is calculated as follows:
+
+        .. math::
+            node_{i} = F_{p_i}(s) * rfac
+
+        .. math::
+            node_{i+1} = F_{p_i}(s) * lfac
+
+        where :math:`s` equals the state at the position of the point flux
+        which is calculated by linear interpolation. The calculation of the
+        fractions :math:`rfac` and :math:`lfac` are described in
+        :py:meth:`~add_pointflux`.
+
+        For the calculation of the spatial flux, :math:`F_{s_i}`, a similar
+        distinction exists. If the spatial flux is not dependend on state,
+        straightforward addition takes place. When there is a state
+        dependency, distributions towards the nodes is calculated as
+        described in :py:meth:`~_internal_forcing` where
+        :math:`F_{s_i}(x, s)` is substituted for the :py:attr:`~systemfluxfunc`
+        :math:`Q(x, s, grad)`. This calculation accounts for the selected
+        :py:attr:`~gauss_degree` and the state argument :math:`s` is linearly
+        interpolated between the neareast nodes.
+
+        ####
+        The flow over the boundaries is calculated as the sum of the internal
+        forcing and the external forcing, :math:`F_{external}`, at both
+        boundary nodes.
+        #### 
+
+
+        Examples
+        --------
+
+        >>> pass
+
+        """
         data = {}
         # internal fluxes
         self._internal_forcing(calcbal=True)
@@ -1334,25 +1491,35 @@ class Flow1DFE:
                 spat += spatialfluxes[key][-1]
             data.update({"spat-"+str(key): spatialfluxes[key][-1]})
 
-        # flow over boundaries
-        fill = np.repeat(0.0, (len(self.nodes) - 1,))
-        leftb = np.insert(fill, 0, internalfluxes[0] + (spat[0] + pnt[0])) * -1
-        rightb = np.append(fill, internalfluxes[-1] + (spat[-1] + pnt[-1])) * -1
+        # storage between iterations, if exists
+        try:
+            storage_change = data.pop("spat-storage_change")
+        except KeyError:
+            storage_change = np.repeat(0.0, len(self.nodes))
+
+        # remove storage change from external spatial forcings
+        spat = spat - storage_change
+
+        # internal balance
+        internalfluxes = internalfluxes + pnt + spat
+
+        # boundaries
+        lbound = internalfluxes[0] + storage_change[0]
+        rbound = internalfluxes[-1] + storage_change[-1]
+
+        # correct for boundary fluxes
+        internalfluxes[0] -= lbound
+        internalfluxes[-1] -= rbound
+        self.fluxes[0] -= lbound
 
         # net flow
-        net = pnt + spat + internalfluxes
-        net[0] += leftb[0]
-        net[-1] += rightb[-1]
-
-        # fluxes
-        self.fluxes[0] = leftb[0]
-        self.fluxes[-1] = -rightb[-1]
+        net = internalfluxes + storage_change
 
         # dump waterbalance & summary to dataframe
-        data.update({'internal': internalfluxes, 'all-spatial': spat,
+        data.update({'storage_change': storage_change,
+                     'internal': internalfluxes, 'all-spatial': spat,
                      'all-points': pnt, 'all-external': pnt + spat,
-                     'lbound': leftb, 'rbound': rightb, 'net': net,
-                     'fluxes': self.fluxes})
+                     'net': net, 'fluxes': self.fluxes})
 
         df_balance = pd.DataFrame(data)
         df_balance.insert(0, 'nodes', self.nodes)
@@ -1368,7 +1535,42 @@ class Flow1DFE:
             print(self.df_balance_summary)
 
     def dataframeify(self, invert):
-        ''' write current static model to dataframe '''
+        """ Write current static model to dataframe
+
+        Save the current model results to :py:attr:`~df_states`.
+
+        Parameters
+        ----------
+        invert : `bool`
+            Mirror :py:attr:`~df_states` w.r.t. the x-axis.
+
+        Notes
+        -----
+        At least, lengths, nodes, states and the internal forcing are written
+        to the dataframe.
+
+        Examples
+        --------
+
+        >>> from waterflow.flow1d.flowFE1d import Flow1DFE
+        >>> from waterflow.utility import conductivityfunctions as condf
+        >>> from waterflow.utility.fluxfunctions import richards_equation
+        >>> from waterflow.utility.helper import initializer
+
+        Select soil 13, 'loam', from De Staringreeks :cite:`Strunk1979`
+        and prepare the conductivity function with the soil parameters.
+
+        >>> s, *_ = condf.soilselector([13])[0]
+        >>> kfun = initializer(condf.VG_conductivity, ksat=s.ksat, a=s.alpha, n=s.n)
+
+        Add states for a stationary no flow situation and check the
+        :py:attr:`~forcing` attribute for the internal forcing values.
+
+        >>> FE = Flow1DFE("Internal forcing example")
+        >>> FE.set_systemfluxfunction(richards_equation, kfun=kfun)
+        >>> FE.set_field1d(nodes=(-10, 0, 11))
+
+        """
         self._calc_theta_k()
         self._solve_initial_object()
 
@@ -1394,8 +1596,11 @@ class Flow1DFE:
 
     def transient_dataframeify(self, print_times=None, include_maxima=True,
                                nodes=None, invert=True):
-        ''' write transient solve data to dataframe '''
+        """ Bundle all static dataframes to a single dataframe
 
+        
+
+        """
         # times at which the model has been solved
         self.dft_solved_times = pd.DataFrame(data=self.solve_data)
 
@@ -1491,7 +1696,7 @@ class Flow1DFE:
         self.dft_balance_summary = dft_bal_sum
 
     def save(self, savepath=None, dirname=None):
-        """ Save model metadata and dataframes
+        """ Save model metadata and dataframes to disk
 
         Parameters
         ----------

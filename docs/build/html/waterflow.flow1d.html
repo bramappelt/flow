@@ -355,7 +355,7 @@ following format:</p>
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.internal_forcing">
 <code class="sig-name descname">internal_forcing</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.internal_forcing" title="Permalink to this definition">¶</a></dt>
 <dd><p>The internal forcing of the system as calculated with the
-system flux function as saved in <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.systemfluxfunc" title="waterflow.flow1d.flowFE1d.Flow1DFE.systemfluxfunc"><code class="xref py py-attr docutils literal notranslate"><span class="pre">systemfluxfunc</span></code></a>,
+system flux function and saved in <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.systemfluxfunc" title="waterflow.flow1d.flowFE1d.Flow1DFE.systemfluxfunc"><code class="xref py py-attr docutils literal notranslate"><span class="pre">systemfluxfunc</span></code></a>,
 using the selected Gaussian quadrature <code class="xref py py-attr docutils literal notranslate"><span class="pre">degree_degree</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -692,7 +692,37 @@ length :py:attr:<a href="#id1"><span class="problematic" id="id2">`</span></a>~n
 <dl class="method">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE._check_boundaries">
 <code class="sig-name descname">_check_boundaries</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE._check_boundaries" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Check for proper boundary conditions</p>
+<p>The system is checked for singularity. When a boundary condition
+is not set explicitly a natural boundary condition (no flow) is
+set as default.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>numpy.linalg.LinAlgError</strong> – This error is raised if the system has infinitely many solutions
+    as a consequence of two Neumann boundary conditions or when none
+    are entered.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.flow1d.flowFE1d</span> <span class="k">import</span> <span class="n">Flow1DFE</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span> <span class="o">=</span> <span class="n">Flow1DFE</span><span class="p">(</span><span class="s2">&quot;Check boundaries&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">set_field1d</span><span class="p">((</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">11</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">add_neumann_BC</span><span class="p">(</span><span class="o">-</span><span class="mf">0.3</span><span class="p">,</span> <span class="s2">&quot;west&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">BCs</span>
+<span class="go">{&#39;west&#39;: (-0.3, &#39;Neumann&#39;, 0)}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">_check_boundaries</span><span class="p">()</span>
+<span class="gt">Traceback (most recent call last):</span>
+ <span class="c">...</span>
+<span class="gr">numpy.linalg.LinAlgError</span>: <span class="n">Singular matrix</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">add_dirichlet_BC</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="s2">&quot;west&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">BCs</span>
+<span class="go">{&#39;west&#39;: (-100, &#39;Dirichlet&#39;, 0)}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">_check_boundaries</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">BCs</span>
+<span class="go">{&#39;west&#39;: (-100, &#39;Dirichlet&#39;, 0), &#39;east&#39;: (0, &#39;Neumann&#39;, -1)}</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="method">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE._internal_forcing">
@@ -753,7 +783,7 @@ when called with default arguments.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="k">import</span> <span class="n">initializer</span>
 </pre></div>
 </div>
-<p>Select soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="#id8" id="id3">[SW79]</a>
+<p>Select soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="#id9" id="id3">[SW79]</a>
 and prepare the conductivity function with the soil parameters.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">condf</span><span class="o">.</span><span class="n">soilselector</span><span class="p">([</span><span class="mi">13</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">kfun</span> <span class="o">=</span> <span class="n">initializer</span><span class="p">(</span><span class="n">condf</span><span class="o">.</span><span class="n">VG_conductivity</span><span class="p">,</span> <span class="n">ksat</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">ksat</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
@@ -886,7 +916,11 @@ because of the infinite amount of solutions in such a situation.</p>
 <dl class="method">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.add_pointflux">
 <code class="sig-name descname">add_pointflux</code><span class="sig-paren">(</span><em class="sig-param">rate</em>, <em class="sig-param">pos</em>, <em class="sig-param">name=None</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.add_pointflux" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Add a pointflux to the system</p>
+<p class="rubric">Notes</p>
+<p>Describe the calculation of <span class="math notranslate nohighlight">\(rfac\)</span> and <span class="math notranslate nohighlight">\(lfac\)</span> here.</p>
+<p class="rubric">Examples</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.add_spatialflux">
@@ -896,12 +930,93 @@ because of the infinite amount of solutions in such a situation.</p>
 <dl class="method">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.calcbalance">
 <code class="sig-name descname">calcbalance</code><span class="sig-paren">(</span><em class="sig-param">print_=False</em>, <em class="sig-param">invert=True</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.calcbalance" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Calculate the water balance for the system</p>
+<p>The water balance values are calculated at every position
+in the domain and will be saved to <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.df_balance" title="waterflow.flow1d.flowFE1d.Flow1DFE.df_balance"><code class="xref py py-attr docutils literal notranslate"><span class="pre">df_balance</span></code></a>.
+The summary of the water balance, which is the sum of all
+relevant columns, is saved in <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.df_balance_summary" title="waterflow.flow1d.flowFE1d.Flow1DFE.df_balance_summary"><code class="xref py py-attr docutils literal notranslate"><span class="pre">df_balance_summary</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>print_</strong> (<cite>bool</cite>, default is <code class="docutils literal notranslate"><span class="pre">False</span></code>) – Print <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.df_balance_summary" title="waterflow.flow1d.flowFE1d.Flow1DFE.df_balance_summary"><code class="xref py py-attr docutils literal notranslate"><span class="pre">df_balance_summary</span></code></a> to the console.</p></li>
+<li><p><strong>invert</strong> (<cite>bool</cite>, default is <code class="docutils literal notranslate"><span class="pre">True</span></code>) – Mirror <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.df_balance_summary" title="waterflow.flow1d.flowFE1d.Flow1DFE.df_balance_summary"><code class="xref py py-attr docutils literal notranslate"><span class="pre">df_balance_summary</span></code></a> w.r.t. the x-axis.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The calculation of the internal forcing and the fluxes as presented
+in the balance dataframe are calculated as described in
+<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE._internal_forcing" title="waterflow.flow1d.flowFE1d.Flow1DFE._internal_forcing"><code class="xref py py-meth docutils literal notranslate"><span class="pre">_internal_forcing()</span></code></a>.</p>
+<p>The external fluxes, <span class="math notranslate nohighlight">\(F_{external}\)</span>, are the sum of all point
+and spatial fluxes.</p>
+<p class="centered">
+<strong><span class="math notranslate nohighlight">\(F_{external} = \sum_{i=1}^{n} F_{p_i} +
+\sum_{i=1}^{m} F_{s_i}\)</span></strong></p><p>The calculation of the point flux, <span class="math notranslate nohighlight">\(F_{p_i}\)</span>, depends on its
+nature. If the point flux depends on position only, the accumulation is
+straightforward. When the point flux is dependend on the state of the
+the system, the distribution towards the surrounding nodes needs to be
+calculated before values can be accumulated to its total. The
+distribution to the nearest nodes is calculated as follows:</p>
+<div class="math notranslate nohighlight">
+\[node_{i} = F_{p_i}(s) * rfac\]</div>
+<div class="math notranslate nohighlight">
+\[node_{i+1} = F_{p_i}(s) * lfac\]</div>
+<p>where <span class="math notranslate nohighlight">\(s\)</span> equals the state at the position of the point flux
+which is calculated by linear interpolation. The calculation of the
+fractions <span class="math notranslate nohighlight">\(rfac\)</span> and <span class="math notranslate nohighlight">\(lfac\)</span> are described in
+<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.add_pointflux" title="waterflow.flow1d.flowFE1d.Flow1DFE.add_pointflux"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_pointflux()</span></code></a>.</p>
+<p>For the calculation of the spatial flux, <span class="math notranslate nohighlight">\(F_{s_i}\)</span>, a similar
+distinction exists. If the spatial flux is not dependend on state,
+straightforward addition takes place. When there is a state
+dependency, distributions towards the nodes is calculated as
+described in <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE._internal_forcing" title="waterflow.flow1d.flowFE1d.Flow1DFE._internal_forcing"><code class="xref py py-meth docutils literal notranslate"><span class="pre">_internal_forcing()</span></code></a> where
+<span class="math notranslate nohighlight">\(F_{s_i}(x, s)\)</span> is substituted for the <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.systemfluxfunc" title="waterflow.flow1d.flowFE1d.Flow1DFE.systemfluxfunc"><code class="xref py py-attr docutils literal notranslate"><span class="pre">systemfluxfunc</span></code></a>
+<span class="math notranslate nohighlight">\(Q(x, s, grad)\)</span>. This calculation accounts for the selected
+<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.gauss_degree" title="waterflow.flow1d.flowFE1d.Flow1DFE.gauss_degree"><code class="xref py py-attr docutils literal notranslate"><span class="pre">gauss_degree</span></code></a> and the state argument <span class="math notranslate nohighlight">\(s\)</span> is linearly
+interpolated between the neareast nodes.</p>
+<p>The flow over the boundaries is calculated as the sum of the internal
+forcing and the external forcing, <span class="math notranslate nohighlight">\(F_{external}\)</span>, at both
+boundary nodes.
+####</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">pass</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="method">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.dataframeify">
 <code class="sig-name descname">dataframeify</code><span class="sig-paren">(</span><em class="sig-param">invert</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.dataframeify" title="Permalink to this definition">¶</a></dt>
-<dd><p>write current static model to dataframe</p>
+<dd><p>Write current static model to dataframe</p>
+<p>Save the current model results to <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.df_states" title="waterflow.flow1d.flowFE1d.Flow1DFE.df_states"><code class="xref py py-attr docutils literal notranslate"><span class="pre">df_states</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>invert</strong> (<cite>bool</cite>) – Mirror <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.df_states" title="waterflow.flow1d.flowFE1d.Flow1DFE.df_states"><code class="xref py py-attr docutils literal notranslate"><span class="pre">df_states</span></code></a> w.r.t. the x-axis.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>At least, lengths, nodes, states and the internal forcing are written
+to the dataframe.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.flow1d.flowFE1d</span> <span class="k">import</span> <span class="n">Flow1DFE</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility</span> <span class="k">import</span> <span class="n">conductivityfunctions</span> <span class="k">as</span> <span class="n">condf</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.fluxfunctions</span> <span class="k">import</span> <span class="n">richards_equation</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="k">import</span> <span class="n">initializer</span>
+</pre></div>
+</div>
+<p>Select soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="#id9" id="id4">[SW79]</a>
+and prepare the conductivity function with the soil parameters.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">condf</span><span class="o">.</span><span class="n">soilselector</span><span class="p">([</span><span class="mi">13</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">kfun</span> <span class="o">=</span> <span class="n">initializer</span><span class="p">(</span><span class="n">condf</span><span class="o">.</span><span class="n">VG_conductivity</span><span class="p">,</span> <span class="n">ksat</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">ksat</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Add states for a stationary no flow situation and check the
+<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.forcing" title="waterflow.flow1d.flowFE1d.Flow1DFE.forcing"><code class="xref py py-attr docutils literal notranslate"><span class="pre">forcing</span></code></a> attribute for the internal forcing values.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span> <span class="o">=</span> <span class="n">Flow1DFE</span><span class="p">(</span><span class="s2">&quot;Internal forcing example&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">set_systemfluxfunction</span><span class="p">(</span><span class="n">richards_equation</span><span class="p">,</span> <span class="n">kfun</span><span class="o">=</span><span class="n">kfun</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">set_field1d</span><span class="p">(</span><span class="n">nodes</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">11</span><span class="p">))</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="method">
@@ -942,6 +1057,10 @@ conditions as saved in <a class="reference internal" href="#waterflow.flow1d.flo
 <span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">add_neumann_BC</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="s2">&quot;down&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">BCs</span>
 <span class="go">{&#39;east&#39;: (-100, &#39;Dirichlet&#39;, -1), &#39;west&#39;: (0.0, &#39;Neumann&#39;, 0)}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">remove_BC</span><span class="p">(</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+ <span class="c">...</span>
+<span class="gr">KeyError</span>: <span class="n">&#39;No boundary named right.&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">remove_BC</span><span class="p">(</span><span class="s2">&quot;west&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">BCs</span>
 <span class="go">{&#39;east&#39;: (-100, &#39;Dirichlet&#39;, -1)}</span>
@@ -965,7 +1084,7 @@ conditions as saved in <a class="reference internal" href="#waterflow.flow1d.flo
 <dl class="method">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.save">
 <code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param">savepath=None</em>, <em class="sig-param">dirname=None</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.save" title="Permalink to this definition">¶</a></dt>
-<dd><p>Save model metadata and dataframes</p>
+<dd><p>Save model metadata and dataframes to disk</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1046,10 +1165,10 @@ are calculated and saved in ~xintegration`.</p>
 <div class="math notranslate nohighlight">
 \[w_{i} = \frac{2}{\left(\left(1 - x_{i}^{2}\right) *
 (P_{n}^{'}(x_{i})^{2}\right)}\]</div>
-<p>See <a class="bibtex reference internal" href="#id8" id="id4">[SW79]</a> for an introduction to stylish blah, blah…</p>
+<p>See <a class="bibtex reference internal" href="#id9" id="id5">[SW79]</a> for an introduction to stylish blah, blah…</p>
 <p class="rubric">References</p>
 <p id="bibtex-bibliography-waterflow.flow1d-1"><dl class="citation">
-<dt class="bibtex label" id="id8"><span class="brackets">SW79</span></dt>
+<dt class="bibtex label" id="id9"><span class="brackets">SW79</span></dt>
 <dd><p>William Strunk, Jr. and E. B. White. <em>The Elements of Style</em>. Macmillan, third edition, 1979.</p>
 </dd>
 </dl>
@@ -1114,8 +1233,8 @@ remains the same.</p></li>
 </pre></div>
 </div>
 <p>Implement the Richards equation for unsturated flow, herein the
-Van Genuchten conductivity function is used. <a class="bibtex reference internal" href="#id8" id="id5">[SW79]</a>.
-Soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="#id8" id="id6">[SW79]</a> is selected.
+Van Genuchten conductivity function is used. <a class="bibtex reference internal" href="#id9" id="id6">[SW79]</a>.
+Soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="#id9" id="id7">[SW79]</a> is selected.
 See <a class="reference internal" href="waterflow.utility.html#waterflow.utility.fluxfunctions.richards_equation" title="waterflow.utility.fluxfunctions.richards_equation"><code class="xref py py-func docutils literal notranslate"><span class="pre">richards_equation()</span></code></a> for
 the full definition of the fluxfunction.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">condf</span><span class="o">.</span><span class="n">soilselector</span><span class="p">([</span><span class="mi">13</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
@@ -1126,7 +1245,7 @@ the full definition of the fluxfunction.</p>
 </pre></div>
 </div>
 <p>For saturated flow the Darcy equation with a constant saturated
-conductivity can be used. <a class="bibtex reference internal" href="#id8" id="id7">[SW79]</a>. See
+conductivity can be used. <a class="bibtex reference internal" href="#id9" id="id8">[SW79]</a>. See
 <a class="reference internal" href="waterflow.utility.html#waterflow.utility.fluxfunctions.darcy" title="waterflow.utility.fluxfunctions.darcy"><code class="xref py py-func docutils literal notranslate"><span class="pre">darcy()</span></code></a> for the full
 definition of the fluxfunction.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">darcy</span> <span class="o">=</span> <span class="n">fluxf</span><span class="o">.</span><span class="n">darcy</span>
@@ -1145,7 +1264,46 @@ definition of the fluxfunction.</p>
 <dl class="method">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.states_to_function">
 <code class="sig-name descname">states_to_function</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.states_to_function" title="Permalink to this definition">¶</a></dt>
-<dd><p>gives a continuous function of states in the domain</p>
+<dd><p>Prepare one-dimensional interpolation function</p>
+<p>One-dimensional piecewise linearly interpolated function which returns
+the system’s states and is continiously defined on the domain
+<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.nodes" title="waterflow.flow1d.flowFE1d.Flow1DFE.nodes"><code class="xref py py-attr docutils literal notranslate"><span class="pre">nodes</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Function that calculates the system’s states for a given position.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><cite>functools.partial</cite></p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The main purpose of this method is to allow for Gaussian quadrature
+calculations which require state values at specific positions between
+the system’s <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.nodes" title="waterflow.flow1d.flowFE1d.Flow1DFE.nodes"><code class="xref py py-attr docutils literal notranslate"><span class="pre">nodes</span></code></a>. This method also provides a tool for
+plotting at arbitrary positions within the domain.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.flow1d.flowFE1d</span> <span class="k">import</span> <span class="n">Flow1DFE</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span> <span class="o">=</span> <span class="n">Flow1DFE</span><span class="p">(</span><span class="s2">&quot;Continiously defined states&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">set_field1d</span><span class="p">((</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">11</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">set_initial_states</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">11</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">continious_states</span> <span class="o">=</span> <span class="n">FE</span><span class="o">.</span><span class="n">states_to_function</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># On a boundary node</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">continious_states</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="go">-10.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># In between two nodes</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">continious_states</span><span class="p">(</span><span class="o">-</span><span class="mf">8.5</span><span class="p">)</span>
+<span class="go">-1.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># multiple results at once</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">continious_states</span><span class="p">([</span><span class="o">-</span><span class="mf">0.2</span> <span class="o">*</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">)])</span>
+<span class="go">array([-10. ,  -9.8,  -9.6,  -9.4,  -9.2,  -9. ])</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Be aware that the function does not raise an exception but returns
+the value of the nearest boundary when a position outside of the
+domain is given as argument.</p>
+</div>
 </dd></dl>
 
 <dl class="method">
@@ -1169,7 +1327,7 @@ has been solved for.</p>
 <dl class="method">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.transient_dataframeify">
 <code class="sig-name descname">transient_dataframeify</code><span class="sig-paren">(</span><em class="sig-param">print_times=None</em>, <em class="sig-param">include_maxima=True</em>, <em class="sig-param">nodes=None</em>, <em class="sig-param">invert=True</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.transient_dataframeify" title="Permalink to this definition">¶</a></dt>
-<dd><p>write transient solve data to dataframe</p>
+<dd><p>Bundle all static dataframes to a single dataframe</p>
 </dd></dl>
 
 <dl class="method">

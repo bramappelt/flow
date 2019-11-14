@@ -49,7 +49,6 @@ FE_ut.transient_dataframeify(nodes=[0, -2, -5, -8, -10])
 
 FE_ut.save(dirname='wbal_testing')
 
-
 fig, ax = plt.subplots()
 for i in FE_ut.dft_states.keys():
     quickplot(FE_ut.dft_states[i], x='states', y=['nodes'], ax=ax, title='Hydraulic heads over time (d)',
@@ -64,7 +63,7 @@ fig, ax = plt.subplots()
 quickplot(FE_ut.dft_solved_times, x='time', y=['dt'], ax=ax, title='Solver')
 
 fig, ax = plt.subplots()
-quickplot(FE_ut.dft_balance_summary, x='time', y=['spat-storage_change'], ax=ax, title='storage change', legend=False)
+quickplot(FE_ut.dft_balance_summary, x='time', y=['storage_change'], ax=ax, title='storage change', legend=False)
 
 fig, ax = plt.subplots()
 for k, v in FE_ut.dft_balance.items():
