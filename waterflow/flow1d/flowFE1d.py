@@ -754,8 +754,8 @@ class Flow1DFE:
         else:
             self.nodes = np.array(nodes)
 
-        self.states = np.repeat(0, len(self.nodes))
-        self.forcing = np.repeat(0, len(self.nodes))
+        self.states = np.repeat(0.0, len(self.nodes))
+        self.forcing = np.repeat(0.0, len(self.nodes))
         self.set_gaussian_quadrature(degree=degree)
         self._FE_precalc()
 
@@ -841,7 +841,7 @@ class Flow1DFE:
         >>> FE = Flow1DFE("Setting states")
         >>> FE.set_field1d((-10, 0, 11))
         >>> FE.states
-        array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+        array([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.])
         >>> FE.set_initial_states([-1 * i for i in range(11)])
         >>> FE.states
         array([  0.,  -1.,  -2.,  -3.,  -4.,  -5.,  -6.,  -7.,  -8.,  -9., -10.])
@@ -1382,23 +1382,18 @@ class Flow1DFE:
         print_ : `bool`, default is ``False``
             Print :py:attr:`~df_balance_summary` to the console.
         invert : `bool`, default is ``True``
-            Mirror :py:attr:`~df_balance_summary` w.r.t. the x-axis.
+            Mirror :py:attr:`~df_balance` w.r.t. the x-axis.
 
         Notes
         -----
-
-        The calculation of the internal forcing and the fluxes as presented
-        in the balance dataframe are calculated as described in
-        :py:meth:`~_internal_forcing`.
-
         The external fluxes, :math:`F_{external}`, are the sum of all point
         and spatial fluxes.
 
         .. centered::
-                :math:`F_{external} = \\sum_{i=1}^{n} F_{p_i} +
-                \\sum_{i=1}^{m} F_{s_i}`
+                :math:`F_{external} = \\sum_{j=1}^{n} F_{p_j} +
+                \\sum_{j=1}^{m} F_{s_j}`
 
-        The calculation of the point flux, :math:`F_{p_i}`, depends on its
+        The calculation of the point flux, :math:`F_{p_j}`, depends on its
         nature. If the point flux depends on position only, the accumulation is
         straightforward. When the point flux is dependend on the state of the
         the system, the distribution towards the surrounding nodes needs to be
@@ -1406,37 +1401,112 @@ class Flow1DFE:
         distribution to the nearest nodes is calculated as follows:
 
         .. math::
-            node_{i} = F_{p_i}(s) * rfac
+            node_{i} = F_{p_j}(s) * rfac
 
         .. math::
-            node_{i+1} = F_{p_i}(s) * lfac
+            node_{i+1} = F_{p_j}(s) * lfac
 
         where :math:`s` equals the state at the position of the point flux
         which is calculated by linear interpolation. The calculation of the
         fractions :math:`rfac` and :math:`lfac` are described in
         :py:meth:`~add_pointflux`.
 
-        For the calculation of the spatial flux, :math:`F_{s_i}`, a similar
+        For the calculation of the spatial flux, :math:`F_{s_j}`, a similar
         distinction exists. If the spatial flux is not dependend on state,
         straightforward addition takes place. When there is a state
         dependency, distributions towards the nodes is calculated as
         described in :py:meth:`~_internal_forcing` where
-        :math:`F_{s_i}(x, s)` is substituted for the :py:attr:`~systemfluxfunc`
+        :math:`F_{s_j}(x, s)` is substituted for the :py:attr:`~systemfluxfunc`
         :math:`Q(x, s, grad)`. This calculation accounts for the selected
         :py:attr:`~gauss_degree` and the state argument :math:`s` is linearly
         interpolated between the neareast nodes.
 
-        ####
-        The flow over the boundaries is calculated as the sum of the internal
-        forcing and the external forcing, :math:`F_{external}`, at both
-        boundary nodes.
-        #### 
+        The internal forcing in the water balance is the sum of the internal
+        forcing as described in :py:meth:`~_internal_forcing` and the external
+        forcing.
 
+        .. math::
+            F_{total\_internal} = F_{internal} + F_{external}
+
+        The top and bottom values in :math:`F_{total\_internal}` are corrected
+        for the flow over the boundaries. The flow over the boundaries is
+        calculated as the difference of :math:`F_{total\_internal}` -
+        :math:`\\Delta s` at those boundary nodes.
+
+        The net flux is calculated as follows:
+
+        .. math::
+            F_{net} = F_{total\_internal} - \\Delta s
+
+        Where :math:`\\Delta s` represents the storage change between
+        iterations at every node in the domain.
+
+        .. note::
+            Although the storage change :math:`\\Delta s` is entered into the
+            model as an external flux, in the calculation of the water balance
+            this term is handled as a separate flux which is not included in
+            the :math:`F_{external}` term.
 
         Examples
         --------
 
-        >>> pass
+        >>> from waterflow.flow1d.flowFE1d import Flow1DFE
+        >>> from waterflow.utility import conductivityfunctions as condf
+        >>> from waterflow.utility import fluxfunctions as fluxf
+        >>> from waterflow.utility.helper import initializer
+
+        Select soil 13, 'loam', from De Staringreeks :cite:`Strunk1979`
+        and prepare the conductivity function and theta-h relation with the
+        soil parameters. These functions are the arguments to the fluxfunction
+        and the storage change function repectively.
+
+        >>> s, *_ = condf.soilselector([13])[0]
+        >>> theta_h = initializer(condf.VG_pressureh, theta_r=s.t_res,
+        ...                       theta_s=s.t_sat, a=s.alpha, n=s.n)
+        >>> kfun = initializer(condf.VG_conductivity, ksat=s.ksat, a=s.alpha, n=s.n)
+        >>> storage_change = initializer(fluxf.storage_change, fun=theta_h)
+
+        >>> FE = Flow1DFE("Calculate water balance")
+        >>> FE.set_systemfluxfunction(fluxf.richards_equation, kfun=kfun)
+        >>> FE.set_field1d(nodes=(-10, 0, 11))
+        >>> FE.add_dirichlet_BC(0.0, 'west')
+        >>> # Constant boundary flow of 0.3 cm/d out of the system
+        >>> FE.add_neumann_BC(-0.3, 'east')
+        >>> # theta_h function needs to be added manually to be included in the water balance
+        >>> FE.tfun = theta_h
+        >>> # Extraction of 0.001 cm/d over the complete domain
+        >>> FE.add_spatialflux(-0.001, 'extraction')
+        >>> # Add storage change function
+        >>> FE.add_spatialflux(storage_change)
+        >>> # Solve the system for one time step (dt=0.01 d)
+        >>> iters = FE.dt_solve(dt=0.01)
+        >>> FE.calcbalance()
+        >>> FE.df_balance
+            nodes  spat-extraction  storage_change  internal  all-spatial  all-points  all-external           net    fluxes
+        0     0.0          -0.0005        0.144730 -0.144730      -0.0005         0.0       -0.0005  0.000000e+00  0.155770
+        1    -1.0          -0.0010        0.266555 -0.266555      -0.0010         0.0       -0.0010 -4.663325e-12 -0.109784
+        2    -2.0          -0.0010        0.222706 -0.222706      -0.0010         0.0       -0.0010 -2.797818e-12 -0.331490
+        3    -3.0          -0.0010        0.182558 -0.182558      -0.0010         0.0       -0.0010 -6.783463e-14 -0.513048
+        4    -4.0          -0.0010        0.145754 -0.145754      -0.0010         0.0       -0.0010  1.635247e-12 -0.657801
+        5    -5.0          -0.0010        0.112096 -0.112096      -0.0010         0.0       -0.0010  1.979528e-12 -0.768897
+        6    -6.0          -0.0010        0.081552 -0.081552      -0.0010         0.0       -0.0010  1.637579e-12 -0.849449
+        7    -7.0          -0.0010        0.054287 -0.054287      -0.0010         0.0       -0.0010  1.292744e-12 -0.902736
+        8    -8.0          -0.0010        0.030765 -0.030765      -0.0010         0.0       -0.0010  1.127098e-12 -0.932501
+        9    -9.0          -0.0010        0.012078 -0.012078      -0.0010         0.0       -0.0010  1.573075e-12 -0.943580
+        10  -10.0          -0.0005        0.002068 -0.002068      -0.0005         0.0       -0.0005  0.000000e+00 -0.945148
+        >>> FE.df_balance_summary
+        spat-extraction   -1.000000e-02
+        storage_change     1.255148e+00
+        internal          -1.255148e+00
+        all-spatial       -1.000000e-02
+        all-points         0.000000e+00
+        all-external      -1.000000e-02
+        net                1.716294e-12
+        dtype: float64
+
+        References
+        ----------
+        .. bibliography:: bibliography.bib
 
         """
         data = {}
@@ -1570,6 +1640,10 @@ class Flow1DFE:
         >>> FE.set_systemfluxfunction(richards_equation, kfun=kfun)
         >>> FE.set_field1d(nodes=(-10, 0, 11))
 
+        References
+        ----------
+        .. bibliography:: bibliography.bib
+
         """
         self._calc_theta_k()
         self._solve_initial_object()
@@ -1596,9 +1670,27 @@ class Flow1DFE:
 
     def transient_dataframeify(self, print_times=None, include_maxima=True,
                                nodes=None, invert=True):
-        """ Bundle all static dataframes to a single dataframe
+        """ Bundle all static dataframes to a single data structure
 
-        
+
+
+        Parameters
+        ----------
+        print_times : `int`, `list` or `numpy.ndarray`
+            pass
+        include_maxima : `bool`
+            pass
+        nodes : `list` or `numpy.ndarray`
+            pass
+        invert : `bool`
+            Mirror the built dataframes w.r.t. the x-axis.
+
+        Notes
+        -----
+
+        Examples
+        --------
+
 
         """
         # times at which the model has been solved
@@ -1704,6 +1796,12 @@ class Flow1DFE:
             A base path to which runs will be saved.
         dirname : :obj:`str`, default is a chronological name
             Name of save directory that is appended to savepath.
+
+        Notes
+        -----
+
+        Examples
+        --------
 
         """
         savepath = savepath or self.savepath
