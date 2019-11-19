@@ -138,14 +138,14 @@ class Flow1DFE:
 
     dft_print_times : `pandas.core.frame.DataFrame`
         Objects that contain a solution to the model at specific times,
-        calculated with :py:meth:`~transient_dataframify`.
+        calculated with :py:meth:`~transient_dataframeify`.
 
     dft_states : `dict`
         Collection of all :py:attr:`~df_states` dataframes at
         :py:attr:`~solved_times` or at :py:attr:~`print_times` if not `None`.
 
     dft_nodes : `dict`
-        Nodes that are selected in :py:meth:`~transient_dataframify` are
+        Nodes that are selected in :py:meth:`~transient_dataframeify` are
         saved at :py:attr:`~solved_times` or at :py:attr:~`print_times`
         if not `None`.
 
@@ -187,7 +187,6 @@ class Flow1DFE:
         length :py:attr:`~nodes~ minus 1.
 
     """
-
     def __init__(self, id_, savepath=OUTPUT_DIR):
         self.id = id_
         self.savepath = savepath
@@ -1624,21 +1623,46 @@ class Flow1DFE:
 
         >>> from waterflow.flow1d.flowFE1d import Flow1DFE
         >>> from waterflow.utility import conductivityfunctions as condf
-        >>> from waterflow.utility.fluxfunctions import richards_equation
+        >>> from waterflow.utility import fluxfunctions as fluxf
         >>> from waterflow.utility.helper import initializer
 
         Select soil 13, 'loam', from De Staringreeks :cite:`Strunk1979`
-        and prepare the conductivity function with the soil parameters.
+        and prepare the conductivity function and theta-h relation with the
+        soil parameters. These functions are the arguments to the fluxfunction
+        and the storage change function repectively.
 
         >>> s, *_ = condf.soilselector([13])[0]
+        >>> theta_h = initializer(condf.VG_pressureh, theta_r=s.t_res,
+        ...                       theta_s=s.t_sat, a=s.alpha, n=s.n)
         >>> kfun = initializer(condf.VG_conductivity, ksat=s.ksat, a=s.alpha, n=s.n)
+        >>> storage_change = initializer(fluxf.storage_change, fun=theta_h)
 
-        Add states for a stationary no flow situation and check the
-        :py:attr:`~forcing` attribute for the internal forcing values.
-
-        >>> FE = Flow1DFE("Internal forcing example")
-        >>> FE.set_systemfluxfunction(richards_equation, kfun=kfun)
+        >>> FE = Flow1DFE("static df_states dataframe")
+        >>> FE.set_systemfluxfunction(fluxf.richards_equation, kfun=kfun)
         >>> FE.set_field1d(nodes=(-10, 0, 11))
+        >>> FE.add_dirichlet_BC(0.0, 'west')
+        >>> # Constant boundary flow of 0.3 cm/d out of the system
+        >>> FE.add_neumann_BC(-0.3, 'east')
+        >>> # theta_h add manually to be included in the dataframe
+        >>> FE.tfun = theta_h
+        >>> # Add storage change function
+        >>> FE.add_spatialflux(storage_change)
+        >>> # Solve the system for one time step (dt=0.01 d)
+        >>> iters = FE.dt_solve(dt=0.01)
+        >>> FE.dataframeify(invert=True)
+        >>> FE.df_states
+            lengths  nodes    states  moisture  conductivities  storage_change  internal_forcing
+        0       0.5    0.0 -9.304032  0.416865        5.936014        0.144618          0.155382
+        1       1.0   -1.0 -8.278454  0.417344        6.220225        0.266340         -0.266340
+        2       1.0   -2.0 -7.295883  0.417781        6.519720        0.222509         -0.222509
+        3       1.0   -3.0 -6.345835  0.418182        6.840203        0.182383         -0.182383
+        4       1.0   -4.0 -5.419426  0.418549        7.189191        0.145605         -0.145605
+        5       1.0   -5.0 -4.509093  0.418885        7.577188        0.111975         -0.111975
+        6       1.0   -6.0 -3.608378  0.419190        8.020009        0.081460         -0.081460
+        7       1.0   -7.0 -2.711757  0.419462        8.544065        0.054224         -0.054224
+        8       1.0   -8.0 -1.814469  0.419698        9.201041        0.030729         -0.030729
+        9       1.0   -9.0 -0.912220  0.419888       10.126956        0.012064         -0.012064
+        10      0.5  -10.0  0.000000  0.420000       12.980000        0.002066          0.951906
 
         References
         ----------
@@ -1670,27 +1694,133 @@ class Flow1DFE:
 
     def transient_dataframeify(self, print_times=None, include_maxima=True,
                                nodes=None, invert=True):
-        """ Bundle all static dataframes to a single data structure
+        """ Combine the static dataframes to a transient collection
 
+        This method will build the following dataframes:
+        :py:meth:`~dft_solved_times`, :py:attr:`dft_states`,
+        :py:attr:`dft_balance`, :py:attr:`dft_balance_summary`.
 
+        Generation of :py:attr:`dft_print_times` and :py:attr:`dft_nodes`
+        depends on the ``print_times`` and ``nodes`` arguments.
 
         Parameters
         ----------
         print_times : `int`, `list` or `numpy.ndarray`
-            pass
+            Number of linearly spaced print times, or sequence of specific
+            print times.
         include_maxima : `bool`
-            pass
+            Include both endpoints in the dataframe.
         nodes : `list` or `numpy.ndarray`
-            pass
+            Positional values of the nodes that will be tracked over time.
         invert : `bool`
             Mirror the built dataframes w.r.t. the x-axis.
 
         Notes
         -----
+        The default behaviour is to generate the dataframes for the times at
+        which the model has been solved. These times are selected by the
+        :py:meth:`~solve` method and saved in :py:attr:`~dft_solved_times`.
+        When ``print_times != None``, the collection of the static dataframes
+        will be built at the new print times. This requires the model to
+        calculate new model objects. The calculations are done from the nearest
+        known object that was solved for in terms of time
+        (:py:attr:`~dft_solved_times`) and will be saved in
+        :py:attr:`~dft_print_times`.
 
         Examples
         --------
 
+        >>> from waterflow.flow1d.flowFE1d import Flow1DFE
+        >>> from waterflow.utility import conductivityfunctions as condf
+        >>> from waterflow.utility import fluxfunctions as fluxf
+        >>> from waterflow.utility.helper import initializer
+
+        Select soil 13, 'loam', from De Staringreeks :cite:`Strunk1979`
+        and prepare the conductivity function and theta-h relation with the
+        soil parameters. These functions are the arguments to the fluxfunction
+        and the storage change function repectively.
+
+        >>> s, *_ = condf.soilselector([13])[0]
+        >>> theta_h = initializer(condf.VG_pressureh, theta_r=s.t_res,
+        ...                       theta_s=s.t_sat, a=s.alpha, n=s.n)
+        >>> kfun = initializer(condf.VG_conductivity, ksat=s.ksat, a=s.alpha, n=s.n)
+        >>> storage_change = initializer(fluxf.storage_change, fun=theta_h)
+
+        >>> FE = Flow1DFE("All transient dataframes")
+        >>> FE.set_systemfluxfunction(fluxf.richards_equation, kfun=kfun)
+        >>> FE.set_field1d(nodes=(-100, 0, 11))
+        >>> FE.add_dirichlet_BC(0.0, 'west')
+        >>> # Constant boundary flow of 0.3 cm/d out of the system
+        >>> FE.add_neumann_BC(-0.3, 'east')
+        >>> # theta_h add manually to be included in the dataframe
+        >>> FE.tfun = theta_h
+        >>> # Extraction of 0.001 cm/d over the complete domain
+        >>> FE.add_spatialflux(-0.001, 'extraction')
+        >>> # Add storage change function
+        >>> FE.add_spatialflux(storage_change)
+        >>> FE.solve(end_time=5, verbosity=False)
+        >>> FE.transient_dataframeify(nodes=[0, -2, -5, -8, -10])
+        >>> # returns None because it is empty
+        >>> FE.dft_print_times
+
+        >>> FE.dft_solved_times.head()
+                               solved_objects     time       dt  iter
+        0  Flow1DFE(All transient dataframes)  0.00000      NaN   NaN
+        1  Flow1DFE(All transient dataframes)  0.00100  0.00100   7.0
+        2  Flow1DFE(All transient dataframes)  0.00200  0.00100   3.0
+        3  Flow1DFE(All transient dataframes)  0.00350  0.00150   3.0
+        4  Flow1DFE(All transient dataframes)  0.00575  0.00225   3.0
+
+        >>> # access transient data from the top node
+        >>> FE.dft_nodes[0]
+                time  lengths  nodes      states  moisture  conductivities  extraction  storage_change  internal_forcing
+        0   0.000000      5.0    0.0    0.000000  0.420000       12.980000      -0.005        0.000000        -12.980000
+        1   0.001000      5.0    0.0   -6.230996  0.418228        6.881334      -0.005        4.413886         -4.108886
+        2   0.002000      5.0    0.0   -8.525052  0.417231        6.149441      -0.005        3.381237         -3.076237
+        3   0.003500      5.0    0.0  -10.769689  0.416145        5.570882      -0.005        2.713307         -2.408307
+        4   0.005750      5.0    0.0  -13.147704  0.414894        5.058867      -0.005        2.213596         -1.908596
+        5   0.009125      5.0    0.0  -15.759044  0.413423        4.583379      -0.005        1.816135         -1.511135
+        6   0.014188      5.0    0.0  -18.682582  0.411673        4.131618      -0.005        1.490460         -1.185460
+        7   0.021781      5.0    0.0  -21.992779  0.409584        3.698174      -0.005        1.219763         -0.914763
+        8   0.033172      5.0    0.0  -25.766774  0.407089        3.281456      -0.005        0.993457         -0.688457
+        9   0.050258      5.0    0.0  -30.088421  0.404117        2.882094      -0.005        0.804074         -0.499074
+        10  0.075887      5.0    0.0  -35.050660  0.400591        2.502107      -0.005        0.645821         -0.340821
+        11  0.114330      5.0    0.0  -40.755672  0.396435        2.144426      -0.005        0.513876         -0.208876
+        12  0.171995      5.0    0.0  -47.311047  0.391582        1.812568      -0.005        0.404104         -0.099104
+        13  0.258493      5.0    0.0  -54.818914  0.385985        1.510322      -0.005        0.312974         -0.007974
+        14  0.388239      5.0    0.0  -63.353249  0.379645        1.241351      -0.005        0.237546          0.067454
+        15  0.582859      5.0    0.0  -72.918234  0.372640        1.008723      -0.005        0.175458          0.129542
+        16  0.874788      5.0    0.0  -83.379449  0.365167        0.814411      -0.005        0.124874          0.180126
+        17  1.312682      5.0    0.0  -94.367200  0.357578        0.658911      -0.005        0.084417          0.220583
+        18  1.812682      5.0    0.0 -103.335192  0.351603        0.559141      -0.005        0.058055          0.246945
+        19  2.312682      5.0    0.0 -109.947478  0.347330        0.497676      -0.005        0.041411          0.263589
+        20  2.812682      5.0    0.0 -114.891068  0.344208        0.457272      -0.005        0.030168          0.274832
+        21  3.312682      5.0    0.0 -118.614160  0.341899        0.429578      -0.005        0.022269          0.282730
+        22  3.812682      5.0    0.0 -121.429531  0.340177        0.410046      -0.005        0.016582          0.288417
+        23  4.312682      5.0    0.0 -123.563493  0.338885        0.395994      -0.005        0.012421          0.292579
+        24  4.812682      5.0    0.0 -125.183260  0.337912        0.385736      -0.005        0.009343          0.295657
+        25  5.000000      5.0    0.0 -125.727039  0.337587        0.382369      -0.005        0.008330          0.296670
+
+        >>> # Revert to initial model state
+        >>> FE.set_initial_states(0.0)
+        >>> FE.solve(end_time=5, verbosity=False)
+        >>> # 5 linearly spaced print times
+        >>> FE.transient_dataframeify(nodes=[0, -2, -5, -8, -10], print_times=5)
+        >>> FE.dft_nodes[0]
+           time  lengths  nodes      states  moisture  conductivities  extraction  storage_change  internal_forcing
+        0  0.00      5.0    0.0    0.000000  0.420000       12.980000      -0.005        0.008330          0.296670
+        1  1.25      5.0    0.0  -93.203885  0.358368        0.673469      -0.005        0.088281          0.216719
+        2  2.50      5.0    0.0 -112.163382  0.345923        0.479024      -0.005        0.036331          0.268668
+        3  3.75      5.0    0.0 -121.156173  0.340343        0.411892      -0.005        0.017130          0.287870
+        4  5.00      5.0    0.0 -125.727039  0.337587        0.382369      -0.005        0.008330          0.296670
+
+        >>> FE.dft_print_times
+                               solved_objects  time
+        0  Flow1DFE(All transient dataframes)  0.00
+        1  Flow1DFE(All transient dataframes)  1.25
+        2  Flow1DFE(All transient dataframes)  2.50
+        3  Flow1DFE(All transient dataframes)  3.75
+        4  Flow1DFE(All transient dataframes)  5.00
 
         """
         # times at which the model has been solved
