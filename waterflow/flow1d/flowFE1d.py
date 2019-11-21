@@ -186,9 +186,12 @@ class Flow1DFE:
         :py:attr:`~nodes`. The shape of this list is :py:attr:`~degree` by
         length :py:attr:`~nodes~ minus 1.
 
+    summarystring : `str`
+        Model information.
+
     """
     def __init__(self, id_, savepath=OUTPUT_DIR):
-        self.id = id_
+        self.id_ = id_
         self.savepath = savepath
         self.systemfluxfunc = None
         self.nodes = None
@@ -211,6 +214,7 @@ class Flow1DFE:
         self.isconverged = False
         self.solve_data = None
         self.runtime = None
+        self.summarystring = ""
         # dataframes
         self.df_states = None
         self.df_balance = None
@@ -234,28 +238,84 @@ class Flow1DFE:
 
     def __repr__(self):
         """ Representation of the object as shown to the user """
-        return "Flow1DFE(" + str(self.id) + ")"
+        return "Flow1DFE(" + str(self.id_) + ")"
 
-    def summary(self, show=True):
+    def summary(self, show=True, save=False, path=None):
         """ Description of the object
+
+        Subsequent calls will update the model description if
+        adaptations to the model were made.
 
         Parameters
         ----------
         show : `bool`, default is True
-            Print object description to the console
+            Print object description to the console.
+        save : `bool`, default is False
+            Save object description to disk.
+        path : `str`, default is None
+            Full path of a directory to which will be saved. This
+            argument is mandatory if ``save=True``.
 
         Notes
         -----
+        The description of the model is saved as :py:attr:`~id_` with a`.txt`
+        extension. The string version of the description is also available via
+        :py:attr:`~summarystring`.
 
-        .. note::
+        Examples
+        --------
 
-            The dataframe that might be included is based on
-            :py:attr:`~df_balance_summary` and is only included if the model
-            has been solved for.
+        >>> from waterflow.flow1d.flowFE1d import Flow1DFE
+        >>> from waterflow.utility import conductivityfunctions as condf
+        >>> from waterflow.utility import fluxfunctions as fluxf
+        >>> from waterflow.utility.helper import initializer
+
+        Select soil 13, 'loam', from De Staringreeks :cite:`Strunk1979`
+        and prepare the conductivity function and theta-h relation with the
+        soil parameters. These functions are the arguments to the fluxfunction
+        and the storage change function repectively.
+
+        >>> s, *_ = condf.soilselector([13])[0]
+        >>> theta_h = initializer(condf.VG_pressureh, theta_r=s.t_res,
+        ...                       theta_s=s.t_sat, a=s.alpha, n=s.n)
+        >>> kfun = initializer(condf.VG_conductivity, ksat=s.ksat, a=s.alpha, n=s.n)
+        >>> storage_change = initializer(fluxf.storage_change, fun=theta_h)
+
+        >>> FE = Flow1DFE("static df_states dataframe")
+        >>> FE.set_field1d(nodes=(-10, 0, 11))
+        >>> FE.set_systemfluxfunction(fluxf.richards_equation, kfun=kfun)
+        >>> FE.add_dirichlet_BC(0.0, 'west')
+        >>> # Constant boundary flow of 0.3 cm/d out of the system
+        >>> FE.add_neumann_BC(-0.3, 'east')
+        >>> # theta_h add manually to be included in the dataframe
+        >>> FE.tfun = theta_h
+        >>> # add spatial flux
+        >>> FE.add_spatialflux(-0.001, 'extraction')
+        >>> # Add storage change function
+        >>> FE.add_spatialflux(storage_change)
+        >>> # Solve the system for one time step (dt=0.01 d)
+        >>> iters = FE.dt_solve(dt=0.01)
+        >>> FE.summary()
+        Id: static df_states dataframe
+        System length: 10.0
+        Number of nodes: 11
+        Gauss degree: 1
+        kfun: VG_conductivity
+        tfun: VG_pressureh
+        BCs: west value: 0.0 and of type Dirichlet, east value: -0.3 and of type Neumann
+        Spatflux: extraction, storage_change
+        <BLANKLINE>
+        spat-extraction   -1.000000e-02
+        storage_change     1.255148e+00
+        internal          -1.255148e+00
+        all-spatial       -1.000000e-02
+        all-points         0.000000e+00
+        all-external      -1.000000e-02
+        net                1.716294e-12
 
         """
-
-        id_ = f"{self.id}"
+        # build key-value pairs where data is available
+        id_ = f"{self.id_}"
         if self.nodes is not None:
             len_ = str(self.nodes[-1] - self.nodes[0])
             num_nodes = str(len(self.nodes))
@@ -272,23 +332,46 @@ class Flow1DFE:
         spatflux = ", ".join(i for i in skeys)
         runtime = self.runtime
 
+        if hasattr(self, 'kfun'):
+            kfun = self.kfun.__name__
+        else:
+            kfun = None
+
+        if hasattr(self, 'tfun'):
+            tfun = self.tfun.__name__
+        else:
+            tfun = None
+
         k = ['Id', 'System length', 'Number of nodes', 'Gauss degree',
-             'BCs', 'Pointflux', 'Spatflux', 'Runtime (s)']
-        v = (id_, len_, num_nodes, degree, bcs, pointflux, spatflux, runtime)
+             'kfun', 'tfun', 'BCs', 'Pointflux', 'Spatflux', 'Runtime (s)']
+        v = (id_, len_, num_nodes, degree, kfun, tfun, bcs, pointflux,
+             spatflux, runtime)
+
+        # build summary string
         sumstring = ""
         for i, j in zip(k, v):
             if j:
                 sumstring += f"{i}: {j}\n"
 
+        try:
+            self.calcbalance()
+            sumstring += '\n' + self.df_balance_summary.to_string()
+        except Exception:
+            pass
+
+        # print to console
         if show:
             for s in sumstring.split('\n'):
                 print(s)
 
-            try:
-                self.calcbalance()
-                print(self.df_balance_summary)
-            except Exception:
-                pass
+        # save to disk
+        if save:
+            if not os.path.isdir(path):
+                os.mkdir(path)
+
+            fname = f"{self.id_}.txt"
+            with open(os.path.join(path, fname), "w") as fw:
+                fw.write(sumstring)
 
         self.summarystring = sumstring
 
@@ -1918,20 +2001,30 @@ class Flow1DFE:
         self.dft_balance_summary = dft_bal_sum
 
     def save(self, savepath=None, dirname=None):
-        """ Save model metadata and dataframes to disk
+        """ Save model data to disk
+
+        The transient dataframes created with
+        :py:meth:`~transient_dataframeify` and the model summary as created
+        with :py:meth:`~summary` will be saved to disk by this method.
 
         Parameters
         ----------
-        savepath: :obj:`str`, default is `OUTDIR`
+        savepath: :obj:`str`, default is ``OUTPUT_DIR``
             A base path to which runs will be saved.
         dirname : :obj:`str`, default is a chronological name
             Name of save directory that is appended to savepath.
 
         Notes
         -----
+        All dataframes of the form ``dft_<name>``, if populated,
+        are written to disk in a `.xlsx` extension. The model summary
+        is saved as :py:attr:`~id_` with a `.txt` extension.
 
-        Examples
-        --------
+        .. warning::
+            Data that already exists in the target directory will
+            be overwritten with new data. Prevent this by selecting a
+            new directory name or set ``dirname=None`` to automatically
+            generate a chronological directory name which is always unique.
 
         """
         savepath = savepath or self.savepath
@@ -1950,6 +2043,7 @@ class Flow1DFE:
             if not os.path.isdir(runpath):
                 os.mkdir(runpath)
 
+        # write transient dataframes
         for k, v in self.__dict__.items():
             # transient dataframes only
             if k.startswith('dft_'):
@@ -1964,6 +2058,9 @@ class Flow1DFE:
                     with pd.ExcelWriter(save_file) as fw:
                         for k, df in v.items():
                             df.to_excel(fw, sheet_name=str(k))
+
+        # write model summary
+        self.summary(show=False, save=True, path=runpath)
 
 
 if __name__ == "__main__":

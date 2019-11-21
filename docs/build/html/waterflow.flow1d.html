@@ -662,6 +662,17 @@ length :py:attr:<a href="#id1"><span class="problematic" id="id2">`</span></a>~n
 </dl>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="waterflow.flow1d.flowFE1d.Flow1DFE.summarystring">
+<code class="sig-name descname">summarystring</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.summarystring" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><cite>str</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="method">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE._CMAT">
 <code class="sig-name descname">_CMAT</code><span class="sig-paren">(</span><em class="sig-param">nodes</em>, <em class="sig-param">states</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE._CMAT" title="Permalink to this definition">¶</a></dt>
@@ -1191,17 +1202,29 @@ conditions as saved in <a class="reference internal" href="#waterflow.flow1d.flo
 <dl class="method">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.save">
 <code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param">savepath=None</em>, <em class="sig-param">dirname=None</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.save" title="Permalink to this definition">¶</a></dt>
-<dd><p>Save model metadata and dataframes to disk</p>
+<dd><p>Save model data to disk</p>
+<p>The transient dataframes created with
+<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.transient_dataframeify" title="waterflow.flow1d.flowFE1d.Flow1DFE.transient_dataframeify"><code class="xref py py-meth docutils literal notranslate"><span class="pre">transient_dataframeify()</span></code></a> and the model summary as created
+with <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.summary" title="waterflow.flow1d.flowFE1d.Flow1DFE.summary"><code class="xref py py-meth docutils literal notranslate"><span class="pre">summary()</span></code></a> will be saved to disk by this method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>savepath</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, default is <cite>OUTDIR</cite>) – A base path to which runs will be saved.</p></li>
+<li><p><strong>savepath</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, default is <code class="docutils literal notranslate"><span class="pre">OUTPUT_DIR</span></code>) – A base path to which runs will be saved.</p></li>
 <li><p><strong>dirname</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, default is a chronological name) – Name of save directory that is appended to savepath.</p></li>
 </ul>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
-<p class="rubric">Examples</p>
+<p>All dataframes of the form <code class="docutils literal notranslate"><span class="pre">dft_&lt;name&gt;</span></code>, if populated,
+are written to disk in a <cite>.xlsx</cite> extension. The model summary
+is saved as <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.id_" title="waterflow.flow1d.flowFE1d.Flow1DFE.id_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">id_</span></code></a> with a <cite>.txt</cite> extension.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Data that already exists in the target directory will
+be overwritten with new data. Prevent this by selecting a
+new directory name or set <code class="docutils literal notranslate"><span class="pre">dirname=None</span></code> to automatically
+generate a chronological directory name which is always unique.</p>
+</div>
 </dd></dl>
 
 <dl class="method">
@@ -1417,7 +1440,7 @@ domain is given as argument.</p>
 
 <dl class="method">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.summary">
-<code class="sig-name descname">summary</code><span class="sig-paren">(</span><em class="sig-param">show=True</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.summary" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">summary</code><span class="sig-paren">(</span><em class="sig-param">show=True</em>, <em class="sig-param">save=False</em>, <em class="sig-param">path=None</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.summary" title="Permalink to this definition">¶</a></dt>
 <dd><p>Description of the object</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
