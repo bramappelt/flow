@@ -12,14 +12,6 @@ Subpackages
 Submodules
 ----------
 
-waterflow.conf module
----------------------
-
-.. automodule:: waterflow.conf
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 
 Module contents
 ---------------

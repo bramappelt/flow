@@ -97,7 +97,6 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="waterflow.html#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="waterflow.html#waterflow-conf-module">waterflow.conf module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="waterflow.html#module-waterflow">Module contents</a></li>
 </ul>
 </li>
@@ -794,7 +793,7 @@ when called with default arguments.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="k">import</span> <span class="n">initializer</span>
 </pre></div>
 </div>
-<p>Select soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="#id13" id="id3">[SW79]</a>
+<p>Select soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="#id14" id="id3">[SW79]</a>
 and prepare the conductivity function with the soil parameters.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">condf</span><span class="o">.</span><span class="n">soilselector</span><span class="p">([</span><span class="mi">13</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">kfun</span> <span class="o">=</span> <span class="n">initializer</span><span class="p">(</span><span class="n">condf</span><span class="o">.</span><span class="n">VG_conductivity</span><span class="p">,</span> <span class="n">ksat</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">ksat</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
@@ -966,13 +965,13 @@ the system, the distribution towards the surrounding nodes needs to be
 calculated before values can be accumulated to its total. The
 distribution to the nearest nodes is calculated as follows:</p>
 <div class="math notranslate nohighlight">
-\[node_{i} = F_{p_j}(s) * rfac\]</div>
+\[node_{i} = F_{p_j}(s) * lfac\]</div>
 <div class="math notranslate nohighlight">
-\[node_{i+1} = F_{p_j}(s) * lfac\]</div>
+\[node_{i+1} = F_{p_j}(s) * rfac\]</div>
 <p>where <span class="math notranslate nohighlight">\(s\)</span> equals the state at the position of the point flux
 which is calculated by linear interpolation. The calculation of the
-fractions <span class="math notranslate nohighlight">\(rfac\)</span> and <span class="math notranslate nohighlight">\(lfac\)</span> are described in
-<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.add_pointflux" title="waterflow.flow1d.flowFE1d.Flow1DFE.add_pointflux"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_pointflux()</span></code></a>.</p>
+fractions, that distribute the flux, <span class="math notranslate nohighlight">\(rfac\)</span> and <span class="math notranslate nohighlight">\(lfac\)</span>
+are described in <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.add_pointflux" title="waterflow.flow1d.flowFE1d.Flow1DFE.add_pointflux"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_pointflux()</span></code></a>.</p>
 <p>For the calculation of the spatial flux, <span class="math notranslate nohighlight">\(F_{s_j}\)</span>, a similar
 distinction exists. If the spatial flux is not dependend on state,
 straightforward addition takes place. When there is a state
@@ -1010,7 +1009,7 @@ the <span class="math notranslate nohighlight">\(F_{external}\)</span> term.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="k">import</span> <span class="n">initializer</span>
 </pre></div>
 </div>
-<p>Select soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="#id13" id="id4">[SW79]</a>
+<p>Select soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="#id14" id="id4">[SW79]</a>
 and prepare the conductivity function and theta-h relation with the
 soil parameters. These functions are the arguments to the fluxfunction
 and the storage change function repectively.</p>
@@ -1062,7 +1061,7 @@ and the storage change function repectively.</p>
 </div>
 <p class="rubric">References</p>
 <p id="bibtex-bibliography-waterflow.flow1d-1"><dl class="citation">
-<dt class="bibtex label" id="id11"><span class="brackets">SW79</span></dt>
+<dt class="bibtex label" id="id12"><span class="brackets">SW79</span></dt>
 <dd><p>William Strunk, Jr. and E. B. White. <em>The Elements of Style</em>. Macmillan, third edition, 1979.</p>
 </dd>
 </dl>
@@ -1089,7 +1088,7 @@ to the dataframe.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="k">import</span> <span class="n">initializer</span>
 </pre></div>
 </div>
-<p>Select soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="#id13" id="id5">[SW79]</a>
+<p>Select soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="#id14" id="id5">[SW79]</a>
 and prepare the conductivity function and theta-h relation with the
 soil parameters. These functions are the arguments to the fluxfunction
 and the storage change function repectively.</p>
@@ -1130,7 +1129,7 @@ and the storage change function repectively.</p>
 </div>
 <p class="rubric">References</p>
 <p id="bibtex-bibliography-waterflow.flow1d-2"><dl class="citation">
-<dt class="bibtex label" id="id12"><span class="brackets">SW79</span></dt>
+<dt class="bibtex label" id="id13"><span class="brackets">SW79</span></dt>
 <dd><p>William Strunk, Jr. and E. B. White. <em>The Elements of Style</em>. Macmillan, third edition, 1979.</p>
 </dd>
 </dl>
@@ -1297,10 +1296,10 @@ are calculated and saved in ~xintegration`.</p>
 <div class="math notranslate nohighlight">
 \[w_{i} = \frac{2}{\left(\left(1 - x_{i}^{2}\right) *
 (P_{n}^{'}(x_{i})^{2}\right)}\]</div>
-<p>See <a class="bibtex reference internal" href="#id13" id="id6">[SW79]</a> for an introduction to stylish blah, blah…</p>
+<p>See <a class="bibtex reference internal" href="#id14" id="id6">[SW79]</a> for an introduction to stylish blah, blah…</p>
 <p class="rubric">References</p>
 <p id="bibtex-bibliography-waterflow.flow1d-3"><dl class="citation">
-<dt class="bibtex label" id="id13"><span class="brackets">SW79</span></dt>
+<dt class="bibtex label" id="id14"><span class="brackets">SW79</span></dt>
 <dd><p>William Strunk, Jr. and E. B. White. <em>The Elements of Style</em>. Macmillan, third edition, 1979.</p>
 </dd>
 </dl>
@@ -1365,8 +1364,8 @@ remains the same.</p></li>
 </pre></div>
 </div>
 <p>Implement the Richards equation for unsturated flow, herein the
-Van Genuchten conductivity function is used. <a class="bibtex reference internal" href="#id13" id="id7">[SW79]</a>.
-Soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="#id13" id="id8">[SW79]</a> is selected.
+Van Genuchten conductivity function is used. <a class="bibtex reference internal" href="#id14" id="id7">[SW79]</a>.
+Soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="#id14" id="id8">[SW79]</a> is selected.
 See <a class="reference internal" href="waterflow.utility.html#waterflow.utility.fluxfunctions.richards_equation" title="waterflow.utility.fluxfunctions.richards_equation"><code class="xref py py-func docutils literal notranslate"><span class="pre">richards_equation()</span></code></a> for
 the full definition of the fluxfunction.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">condf</span><span class="o">.</span><span class="n">soilselector</span><span class="p">([</span><span class="mi">13</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
@@ -1377,7 +1376,7 @@ the full definition of the fluxfunction.</p>
 </pre></div>
 </div>
 <p>For saturated flow the Darcy equation with a constant saturated
-conductivity can be used. <a class="bibtex reference internal" href="#id13" id="id9">[SW79]</a>. See
+conductivity can be used. <a class="bibtex reference internal" href="#id14" id="id9">[SW79]</a>. See
 <a class="reference internal" href="waterflow.utility.html#waterflow.utility.fluxfunctions.darcy" title="waterflow.utility.fluxfunctions.darcy"><code class="xref py py-func docutils literal notranslate"><span class="pre">darcy()</span></code></a> for the full
 definition of the fluxfunction.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">darcy</span> <span class="o">=</span> <span class="n">fluxf</span><span class="o">.</span><span class="n">darcy</span>
@@ -1442,17 +1441,72 @@ domain is given as argument.</p>
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.summary">
 <code class="sig-name descname">summary</code><span class="sig-paren">(</span><em class="sig-param">show=True</em>, <em class="sig-param">save=False</em>, <em class="sig-param">path=None</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.summary" title="Permalink to this definition">¶</a></dt>
 <dd><p>Description of the object</p>
+<p>Subsequent calls will update the model description if
+adaptations to the model were made.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>show</strong> (<cite>bool</cite>, default is True) – Print object description to the console</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>show</strong> (<cite>bool</cite>, default is True) – Print object description to the console.</p></li>
+<li><p><strong>save</strong> (<cite>bool</cite>, default is False) – Save object description to disk.</p></li>
+<li><p><strong>path</strong> (<cite>str</cite>, default is None) – Full path of a directory to which will be saved. This
+argument is mandatory if <code class="docutils literal notranslate"><span class="pre">save=True</span></code>.</p></li>
+</ul>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The dataframe that might be included is based on
-<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.df_balance_summary" title="waterflow.flow1d.flowFE1d.Flow1DFE.df_balance_summary"><code class="xref py py-attr docutils literal notranslate"><span class="pre">df_balance_summary</span></code></a> and is only included if the model
-has been solved for.</p>
+<p>The description of the model is saved as <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.id_" title="waterflow.flow1d.flowFE1d.Flow1DFE.id_"><code class="xref py py-attr docutils literal notranslate"><span class="pre">id_</span></code></a> with a`.txt`
+extension. The string version of the description is also available via
+<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.summarystring" title="waterflow.flow1d.flowFE1d.Flow1DFE.summarystring"><code class="xref py py-attr docutils literal notranslate"><span class="pre">summarystring</span></code></a>.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.flow1d.flowFE1d</span> <span class="k">import</span> <span class="n">Flow1DFE</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility</span> <span class="k">import</span> <span class="n">conductivityfunctions</span> <span class="k">as</span> <span class="n">condf</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility</span> <span class="k">import</span> <span class="n">fluxfunctions</span> <span class="k">as</span> <span class="n">fluxf</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="k">import</span> <span class="n">initializer</span>
+</pre></div>
+</div>
+<p>Select soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="#id14" id="id10">[SW79]</a>
+and prepare the conductivity function and theta-h relation with the
+soil parameters. These functions are the arguments to the fluxfunction
+and the storage change function repectively.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">condf</span><span class="o">.</span><span class="n">soilselector</span><span class="p">([</span><span class="mi">13</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">theta_h</span> <span class="o">=</span> <span class="n">initializer</span><span class="p">(</span><span class="n">condf</span><span class="o">.</span><span class="n">VG_pressureh</span><span class="p">,</span> <span class="n">theta_r</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">t_res</span><span class="p">,</span>
+<span class="gp">... </span>                      <span class="n">theta_s</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">t_sat</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">kfun</span> <span class="o">=</span> <span class="n">initializer</span><span class="p">(</span><span class="n">condf</span><span class="o">.</span><span class="n">VG_conductivity</span><span class="p">,</span> <span class="n">ksat</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">ksat</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">storage_change</span> <span class="o">=</span> <span class="n">initializer</span><span class="p">(</span><span class="n">fluxf</span><span class="o">.</span><span class="n">storage_change</span><span class="p">,</span> <span class="n">fun</span><span class="o">=</span><span class="n">theta_h</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span> <span class="o">=</span> <span class="n">Flow1DFE</span><span class="p">(</span><span class="s2">&quot;static df_states dataframe&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">set_field1d</span><span class="p">(</span><span class="n">nodes</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">11</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">set_systemfluxfunction</span><span class="p">(</span><span class="n">fluxf</span><span class="o">.</span><span class="n">richards_equation</span><span class="p">,</span> <span class="n">kfun</span><span class="o">=</span><span class="n">kfun</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">add_dirichlet_BC</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;west&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Constant boundary flow of 0.3 cm/d out of the system</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">add_neumann_BC</span><span class="p">(</span><span class="o">-</span><span class="mf">0.3</span><span class="p">,</span> <span class="s1">&#39;east&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># theta_h add manually to be included in the dataframe</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">tfun</span> <span class="o">=</span> <span class="n">theta_h</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># add spatial flux</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">add_spatialflux</span><span class="p">(</span><span class="o">-</span><span class="mf">0.001</span><span class="p">,</span> <span class="s1">&#39;extraction&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Add storage change function</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">add_spatialflux</span><span class="p">(</span><span class="n">storage_change</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Solve the system for one time step (dt=0.01 d)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">iters</span> <span class="o">=</span> <span class="n">FE</span><span class="o">.</span><span class="n">dt_solve</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span>
+<span class="go">Id: static df_states dataframe</span>
+<span class="go">System length: 10.0</span>
+<span class="go">Number of nodes: 11</span>
+<span class="go">Gauss degree: 1</span>
+<span class="go">kfun: VG_conductivity</span>
+<span class="go">tfun: VG_pressureh</span>
+<span class="go">BCs: west value: 0.0 and of type Dirichlet, east value: -0.3 and of type Neumann</span>
+<span class="go">Spatflux: extraction, storage_change</span>
+
+<span class="go">spat-extraction   -1.000000e-02</span>
+<span class="go">storage_change     1.255148e+00</span>
+<span class="go">internal          -1.255148e+00</span>
+<span class="go">all-spatial       -1.000000e-02</span>
+<span class="go">all-points         0.000000e+00</span>
+<span class="go">all-external      -1.000000e-02</span>
+<span class="go">net                1.716294e-12</span>
+</pre></div>
 </div>
 </dd></dl>
 
@@ -1493,7 +1547,7 @@ known object that was solved for in terms of time
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="k">import</span> <span class="n">initializer</span>
 </pre></div>
 </div>
-<p>Select soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="#id13" id="id10">[SW79]</a>
+<p>Select soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="#id14" id="id11">[SW79]</a>
 and prepare the conductivity function and theta-h relation with the
 soil parameters. These functions are the arguments to the fluxfunction
 and the storage change function repectively.</p>
