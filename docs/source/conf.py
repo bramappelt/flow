@@ -36,6 +36,7 @@ release = 'v1.0'
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.napoleon',
               'sphinx.ext.coverage',
+	      'sphinx.ext.imgmath',
               'sphinx.ext.mathjax',
               'sphinx.ext.doctest',
               'sphinx.ext.githubpages',
@@ -68,7 +69,11 @@ html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 
 # Math settings
-# math_number_all = True
+math_number_all = True
+
+# Latex settings
+pngmath_latex=r"C:\Program Files\MiKTeX 2.9\miktex\bin\x64\latex.exe"
+pngmath_dvipng=r"C:\Program Files\MiKTeX 2.9\miktex\bin\x64\dvipng.exe"
 
 # Theme settings
 html_logo = './_static/drop.png'

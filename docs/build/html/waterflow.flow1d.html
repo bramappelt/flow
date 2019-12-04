@@ -27,7 +27,6 @@
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>
         <script type="text/javascript" src="_static/language_data.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -675,7 +674,55 @@ length :py:attr:<a href="#id1"><span class="problematic" id="id2">`</span></a>~n
 <dl class="method">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE._CMAT">
 <code class="sig-name descname">_CMAT</code><span class="sig-paren">(</span><em class="sig-param">nodes</em>, <em class="sig-param">states</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE._CMAT" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Build the jacobian matrix</p>
+<p>Build the complete jacobian matrix according to the finite elements
+scheme for the selected degree. The jacobian matrix is assigned to
+<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.coefmatr" title="waterflow.flow1d.flowFE1d.Flow1DFE.coefmatr"><code class="xref py py-attr docutils literal notranslate"><span class="pre">coefmatr</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nodes</strong> (<cite>numpy.ndarray</cite>) – Array that contains the nodal positions.</p></li>
+<li><p><strong>states</strong> (<cite>numpy.ndarray</cite>) – Array that contains the states at the nodal positions.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The jacobian matrix <img class="math" src="_images/math/211284f68205c3e66773eaf026f32a0acdd3dfb3.png" alt="A"/> is build from three individual parts.</p>
+<div class="math" id="equation-waterflow-flow1d-0">
+<p><span class="eqno">(1)<a class="headerlink" href="#equation-waterflow-flow1d-0" title="Permalink to this equation">¶</a></span><img src="_images/math/72a6e445b022047bd98fe9062df9516053b61c63.png" alt="A = A_{sys} + A_{spat} + A_{point}"/></p>
+</div><ul class="simple">
+<li><p><img class="math" src="_images/math/8cd2b1f5dce2b3c2ead0dc1e50cbb896ebcb5cff.png" alt="A_{sys}"/>, derivatives of the <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.systemfluxfunc" title="waterflow.flow1d.flowFE1d.Flow1DFE.systemfluxfunc"><code class="xref py py-attr docutils literal notranslate"><span class="pre">systemfluxfunc</span></code></a>.</p></li>
+<li><p><img class="math" src="_images/math/2eeefdbab0e80111b8ea826710e919ab469655b2.png" alt="A_{spat}"/>, derivatives of functions in <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.Sspatialflux" title="waterflow.flow1d.flowFE1d.Flow1DFE.Sspatialflux"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Sspatialflux</span></code></a>.</p></li>
+<li><p><img class="math" src="_images/math/dbb4b0a4cbd3282fe3f4bfc0ce9f7875679dac6f.png" alt="A_{point}"/>, derivatives of functions in <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.Spointflux" title="waterflow.flow1d.flowFE1d.Flow1DFE.Spointflux"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Spointflux</span></code></a>.</p></li>
+</ul>
+<div class="math" id="equation-waterflow-flow1d-1">
+<p><span class="eqno">(2)<a class="headerlink" href="#equation-waterflow-flow1d-1" title="Permalink to this equation">¶</a></span><img src="_images/math/278c6ba40f2174f221321999510e49961646d292.png" alt="A_{sys} = \begin{bmatrix}
+                -\frac{\delta Q_{l}}{\delta x}_{i} &amp; -\frac{\delta Q_{r}}{\delta x}_{i} &amp;  &amp;  &amp;  &amp; \\
+                \frac{\delta Q_{l}}{\delta x}_{i} &amp; \frac{\delta Q_{r}}{\delta x}_{i} -\frac{\delta Q_{l}}{\delta x}_{i+1} &amp; -\frac{\delta Q_{r}}{\delta x}_{i+1} &amp;  &amp; &amp; \\
+                 &amp; \frac{\delta Q_{l}}{\delta x}_{i+1} &amp; \frac{\delta Q_{r}}{\delta x}_{i+1} -\frac{\delta Q_{l}}{\delta x}_{i+2} &amp; \ddots &amp; &amp; \\
+                 &amp;  &amp; \ddots &amp; \ddots &amp; &amp; \ddots &amp; \\
+                 &amp;  &amp;  &amp; \ddots &amp;  &amp; \frac{\delta Q_{r}}{\delta x}_{n-1} -\frac{\delta Q_{l}}{\delta x}_{n} &amp; -\frac{\delta Q_{r}}{\delta x}_{n} \\
+                 &amp;  &amp;  &amp;  &amp;  &amp; \frac{\delta Q_{l}}{\delta x}_{n} &amp; \frac{\delta Q_{r}}{\delta x}_{n}
+        \end{bmatrix}"/></p>
+</div><div class="math" id="equation-waterflow-flow1d-2">
+<p><span class="eqno">(3)<a class="headerlink" href="#equation-waterflow-flow1d-2" title="Permalink to this equation">¶</a></span><img src="_images/math/78b5cf5a1af0ce7cf57b72b92ae88d5edd379b39.png" alt="A_{spat} = \begin{bmatrix}
+                \Sigma \frac{\delta S_{l}}{\delta x}_{i} &amp; \Sigma \frac{\delta S_{r}}{\delta x}_{i} &amp;  &amp;  &amp;  &amp; \\
+                \Sigma \frac{\delta S_{l}}{\delta x}_{i} &amp; \Sigma \frac{\delta S_{r}}{\delta x}_{i} + \Sigma \frac{\delta S_{l}}{\delta x}_{i+1} &amp; \Sigma \frac{\delta S_{r}}{\delta x}_{i+1} &amp;  &amp; &amp; \\
+                  &amp; \Sigma \frac{\delta S_{l}}{\delta x}_{i+1} &amp; \Sigma \frac{\delta S_{r}}{\delta x}_{i+1} + \Sigma \frac{\delta S_{l}}{\delta x}_{i+2} &amp; \ddots &amp; &amp; \\
+                  &amp;  &amp; \ddots &amp; \ddots &amp; &amp; \ddots &amp; \\
+                  &amp;  &amp;  &amp; \ddots &amp;  &amp; \Sigma \frac{\delta S_{r}}{\delta x}_{n-1} + \Sigma \frac{\delta S_{l}}{\delta x}_{n} &amp; \Sigma \frac{\delta S_{r}}{\delta x}_{n} \\
+                  &amp;  &amp;  &amp;  &amp;  &amp; \Sigma \frac{\delta S_{l}}{\delta x}_{n} &amp; \Sigma \frac{\delta S_{r}}{\delta x}_{n}
+           \end{bmatrix}"/></p>
+</div><div class="math" id="equation-waterflow-flow1d-3">
+<p><span class="eqno">(4)<a class="headerlink" href="#equation-waterflow-flow1d-3" title="Permalink to this equation">¶</a></span><img src="_images/math/f0978c9b774463dd1414a775e2209a8c892b232a.png" alt="A_{point} = \begin{bmatrix}
+                \Sigma \frac{\delta P_{l}}{\delta x}_{i} &amp;  &amp;  &amp;  &amp;  &amp; \\
+                &amp; \Sigma \frac{\delta P_{r}}{\delta x}_{i} + \Sigma \frac{\delta P_{l}}{\delta x}_{i+1} &amp;  &amp;  &amp;  &amp;  \\
+                &amp;  &amp; \Sigma \frac{\delta P_{r}}{\delta x}_{i+1} + \Sigma \frac{\delta P_{l}}{\delta x}_{i+2} &amp;  &amp;  &amp;  \\
+                &amp;  &amp;  &amp; \ddots &amp;  &amp;  &amp; \\
+                &amp;  &amp;  &amp;  &amp;  &amp; \Sigma \frac{\delta P_{r}}{\delta x}_{n-1} + \Sigma \frac{\delta P_{l}}{\delta x}_{n}  &amp;  \\
+                &amp;  &amp;  &amp;  &amp;  &amp;  &amp; \Sigma \frac{\delta P_{r}}{\delta x}_{n}
+            \end{bmatrix}"/></p>
+</div></dd></dl>
 
 <dl class="method">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE._FE_precalc">
@@ -754,30 +801,31 @@ summation in the <cite>notes</cite> section is applied.</p></li>
 </dl>
 <p class="rubric">Notes</p>
 <p>This mathematical description of the internal forcing
-calculation describes how the forcing at nodes <span class="math notranslate nohighlight">\(i\)</span> and
-<span class="math notranslate nohighlight">\(i+1\)</span> is calculated. To calculate this forcing at the current
-time step <span class="math notranslate nohighlight">\(t\)</span>, states from the previous time step or initial
+calculation describes how the forcing at nodes <img class="math" src="_images/math/5aa339d4daf45a810dda332e3c80a0698e526e04.png" alt="i"/> and
+<img class="math" src="_images/math/8b66f050440037d47ce61e6cab6da0434856c696.png" alt="i+1"/> is calculated. To calculate this forcing at the current
+time step <img class="math" src="_images/math/907a4add6d5db5b7f197f7924f1371b8ac404fe6.png" alt="t"/>, states from the previous time step or initial
 states assigned through <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.set_initial_states" title="waterflow.flow1d.flowFE1d.Flow1DFE.set_initial_states"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_initial_states()</span></code></a> are needed,
-this is denoted by <span class="math notranslate nohighlight">\(t-1\)</span> in the subscripts. These functions are
-applied to all the <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.nodes" title="waterflow.flow1d.flowFE1d.Flow1DFE.nodes"><code class="xref py py-attr docutils literal notranslate"><span class="pre">nodes</span></code></a> in the domain. <span class="math notranslate nohighlight">\(j\)</span> denotes
+this is denoted by <img class="math" src="_images/math/7bcad2a761e7bbc9562bbd567947e34cc047e536.png" alt="t-1"/> in the subscripts. These functions are
+applied to all the <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.nodes" title="waterflow.flow1d.flowFE1d.Flow1DFE.nodes"><code class="xref py py-attr docutils literal notranslate"><span class="pre">nodes</span></code></a> in the domain. <img class="math" src="_images/math/e3fc28292267f066fee7718c64f4bbfece521f24.png" alt="j"/> denotes
 the indices of the Gaussian quadrature positions and weights. The
 direction of flow is defined to be positive to the right.</p>
-<div class="math notranslate nohighlight">
-\[F_{i,t} = - \sum_{j=0}^{degree-1} Q(x_{i,j}, s_{j,t-1}, grad_{j,t-1})*weight_{-j-1}\]</div>
-<div class="math notranslate nohighlight">
-\[F_{i+1,t} = \sum_{j=0}^{degree-1} Q(x_{i,j}, s_{j,t-1}, grad_{j,t-1})*weight_{j}\]</div>
-<ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(degree\)</span> corresponds to <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.gauss_degree" title="waterflow.flow1d.flowFE1d.Flow1DFE.gauss_degree"><code class="xref py py-attr docutils literal notranslate"><span class="pre">gauss_degree</span></code></a>.</p></li>
-<li><p><span class="math notranslate nohighlight">\(weight\)</span> is described in <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE._wgauss" title="waterflow.flow1d.flowFE1d.Flow1DFE._wgauss"><code class="xref py py-attr docutils literal notranslate"><span class="pre">_wgauss</span></code></a>.</p></li>
-<li><p><span class="math notranslate nohighlight">\(Q(x, s, grad)\)</span> is the <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.systemfluxfunc" title="waterflow.flow1d.flowFE1d.Flow1DFE.systemfluxfunc"><code class="xref py py-attr docutils literal notranslate"><span class="pre">systemfluxfunc</span></code></a>.</p></li>
+<div class="math" id="equation-waterflow-flow1d-4">
+<p><span class="eqno">(5)<a class="headerlink" href="#equation-waterflow-flow1d-4" title="Permalink to this equation">¶</a></span><img src="_images/math/16fc64d64e11fe2aff9a5bca38887d56800da8d1.png" alt="F_{i,t} = - \sum_{j=0}^{degree-1} Q(x_{i,j}, s_{j,t-1}, grad_{i,t-1})*weight_{-j-1}"/></p>
+</div><div class="math" id="equation-waterflow-flow1d-5">
+<p><span class="eqno">(6)<a class="headerlink" href="#equation-waterflow-flow1d-5" title="Permalink to this equation">¶</a></span><img src="_images/math/4bc79931c87448e15d632e7b05cd23186123604b.png" alt="F_{i+1,t} = \sum_{j=0}^{degree-1} Q(x_{i,j}, s_{j,t-1}, grad_{i,t-1})*weight_{j}"/></p>
+</div><ul class="simple">
+<li><p><img class="math" src="_images/math/c9b0d163513f3765c5f21a39aee98e29d5c2ece2.png" alt="degree"/> corresponds to <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.gauss_degree" title="waterflow.flow1d.flowFE1d.Flow1DFE.gauss_degree"><code class="xref py py-attr docutils literal notranslate"><span class="pre">gauss_degree</span></code></a>.</p></li>
+<li><p><img class="math" src="_images/math/765487ff3d6b1fc5696db24a2fb3dfdf21930fe6.png" alt="weight"/> is described in <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE._wgauss" title="waterflow.flow1d.flowFE1d.Flow1DFE._wgauss"><code class="xref py py-attr docutils literal notranslate"><span class="pre">_wgauss</span></code></a>.</p></li>
+<li><p><img class="math" src="_images/math/193f7a9847189dc810a577207c7ebc2b3c1bc6fa.png" alt="Q(x, s, grad)"/> is the <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.systemfluxfunc" title="waterflow.flow1d.flowFE1d.Flow1DFE.systemfluxfunc"><code class="xref py py-attr docutils literal notranslate"><span class="pre">systemfluxfunc</span></code></a>.</p></li>
 </ul>
-<p class="centered">
-<strong><span class="math notranslate nohighlight">\(Q(x_{i,j}, s_{j,t-1}, grad_{j,t-1}) =\)</span></strong></p><p class="centered">
-<strong><span class="math notranslate nohighlight">\(Q(x_{i,j},s_{i,t-1}*pos_{-j-1}+s_{i+1,t-1}*pos_{j},(s_{i+1,t-1}-s_{i,t-1})/L_{i})\)</span></strong></p><ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(x\)</span> is <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.xintegration" title="waterflow.flow1d.flowFE1d.Flow1DFE.xintegration"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xintegration</span></code></a>.</p></li>
-<li><p><span class="math notranslate nohighlight">\(s\)</span> corresponds to <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.states" title="waterflow.flow1d.flowFE1d.Flow1DFE.states"><code class="xref py py-attr docutils literal notranslate"><span class="pre">states</span></code></a>.</p></li>
-<li><p><span class="math notranslate nohighlight">\(pos\)</span> is described in <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE._xgauss" title="waterflow.flow1d.flowFE1d.Flow1DFE._xgauss"><code class="xref py py-attr docutils literal notranslate"><span class="pre">_xgauss</span></code></a>.</p></li>
-<li><p><span class="math notranslate nohighlight">\(L\)</span> are the nodal distances as in <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.nframe" title="waterflow.flow1d.flowFE1d.Flow1DFE.nframe"><code class="xref py py-attr docutils literal notranslate"><span class="pre">nframe</span></code></a>.</p></li>
+<div class="math" id="equation-waterflow-flow1d-6">
+<p><span class="eqno">(7)<a class="headerlink" href="#equation-waterflow-flow1d-6" title="Permalink to this equation">¶</a></span><img src="_images/math/6928de9f33cd4729357f9b7261a8d74e22f2488b.png" alt="Q(x_{i,j}, s_{j,t-1}, grad_{i,t-1}) =
+Q(x_{i,j},s_{i,t-1}*pos_{-j-1}+s_{i+1,t-1}*pos_{j},(s_{i+1,t-1}-s_{i,t-1})/L_{i})"/></p>
+</div><ul class="simple">
+<li><p><img class="math" src="_images/math/888f7c323ac0341871e867220ae2d76467d74d6e.png" alt="x"/> is <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.xintegration" title="waterflow.flow1d.flowFE1d.Flow1DFE.xintegration"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xintegration</span></code></a>.</p></li>
+<li><p><img class="math" src="_images/math/106b04b320e75010b1d8029e59244f234f75e6f9.png" alt="s"/> corresponds to <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.states" title="waterflow.flow1d.flowFE1d.Flow1DFE.states"><code class="xref py py-attr docutils literal notranslate"><span class="pre">states</span></code></a>.</p></li>
+<li><p><img class="math" src="_images/math/40afbc58cd638b7d86e662fc1d8554912598a3db.png" alt="pos"/> is described in <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE._xgauss" title="waterflow.flow1d.flowFE1d.Flow1DFE._xgauss"><code class="xref py py-attr docutils literal notranslate"><span class="pre">_xgauss</span></code></a>.</p></li>
+<li><p><img class="math" src="_images/math/19eef1966f7c545af3ac8c0fa486974d873e3c65.png" alt="L"/> are the nodal distances as in <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.nframe" title="waterflow.flow1d.flowFE1d.Flow1DFE.nframe"><code class="xref py py-attr docutils literal notranslate"><span class="pre">nframe</span></code></a>.</p></li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -928,7 +976,7 @@ because of the infinite amount of solutions in such a situation.</p>
 <code class="sig-name descname">add_pointflux</code><span class="sig-paren">(</span><em class="sig-param">rate</em>, <em class="sig-param">pos</em>, <em class="sig-param">name=None</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.add_pointflux" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a pointflux to the system</p>
 <p class="rubric">Notes</p>
-<p>Describe the calculation of <span class="math notranslate nohighlight">\(rfac\)</span> and <span class="math notranslate nohighlight">\(lfac\)</span> here.</p>
+<p>Describe the calculation of <img class="math" src="_images/math/0ac002b95bdf53f34b0324be11dda0527b39cda1.png" alt="rfac"/> and <img class="math" src="_images/math/05f849c308f3b3287a5b63a095df2e3247025c1f.png" alt="lfac"/> here.</p>
 <p class="rubric">Examples</p>
 </dd></dl>
 
@@ -954,53 +1002,54 @@ relevant columns, is saved in <a class="reference internal" href="#waterflow.flo
 </dd>
 </dl>
 <p class="rubric">Notes</p>
-<p>The external fluxes, <span class="math notranslate nohighlight">\(F_{external}\)</span>, are the sum of all point
+<p>The external fluxes, <img class="math" src="_images/math/6fd2860318fa09d7c44f574ad52a40cdf7ba79cf.png" alt="F_{external}"/>, are the sum of all point
 and spatial fluxes.</p>
-<p class="centered">
-<strong><span class="math notranslate nohighlight">\(F_{external} = \sum_{j=1}^{n} F_{p_j} +
-\sum_{j=1}^{m} F_{s_j}\)</span></strong></p><p>The calculation of the point flux, <span class="math notranslate nohighlight">\(F_{p_j}\)</span>, depends on its
+<div class="math" id="equation-waterflow-flow1d-7">
+<p><span class="eqno">(8)<a class="headerlink" href="#equation-waterflow-flow1d-7" title="Permalink to this equation">¶</a></span><img src="_images/math/3c18b7c95229066b9935d7b9f7263431675ec231.png" alt="F_{external} = \sum_{j=1}^{n} F_{p_j} +
+\sum_{j=1}^{m} F_{s_j}"/></p>
+</div><p>The calculation of the point flux, <img class="math" src="_images/math/15bbf8df11e983126a6dd5ba6764df82fd571e72.png" alt="F_{p_j}"/>, depends on its
 nature. If the point flux depends on position only, the accumulation is
 straightforward. When the point flux is dependend on the state of the
 the system, the distribution towards the surrounding nodes needs to be
 calculated before values can be accumulated to its total. The
 distribution to the nearest nodes is calculated as follows:</p>
-<div class="math notranslate nohighlight">
-\[node_{i} = F_{p_j}(s) * lfac\]</div>
-<div class="math notranslate nohighlight">
-\[node_{i+1} = F_{p_j}(s) * rfac\]</div>
-<p>where <span class="math notranslate nohighlight">\(s\)</span> equals the state at the position of the point flux
+<div class="math" id="equation-waterflow-flow1d-8">
+<p><span class="eqno">(9)<a class="headerlink" href="#equation-waterflow-flow1d-8" title="Permalink to this equation">¶</a></span><img src="_images/math/27bda5c1d17446b2a52edcfa1588aac287286197.png" alt="node_{i} = F_{p_j}(s) * lfac"/></p>
+</div><div class="math" id="equation-waterflow-flow1d-9">
+<p><span class="eqno">(10)<a class="headerlink" href="#equation-waterflow-flow1d-9" title="Permalink to this equation">¶</a></span><img src="_images/math/df6caa98591163ebf3110b7d1098160756ae4cbb.png" alt="node_{i+1} = F_{p_j}(s) * rfac"/></p>
+</div><p>where <img class="math" src="_images/math/106b04b320e75010b1d8029e59244f234f75e6f9.png" alt="s"/> equals the state at the position of the point flux
 which is calculated by linear interpolation. The calculation of the
-fractions, that distribute the flux, <span class="math notranslate nohighlight">\(rfac\)</span> and <span class="math notranslate nohighlight">\(lfac\)</span>
+fractions, that distribute the flux, <img class="math" src="_images/math/0ac002b95bdf53f34b0324be11dda0527b39cda1.png" alt="rfac"/> and <img class="math" src="_images/math/05f849c308f3b3287a5b63a095df2e3247025c1f.png" alt="lfac"/>
 are described in <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.add_pointflux" title="waterflow.flow1d.flowFE1d.Flow1DFE.add_pointflux"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_pointflux()</span></code></a>.</p>
-<p>For the calculation of the spatial flux, <span class="math notranslate nohighlight">\(F_{s_j}\)</span>, a similar
+<p>For the calculation of the spatial flux, <img class="math" src="_images/math/ce1e25681884da6adc230966e8a449e553e776f5.png" alt="F_{s_j}"/>, a similar
 distinction exists. If the spatial flux is not dependend on state,
 straightforward addition takes place. When there is a state
 dependency, distributions towards the nodes is calculated as
 described in <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE._internal_forcing" title="waterflow.flow1d.flowFE1d.Flow1DFE._internal_forcing"><code class="xref py py-meth docutils literal notranslate"><span class="pre">_internal_forcing()</span></code></a> where
-<span class="math notranslate nohighlight">\(F_{s_j}(x, s)\)</span> is substituted for the <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.systemfluxfunc" title="waterflow.flow1d.flowFE1d.Flow1DFE.systemfluxfunc"><code class="xref py py-attr docutils literal notranslate"><span class="pre">systemfluxfunc</span></code></a>
-<span class="math notranslate nohighlight">\(Q(x, s, grad)\)</span>. This calculation accounts for the selected
-<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.gauss_degree" title="waterflow.flow1d.flowFE1d.Flow1DFE.gauss_degree"><code class="xref py py-attr docutils literal notranslate"><span class="pre">gauss_degree</span></code></a> and the state argument <span class="math notranslate nohighlight">\(s\)</span> is linearly
+<img class="math" src="_images/math/ffbf92b8d57aeb7b65b929ec7e95902e7f4fcd3e.png" alt="F_{s_j}(x, s)"/> is substituted for the <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.systemfluxfunc" title="waterflow.flow1d.flowFE1d.Flow1DFE.systemfluxfunc"><code class="xref py py-attr docutils literal notranslate"><span class="pre">systemfluxfunc</span></code></a>
+<img class="math" src="_images/math/193f7a9847189dc810a577207c7ebc2b3c1bc6fa.png" alt="Q(x, s, grad)"/>. This calculation accounts for the selected
+<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.gauss_degree" title="waterflow.flow1d.flowFE1d.Flow1DFE.gauss_degree"><code class="xref py py-attr docutils literal notranslate"><span class="pre">gauss_degree</span></code></a> and the state argument <img class="math" src="_images/math/106b04b320e75010b1d8029e59244f234f75e6f9.png" alt="s"/> is linearly
 interpolated between the neareast nodes.</p>
 <p>The internal forcing in the water balance is the sum of the internal
 forcing as described in <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE._internal_forcing" title="waterflow.flow1d.flowFE1d.Flow1DFE._internal_forcing"><code class="xref py py-meth docutils literal notranslate"><span class="pre">_internal_forcing()</span></code></a> and the external
 forcing.</p>
-<div class="math notranslate nohighlight">
-\[F_{total\_internal} = F_{internal} + F_{external}\]</div>
-<p>The top and bottom values in <span class="math notranslate nohighlight">\(F_{total\_internal}\)</span> are corrected
+<div class="math" id="equation-waterflow-flow1d-10">
+<p><span class="eqno">(11)<a class="headerlink" href="#equation-waterflow-flow1d-10" title="Permalink to this equation">¶</a></span><img src="_images/math/19310ba848a035a9ff88833353834d1120ad2a4d.png" alt="F_{total\_internal} = F_{internal} + F_{external}"/></p>
+</div><p>The top and bottom values in <img class="math" src="_images/math/ac7008d0a3939c7d267bb39ffe2560cbfee3c555.png" alt="F_{total\_internal}"/> are corrected
 for the flow over the boundaries. The flow over the boundaries is
-calculated as the difference of <span class="math notranslate nohighlight">\(F_{total\_internal}\)</span> -
-<span class="math notranslate nohighlight">\(\Delta s\)</span> at those boundary nodes.</p>
+calculated as the difference of <img class="math" src="_images/math/ac7008d0a3939c7d267bb39ffe2560cbfee3c555.png" alt="F_{total\_internal}"/> -
+<img class="math" src="_images/math/82f8146372613edd07fa9be8b9227bdde1c42ac4.png" alt="\Delta s"/> at those boundary nodes.</p>
 <p>The net flux is calculated as follows:</p>
-<div class="math notranslate nohighlight">
-\[F_{net} = F_{total\_internal} - \Delta s\]</div>
-<p>Where <span class="math notranslate nohighlight">\(\Delta s\)</span> represents the storage change between
+<div class="math" id="equation-waterflow-flow1d-11">
+<p><span class="eqno">(12)<a class="headerlink" href="#equation-waterflow-flow1d-11" title="Permalink to this equation">¶</a></span><img src="_images/math/e24f3b3a2579fa18a50ffc6e95fec2bd082d9e2b.png" alt="F_{net} = F_{total\_internal} - \Delta s"/></p>
+</div><p>Where <img class="math" src="_images/math/82f8146372613edd07fa9be8b9227bdde1c42ac4.png" alt="\Delta s"/> represents the storage change between
 iterations at every node in the domain.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Although the storage change <span class="math notranslate nohighlight">\(\Delta s\)</span> is entered into the
+<p>Although the storage change <img class="math" src="_images/math/82f8146372613edd07fa9be8b9227bdde1c42ac4.png" alt="\Delta s"/> is entered into the
 model as an external flux, in the calculation of the water balance
 this term is handled as a separate flux which is not included in
-the <span class="math notranslate nohighlight">\(F_{external}\)</span> term.</p>
+the <img class="math" src="_images/math/6fd2860318fa09d7c44f574ad52a40cdf7ba79cf.png" alt="F_{external}"/> term.</p>
 </div>
 <p class="rubric">Examples</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.flow1d.flowFE1d</span> <span class="k">import</span> <span class="n">Flow1DFE</span>
@@ -1291,12 +1340,12 @@ are calculated and saved in ~xintegration`.</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
-<div class="math notranslate nohighlight">
-\[P_{n}(x) = \text{Legendre polynomials of degree n}\]</div>
-<div class="math notranslate nohighlight">
-\[w_{i} = \frac{2}{\left(\left(1 - x_{i}^{2}\right) *
-(P_{n}^{'}(x_{i})^{2}\right)}\]</div>
-<p>See <a class="bibtex reference internal" href="#id14" id="id6">[SW79]</a> for an introduction to stylish blah, blah…</p>
+<div class="math" id="equation-waterflow-flow1d-12">
+<p><span class="eqno">(13)<a class="headerlink" href="#equation-waterflow-flow1d-12" title="Permalink to this equation">¶</a></span><img src="_images/math/10495f922b4438d88fb2380843624b4f0737ca55.png" alt="P_{n}(x) = \text{Legendre polynomials of degree n}"/></p>
+</div><div class="math" id="equation-waterflow-flow1d-13">
+<p><span class="eqno">(14)<a class="headerlink" href="#equation-waterflow-flow1d-13" title="Permalink to this equation">¶</a></span><img src="_images/math/912abce415df10710cd8edd6114717bb0d3d165e.png" alt="w_{i} = \frac{2}{\left(\left(1 - x_{i}^{2}\right) *
+(P_{n}^{'}(x_{i})^{2}\right)}"/></p>
+</div><p>See <a class="bibtex reference internal" href="#id14" id="id6">[SW79]</a> for an introduction to stylish blah, blah…</p>
 <p class="rubric">References</p>
 <p id="bibtex-bibliography-waterflow.flow1d-3"><dl class="citation">
 <dt class="bibtex label" id="id14"><span class="brackets">SW79</span></dt>
