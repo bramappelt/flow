@@ -26,10 +26,14 @@ conductivity_func = initializer(condf.VG_conductivity, ksat=ksat, a=alpha, n=n)
 storage_change = initializer(fluxf.storage_change, fun=theta_h)
 
 
+def Spflux(s):
+    return abs(np.sin(s)) * -0.1
+
+
 # ########################### SOLVE TRANSIENT ################################
 
 FE_ut = Flow1DFE('Unsaturated transient model')
-FE_ut.set_field1d(nodes=xsp, degree=4)
+FE_ut.set_field1d(nodes=xsp, degree=1)
 # FE_ut.set_gaussian_quadrature(2)
 FE_ut.set_initial_states(initial_states)
 FE_ut.set_systemfluxfunction(fluxf.richards_equation, kfun=conductivity_func)
@@ -40,6 +44,8 @@ FE_ut.tfun = theta_h
 FE_ut.add_spatialflux(-0.001, 'extraction')
 
 FE_ut.add_spatialflux(storage_change)
+FE_ut.add_pointflux(Spflux, -3.1)
+
 
 FE_ut.solve(dt_min=1e-5, dt_max=2, end_time=10, maxiter=500,
             dtitlow=1.5, dtithigh=0.5, itermin=3, itermax=7,

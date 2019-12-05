@@ -184,7 +184,7 @@ class Flow1DFE:
     xintegration : `list`
         Absolute positions of the Gaussian quadrature points in the domain
         :py:attr:`~nodes`. The shape of this list is :py:attr:`~degree` by
-        length :py:attr:`~nodes~ minus 1.
+        length :py:attr:`~nodes~` minus 1.
 
     summarystring : `str`
         Model information.
@@ -476,19 +476,18 @@ class Flow1DFE:
         direction of flow is defined to be positive to the right.
 
         .. math::
-            F_{i,t} = - \\sum_{j=0}^{degree-1} Q(x_{i,j}, s_{j,t-1}, grad_{j,t-1})*weight_{-j-1}
+            F_{i,t} = - \\sum_{j=0}^{degree-1} Q(x_{i,j}, s_{j,t-1}, grad_{i,t-1})*weight_{-j-1}
 
         .. math::
-            F_{i+1,t} = \\sum_{j=0}^{degree-1} Q(x_{i,j}, s_{j,t-1}, grad_{j,t-1})*weight_{j}
+            F_{i+1,t} = \\sum_{j=0}^{degree-1} Q(x_{i,j}, s_{j,t-1}, grad_{i,t-1})*weight_{j}
 
         * :math:`degree` corresponds to :py:attr:`~gauss_degree`.
         * :math:`weight` is described in :py:attr:`~_wgauss`.
         * :math:`Q(x, s, grad)` is the :py:attr:`~systemfluxfunc`.
 
-        .. centered::
-                :math:`Q(x_{i,j}, s_{j,t-1}, grad_{j,t-1}) =`
-        .. centered::
-                :math:`Q(x_{i,j},s_{i,t-1}*pos_{-j-1}+s_{i+1,t-1}*pos_{j},(s_{i+1,t-1}-s_{i,t-1})/L_{i})`
+        .. math::
+            Q(x_{i,j}, s_{j,t-1}, grad_{i,t-1}) =
+            Q(x_{i,j},s_{i,t-1}*pos_{-j-1}+s_{i+1,t-1}*pos_{j},(s_{i+1,t-1}-s_{i,t-1})/L_{i})
 
         * :math:`x` is :py:attr:`~xintegration`.
         * :math:`s` corresponds to :py:attr:`~states`.
@@ -715,6 +714,106 @@ class Flow1DFE:
         self.lengths = np.array(length)
 
     def _CMAT(self, nodes, states):
+        """ Build the jacobian matrix
+
+        Build the complete jacobian matrix according to the finite elements
+        scheme for the selected degree. The jacobian matrix is assigned to
+        :py:attr:`~coefmatr`.
+
+        Parameters
+        ----------
+        nodes : `numpy.ndarray`
+            Array that contains the nodal positions.
+        states : `numpy.ndarray`
+            Array that contains the states at the nodal positions.
+
+        Notes
+        -----
+        The jacobian matrix :math:`A` is build from three individual parts.
+
+        .. math::
+            A = A_{sys} + A_{spat} + A_{point}
+
+        * :math:`A_{sys}`, derivatives of the :py:attr:`~systemfluxfunc`.
+        * :math:`A_{spat}`, derivatives of functions in :py:attr:`~Sspatialflux`.
+        * :math:`A_{point}`, derivatives of functions in :py:attr:`~Spointflux`.
+
+        **System's flow equation jacobian**
+
+        .. math::
+            A_{sys} = \\begin{bmatrix}
+                            -\\frac{\\delta Q_{l}}{\\delta x}_{i} & -\\frac{\\delta Q_{r}}{\\delta x}_{i} &  &  &  & \\\\
+                            \\frac{\\delta Q_{l}}{\\delta x}_{i} & \\frac{\\delta Q_{r}}{\\delta x}_{i} -\\frac{\\delta Q_{l}}{\\delta x}_{i+1} & -\\frac{\\delta Q_{r}}{\\delta x}_{i+1} &  & & \\\\
+                             & \\frac{\\delta Q_{l}}{\\delta x}_{i+1} & \\frac{\\delta Q_{r}}{\\delta x}_{i+1} -\\frac{\\delta Q_{l}}{\\delta x}_{i+2} & \\ddots & & \\\\
+                             &  & \\ddots & \\ddots & & \\ddots & \\\\
+                             &  &  & \\ddots &  & \\frac{\\delta Q_{r}}{\\delta x}_{n-1} -\\frac{\\delta Q_{l}}{\\delta x}_{n} & -\\frac{\\delta Q_{r}}{\\delta x}_{n} \\\\
+                             &  &  &  &  & \\frac{\\delta Q_{l}}{\\delta x}_{n} & \\frac{\\delta Q_{r}}{\\delta x}_{n}
+                    \\end{bmatrix}
+
+        **Spatial state dependent jacobian**
+
+        The derivatives of the state dependend spatial fluxes, if present, are
+        collected in :math:`A_{spat}`.
+
+        .. math::
+            \\sum \\frac{\\delta S_{l}}{\\delta x}_{i} = \\sum_{\\lambda=1}^{\\Lambda} \\sum_{j=1}^{n} \\frac{S(X, s + \\delta x)_{i,j} - S(X, s)_{i,j}}{\\delta x} * L_{i} * (1-p_{\\lambda}) * (1-w_{\\lambda})
+
+        .. math::
+            \\sum \\frac{\\delta S_{r}}{\\delta x}_{i} = \\sum_{\\lambda=1}^{\\Lambda} \\sum_{j=1}^{n} \\frac{S(X, s + \\delta x)_{i,j} - S(X, s)_{i,j}}{\\delta x} * L_{i} * p_{\\lambda} * w_{\\lambda}
+
+        The elaboration of the arguments to the spatial state dependent flux
+        function: :math:`X = X_{i, \\lambda}` and represents the absolute
+        position of the Gaussian quadrature point described in
+        :py:attr:`~xintegration`. The state :math:`s` is this position is
+        calculated as follows:
+
+        .. math::
+            s = s_{i, j} * (1-p_{\\lambda}) + s_{i+1, j} * p_{\\lambda}
+
+        The structure of the jacobian matrix for the sum of all state
+        dependent spatialflux functions, :math:`S_{X, s}`, read as follows:
+
+        .. math::
+            A_{spat} = \\begin{bmatrix}
+                            \\Sigma \\frac{\\delta S_{l}}{\\delta x}_{i} & \\Sigma \\frac{\\delta S_{r}}{\\delta x}_{i} &  &  &  & \\\\
+                            \\Sigma \\frac{\\delta S_{l}}{\\delta x}_{i} & \\Sigma \\frac{\\delta S_{r}}{\\delta x}_{i} + \\Sigma \\frac{\\delta S_{l}}{\\delta x}_{i+1} & \\Sigma \\frac{\\delta S_{r}}{\\delta x}_{i+1} &  & & \\\\
+                              & \\Sigma \\frac{\\delta S_{l}}{\\delta x}_{i+1} & \\Sigma \\frac{\\delta S_{r}}{\\delta x}_{i+1} + \\Sigma \\frac{\\delta S_{l}}{\\delta x}_{i+2} & \\ddots & & \\\\
+                              &  & \\ddots & \\ddots & & \\ddots & \\\\
+                              &  &  & \\ddots &  & \\Sigma \\frac{\\delta S_{r}}{\\delta x}_{n-1} + \\Sigma \\frac{\\delta S_{l}}{\\delta x}_{n} & \\Sigma \\frac{\\delta S_{r}}{\\delta x}_{n} \\\\
+                              &  &  &  &  & \\Sigma \\frac{\\delta S_{l}}{\\delta x}_{n} & \\Sigma \\frac{\\delta S_{r}}{\\delta x}_{n}
+                       \\end{bmatrix}
+
+        **Point state dependent jacobian**
+
+        The derivatives of the state dependend point fluxes, if present, are
+        collected in :math:`A_{point}`.
+
+        .. math::
+            \\sum \\frac{\\delta P_{l}}{\\delta x}_{i} = \\sum_{k=1}^{m} \\frac{P(s + \\delta x)_{i,k} + P(s)_{i,k}}{\\delta x} * rfac_{k}
+
+        .. math::
+            \\sum \\frac{\\delta P_{r}}{\\delta x}_{i} = \\sum_{k=1}^{m} \\frac{P(s + \\delta x)_{i,k} + P(s)_{i,k}}{\\delta x} * lfac_{k}
+
+        The state argument of :math:`P(s)` is calculated by linear
+        interpolation between the nearest nodes.
+
+        .. math::
+            s = s_{i} + rfac_{k} * (s_{i+1} - s_{i})
+
+        The structure of the jacobian matrix for the sum of all state
+        dependent pointflux functions, :math:`P_{s}`, read as follows:
+
+        .. math::
+            A_{point} = \\begin{bmatrix}
+                            \\Sigma \\frac{\\delta P_{l}}{\\delta x}_{i} &  &  &  &  & \\\\
+                            & \\Sigma \\frac{\\delta P_{r}}{\\delta x}_{i} + \\Sigma \\frac{\\delta P_{l}}{\\delta x}_{i+1} &  &  &  &  \\\\
+                            &  & \\Sigma \\frac{\\delta P_{r}}{\\delta x}_{i+1} + \\Sigma \\frac{\\delta P_{l}}{\\delta x}_{i+2} &  &  &  \\\\
+                            &  &  & \\ddots &  &  & \\\\
+                            &  &  &  &  & \\Sigma \\frac{\\delta P_{r}}{\\delta x}_{n-1} + \\Sigma \\frac{\\delta P_{l}}{\\delta x}_{n}  &  \\\\
+                            &  &  &  &  &  & \\Sigma \\frac{\\delta P_{r}}{\\delta x}_{n}
+                        \\end{bmatrix}
+
+        """
         systemflux = self.systemfluxfunc
         A = np.zeros((len(nodes), len(nodes)))
         # internal flux
@@ -731,6 +830,7 @@ class Flow1DFE:
             Svalr = 0
             # calculates the selected integral approximation
             for idx in range(len(pos)):
+                # position and state gaussian integration
                 x = self.xintegration[i][idx]
                 state_x = stateleft * pos[-idx-1] + stateright * pos[idx]
 
@@ -743,6 +843,8 @@ class Flow1DFE:
                     Sval = [Sfunc(x, s) for s in state_x]
                     dsl = (Sval[1] - Sval[0]) / self._delta
                     dsr = (Sval[2] - Sval[0]) / self._delta
+
+                    # distribution of flux according to gaussian integration
                     Svall += pos[-idx-1] * weight[-idx-1] * L * dsl
                     Svalr += pos[idx] * weight[idx] * L * dsr
 
@@ -761,11 +863,11 @@ class Flow1DFE:
             # calculate state at position by linear interpolation
             dstates = self.states[idx_r] - self.states[idx_l]
             state = self.states[idx_l] + rfac * dstates
-            Ai = Sfunc(state)
-            Aiw = Sfunc(state + self._delta)
-            Aiiw = (Aiw - Ai) / self._delta
-            A[idx_l][idx_l] += Aiiw * lfac
-            A[idx_r][idx_r] += Aiiw * rfac
+            sfunc_s = Sfunc(state)
+            sfunc_sd = Sfunc(state + self._delta)
+            dfunc = (sfunc_sd - sfunc_s) / self._delta
+            A[idx_l][idx_l] += dfunc * lfac
+            A[idx_r][idx_r] += dfunc * rfac
 
         self.coefmatr = A
 
@@ -1471,9 +1573,9 @@ class Flow1DFE:
         The external fluxes, :math:`F_{external}`, are the sum of all point
         and spatial fluxes.
 
-        .. centered::
-                :math:`F_{external} = \\sum_{j=1}^{n} F_{p_j} +
-                \\sum_{j=1}^{m} F_{s_j}`
+        .. math::
+            F_{external} = \\sum_{j=1}^{n} F_{p_j} +
+            \\sum_{j=1}^{m} F_{s_j}
 
         The calculation of the point flux, :math:`F_{p_j}`, depends on its
         nature. If the point flux depends on position only, the accumulation is
@@ -1483,15 +1585,15 @@ class Flow1DFE:
         distribution to the nearest nodes is calculated as follows:
 
         .. math::
-            node_{i} = F_{p_j}(s) * rfac
+            node_{i} = F_{p_j}(s) * lfac
 
         .. math::
-            node_{i+1} = F_{p_j}(s) * lfac
+            node_{i+1} = F_{p_j}(s) * rfac
 
         where :math:`s` equals the state at the position of the point flux
         which is calculated by linear interpolation. The calculation of the
-        fractions :math:`rfac` and :math:`lfac` are described in
-        :py:meth:`~add_pointflux`.
+        fractions, that distribute the flux, :math:`rfac` and :math:`lfac`
+        are described in :py:meth:`~add_pointflux`.
 
         For the calculation of the spatial flux, :math:`F_{s_j}`, a similar
         distinction exists. If the spatial flux is not dependend on state,
