@@ -64,6 +64,7 @@ class Flow1DFE:
 
     coefmatr : `numpy.ndarray`
         Square jacobian matrix used in the finite elements solution procedure.
+        The exact dimension of the matrix is :math:`N \\times N`.
 
     BCs : `dict`
         This contains the system's boundary conditions. The keys that indicate
@@ -90,7 +91,8 @@ class Flow1DFE:
         using the selected Gaussian quadrature :py:attr:`~degree_degree`.
 
     forcing : `numpy.ndarray`
-        pass
+        All the forcing fluxes applied to the system. The dimension of this
+        matrix is :math:`[1 \\times N]`.
 
     conductivities : `numpy.ndarray`
         pass
@@ -456,8 +458,7 @@ class Flow1DFE:
         ----------
         calcflux : `bool`, default is False
             If ``True``, fluxes through the nodes are calculated and
-            saved in :py:attr:`~fluxes`. In this case only the second
-            summation in the `notes` section is applied.
+            saved in :py:attr:`~fluxes`.
         calcbal : `bool`, default = False
             If ``True``, internal forcing is saved in
             :py:attr:`~internal_forcing` instead of :py:attr:`~forcing`.
@@ -466,33 +467,40 @@ class Flow1DFE:
         -----
 
         This mathematical description of the internal forcing
-        calculation describes how the forcing at nodes :math:`i` and
-        :math:`i+1` is calculated. To calculate this forcing at the current
-        time step :math:`t`, states from the previous time step or initial
-        states assigned through :py:meth:`~set_initial_states` are needed,
-        this is denoted by :math:`t-1` in the subscripts. These functions are
-        applied to all the :py:attr:`~nodes` in the domain. :math:`j` denotes
-        the indices of the Gaussian quadrature positions and weights. The
-        direction of flow is defined to be positive to the right.
+        calculation describes how the forcing at the nodes is calculated.
+        The direction of flow is defined to be positive to the right.
+        The equation below describes how the forcing at a specific node can
+        be calculated, taking the Gaussian quadrature procedure into account.
 
         .. math::
-            F_{i,t} = - \\sum_{j=0}^{degree-1} Q(x_{i,j}, s_{j,t-1}, grad_{i,t-1})*weight_{-j-1}
+            F_{i} = \\sum_{\\lambda=1}^{\\Lambda} Q(X_{i,\\lambda}, s_{i,\\lambda}+\\delta x, grad_{i}) * w_{\\lambda}
+
+        Argument :math:`X_{i, \\lambda}` represents the absolute position
+        of the Gaussian quadrature point as saved in :py:attr:`~xintegration`.
+        The state argument :math:`s_{i,\\lambda}` at this specific Gaussian
+        quadrature point is calculated as follows:        
 
         .. math::
-            F_{i+1,t} = \\sum_{j=0}^{degree-1} Q(x_{i,j}, s_{j,t-1}, grad_{i,t-1})*weight_{j}
+            s_{i,\\lambda} = s_{i} * (1-p_{\\lambda}) + s_{i+1} * p_{\\lambda}
 
-        * :math:`degree` corresponds to :py:attr:`~gauss_degree`.
-        * :math:`weight` is described in :py:attr:`~_wgauss`.
-        * :math:`Q(x, s, grad)` is the :py:attr:`~systemfluxfunc`.
+        The third argument, :math:`grad_{i}`, is the gradient of the state
+        between the nodes of the current segment and is calculated as
+        shown below:
 
         .. math::
-            Q(x_{i,j}, s_{j,t-1}, grad_{i,t-1}) =
-            Q(x_{i,j},s_{i,t-1}*pos_{-j-1}+s_{i+1,t-1}*pos_{j},(s_{i+1,t-1}-s_{i,t-1})/L_{i})
+            grad_{i} = \\frac{s_{i+1} - s{i}}{L_{i}}
 
-        * :math:`x` is :py:attr:`~xintegration`.
-        * :math:`s` corresponds to :py:attr:`~states`.
-        * :math:`pos` is described in :py:attr:`~_xgauss`.
-        * :math:`L` are the nodal distances as in :py:attr:`~nframe`.
+        All internal fluxes are collected in :math:`F_{internal}`.
+
+        .. math::
+            F_{internal} = \\begin{bmatrix}
+                                -F_{i}              \\\\
+                                F_{i} - F_{i+1}    \\\\
+                                F_{i+1} - F_{i+2}  \\\\
+                                \\vdots            \\\\
+                                F_{N-1} - F_{N}    \\\\
+                                -F_{N}
+                           \\end{bmatrix}
 
         .. note::
             If both of the arguments are truthy, the argument which occurs in
@@ -717,8 +725,8 @@ class Flow1DFE:
         """ Build the jacobian matrix
 
         Build the complete jacobian matrix according to the finite elements
-        scheme for the selected degree. The jacobian matrix is assigned to
-        :py:attr:`~coefmatr`.
+        scheme for the selected degree. The jacobian matrix :math:`A` is
+        assigned to :py:attr:`~coefmatr`.
 
         Parameters
         ----------
@@ -740,38 +748,67 @@ class Flow1DFE:
 
         **System's flow equation jacobian**
 
+        The derivatives of the systemflux function, :math:`Q`, are collected
+        in :math:`A_{sys}`. The equation below describes how the
+        derivatives are calculated in which the Gaussian quadrature scheme
+        is accounted for.
+
+        .. math::
+            \\frac{\\delta Q}{\\delta x}_{i} = \\sum_{\\lambda}^{\\Lambda} \\frac{Q(X_{i,\\lambda}, s_{i,\\lambda}+\\delta x, grad_{i}) - Q(X_{i,\\lambda}, s_{i,\\lambda}, grad_{i})}{\\delta x} * w_{\\lambda}
+
+        Argument :math:`X_{i, \\lambda}` represents the absolute position
+        of the Gaussian quadrature point as saved in :py:attr:`~xintegration`.
+        The state argument :math:`s_{i,\\lambda}` at this specific Gaussian
+        quadrature point is calculated as follows:
+
+        .. math::
+            s_{i,\\lambda} = s_{i} * (1-p_{\\lambda}) + s_{i+1} * p_{\\lambda}
+
+        The third argument, :math:`grad_{i}`, is the gradient of the state
+        between the nodes of the current segment and is calculated as
+        shown below:
+
+        .. math::
+            grad_{i} = \\frac{s_{i+1} - s{i}}{L_{i}}
+
+        :math:`A_{sys}` presents the structure of the sparse jacobian matrix
+        in which the derivatives of the systemflux function :math:`Q` are
+        saved.
+
         .. math::
             A_{sys} = \\begin{bmatrix}
-                            -\\frac{\\delta Q_{l}}{\\delta x}_{i} & -\\frac{\\delta Q_{r}}{\\delta x}_{i} &  &  &  & \\\\
-                            \\frac{\\delta Q_{l}}{\\delta x}_{i} & \\frac{\\delta Q_{r}}{\\delta x}_{i} -\\frac{\\delta Q_{l}}{\\delta x}_{i+1} & -\\frac{\\delta Q_{r}}{\\delta x}_{i+1} &  & & \\\\
-                             & \\frac{\\delta Q_{l}}{\\delta x}_{i+1} & \\frac{\\delta Q_{r}}{\\delta x}_{i+1} -\\frac{\\delta Q_{l}}{\\delta x}_{i+2} & \\ddots & & \\\\
+                            -\\frac{\\delta Q}{\\delta x}_{i} & -\\frac{\\delta Q}{\\delta x}_{i} &  &  &  & \\\\
+                            \\frac{\\delta Q}{\\delta x}_{i} & \\frac{\\delta Q}{\\delta x}_{i} -\\frac{\\delta Q}{\\delta x}_{i+1} & -\\frac{\\delta Q}{\\delta x}_{i+1} &  & & \\\\
+                             & \\frac{\\delta Q}{\\delta x}_{i+1} & \\frac{\\delta Q}{\\delta x}_{i+1} -\\frac{\\delta Q}{\\delta x}_{i+2} & \\ddots & & \\\\
                              &  & \\ddots & \\ddots & & \\ddots & \\\\
-                             &  &  & \\ddots &  & \\frac{\\delta Q_{r}}{\\delta x}_{n-1} -\\frac{\\delta Q_{l}}{\\delta x}_{n} & -\\frac{\\delta Q_{r}}{\\delta x}_{n} \\\\
-                             &  &  &  &  & \\frac{\\delta Q_{l}}{\\delta x}_{n} & \\frac{\\delta Q_{r}}{\\delta x}_{n}
+                             &  &  & \\ddots &  & \\frac{\\delta Q}{\\delta x}_{N-1} -\\frac{\\delta Q}{\\delta x}_{N} & -\\frac{\\delta Q}{\\delta x}_{N} \\\\
+                             &  &  &  &  & \\frac{\\delta Q}{\\delta x}_{N} & \\frac{\\delta Q}{\\delta x}_{N}
                     \\end{bmatrix}
 
         **Spatial state dependent jacobian**
 
-        The derivatives of the state dependend spatial fluxes, if present, are
-        collected in :math:`A_{spat}`.
+        The derivatives of the state dependent spatial fluxes :math:`S`, if
+        present, are collected in :math:`A_{spat}`. The calculation of these
+        derivatives is described by the equations below. The values are summed
+        at every segment in the model domain, taking into account the selected
+        Gaussian quadrature scheme.
 
         .. math::
-            \\sum \\frac{\\delta S_{l}}{\\delta x}_{i} = \\sum_{\\lambda=1}^{\\Lambda} \\sum_{j=1}^{n} \\frac{S(X, s + \\delta x)_{i,j} - S(X, s)_{i,j}}{\\delta x} * L_{i} * (1-p_{\\lambda}) * (1-w_{\\lambda})
+            \\sum \\frac{\\delta S_{l}}{\\delta x}_{i} = \\sum_{\\lambda=1}^{\\Lambda} \\sum_{j=1}^{n} \\frac{S(X_{i,\\lambda}, s_{i,\\lambda} + \\delta x)_{j} - S(X_{i,\\lambda}, s_{i,\\lambda})_{j}}{\\delta x} * L_{i} * (1-p_{\\lambda}) * w_{\\lambda}
 
         .. math::
-            \\sum \\frac{\\delta S_{r}}{\\delta x}_{i} = \\sum_{\\lambda=1}^{\\Lambda} \\sum_{j=1}^{n} \\frac{S(X, s + \\delta x)_{i,j} - S(X, s)_{i,j}}{\\delta x} * L_{i} * p_{\\lambda} * w_{\\lambda}
+            \\sum \\frac{\\delta S_{r}}{\\delta x}_{i} = \\sum_{\\lambda=1}^{\\Lambda} \\sum_{j=1}^{n} \\frac{S(X_{i,\\lambda}, s_{i,\\lambda} + \\delta x)_{j} - S(X_{i,\\lambda}, s_{i,\\lambda})_{j}}{\\delta x} * L_{i} * p_{\\lambda} * w_{\\lambda}
 
-        The elaboration of the arguments to the spatial state dependent flux
-        function: :math:`X = X_{i, \\lambda}` and represents the absolute
-        position of the Gaussian quadrature point described in
-        :py:attr:`~xintegration`. The state :math:`s` is this position is
-        calculated as follows:
+        Argument :math:`X_{i, \\lambda}` represents the absolute position
+        of the Gaussian quadrature point as saved in :py:attr:`~xintegration`.
+        The state argument :math:`s_{i,\\lambda}` at this specific Gaussian
+        quadrature point is calculated as follows:
 
         .. math::
-            s = s_{i, j} * (1-p_{\\lambda}) + s_{i+1, j} * p_{\\lambda}
+            s_{i,\\lambda} = s_{i} * (1-p_{\\lambda}) + s_{i+1} * p_{\\lambda}
 
-        The structure of the jacobian matrix for the sum of all state
-        dependent spatialflux functions, :math:`S_{X, s}`, read as follows:
+        The structure of the sparse jacobian matrix, :math:`A_{spat}`, of the
+        sum of all state dependent spatialflux functions is shown below:
 
         .. math::
             A_{spat} = \\begin{bmatrix}
@@ -779,29 +816,32 @@ class Flow1DFE:
                             \\Sigma \\frac{\\delta S_{l}}{\\delta x}_{i} & \\Sigma \\frac{\\delta S_{r}}{\\delta x}_{i} + \\Sigma \\frac{\\delta S_{l}}{\\delta x}_{i+1} & \\Sigma \\frac{\\delta S_{r}}{\\delta x}_{i+1} &  & & \\\\
                               & \\Sigma \\frac{\\delta S_{l}}{\\delta x}_{i+1} & \\Sigma \\frac{\\delta S_{r}}{\\delta x}_{i+1} + \\Sigma \\frac{\\delta S_{l}}{\\delta x}_{i+2} & \\ddots & & \\\\
                               &  & \\ddots & \\ddots & & \\ddots & \\\\
-                              &  &  & \\ddots &  & \\Sigma \\frac{\\delta S_{r}}{\\delta x}_{n-1} + \\Sigma \\frac{\\delta S_{l}}{\\delta x}_{n} & \\Sigma \\frac{\\delta S_{r}}{\\delta x}_{n} \\\\
-                              &  &  &  &  & \\Sigma \\frac{\\delta S_{l}}{\\delta x}_{n} & \\Sigma \\frac{\\delta S_{r}}{\\delta x}_{n}
+                              &  &  & \\ddots &  & \\Sigma \\frac{\\delta S_{r}}{\\delta x}_{N-1} + \\Sigma \\frac{\\delta S_{l}}{\\delta x}_{N} & \\Sigma \\frac{\\delta S_{r}}{\\delta x}_{N} \\\\
+                              &  &  &  &  & \\Sigma \\frac{\\delta S_{l}}{\\delta x}_{N} & \\Sigma \\frac{\\delta S_{r}}{\\delta x}_{N}
                        \\end{bmatrix}
 
         **Point state dependent jacobian**
 
-        The derivatives of the state dependend point fluxes, if present, are
-        collected in :math:`A_{point}`.
+        The derivatives of the state dependend point fluxes, :math:`P`, if
+        present, are collected in :math:`A_{point}`. The derivates are
+        calculated for the specific functions, distributed to the two nearest
+        nodes and summed to a total at this specific position. This is
+        described by the equations below:
 
         .. math::
-            \\sum \\frac{\\delta P_{l}}{\\delta x}_{i} = \\sum_{k=1}^{m} \\frac{P(s + \\delta x)_{i,k} + P(s)_{i,k}}{\\delta x} * rfac_{k}
+            \\sum \\frac{\\delta P_{l}}{\\delta x}_{i} = \\sum_{k=1}^{m} \\frac{P(s_{i,k} + \\delta x)_{k} + P(s_{i,k})_{k}}{\\delta x} * rfac_{k}
 
         .. math::
-            \\sum \\frac{\\delta P_{r}}{\\delta x}_{i} = \\sum_{k=1}^{m} \\frac{P(s + \\delta x)_{i,k} + P(s)_{i,k}}{\\delta x} * lfac_{k}
+            \\sum \\frac{\\delta P_{r}}{\\delta x}_{i} = \\sum_{k=1}^{m} \\frac{P(s_{i,k} + \\delta x)_{k} + P(s_{i,k})_{k}}{\\delta x} * lfac_{k}
 
-        The state argument of :math:`P(s)` is calculated by linear
+        The state argument, :math:`s_{i,k}`, is calculated by linear
         interpolation between the nearest nodes.
 
         .. math::
-            s = s_{i} + rfac_{k} * (s_{i+1} - s_{i})
+            s_{i,k} = s_{i} + rfac_{k} * (s_{i+1} - s_{i})
 
-        The structure of the jacobian matrix for the sum of all state
-        dependent pointflux functions, :math:`P_{s}`, read as follows:
+        The structure of the jacobian matrix, :math:`A_{point}`, of the sum of
+        all state dependent pointflux functions is shown below:
 
         .. math::
             A_{point} = \\begin{bmatrix}
@@ -809,8 +849,8 @@ class Flow1DFE:
                             & \\Sigma \\frac{\\delta P_{r}}{\\delta x}_{i} + \\Sigma \\frac{\\delta P_{l}}{\\delta x}_{i+1} &  &  &  &  \\\\
                             &  & \\Sigma \\frac{\\delta P_{r}}{\\delta x}_{i+1} + \\Sigma \\frac{\\delta P_{l}}{\\delta x}_{i+2} &  &  &  \\\\
                             &  &  & \\ddots &  &  & \\\\
-                            &  &  &  &  & \\Sigma \\frac{\\delta P_{r}}{\\delta x}_{n-1} + \\Sigma \\frac{\\delta P_{l}}{\\delta x}_{n}  &  \\\\
-                            &  &  &  &  &  & \\Sigma \\frac{\\delta P_{r}}{\\delta x}_{n}
+                            &  &  &  &  & \\Sigma \\frac{\\delta P_{r}}{\\delta x}_{N-1} + \\Sigma \\frac{\\delta P_{l}}{\\delta x}_{N}  &  \\\\
+                            &  &  &  &  &  & \\Sigma \\frac{\\delta P_{r}}{\\delta x}_{N}
                         \\end{bmatrix}
 
         """

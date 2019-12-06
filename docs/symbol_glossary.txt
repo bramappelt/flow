@@ -11,10 +11,10 @@ S = Spatial and state dependent forcing function.
 P = Positional and state dependent forcing function.
 
 \\delta s = Storage change.
-F_{external} = Sum of all point and spatial forcing.
-F_{internal} = Sum of the interal forcing in the system.
-F_{total_internal} = F_{internal} + F{external}.
-F_net = F_{total_internal} - \\Delta s.
+F_{external} = All point and spatial fluxes.
+F_{internal} = Interal fluxes in the system.
+F_{total} = F_{internal} + F{external}, sum of all forcing fluxes.
+F_net = F_{total} - \\Delta s, net fluxes in the system.
 
 A = Sum of all jacobian matrices.
 A_{sys} = Jacobian system flux function.
@@ -38,5 +38,8 @@ w = All weights of the Gaussian integration procedure for degree :math:`\\Lambda
 
 lfac = Distribution factor for pointflux P towards the nearest left node.
 rfac = Distribution factor for pointflux P towards the nearest right node.
+
+_{l} = left node of the segment.
+_{r} = right node of the segment.
 
 

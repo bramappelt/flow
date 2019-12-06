@@ -33,7 +33,7 @@ def Spflux(s):
 # ########################### SOLVE TRANSIENT ################################
 
 FE_ut = Flow1DFE('Unsaturated transient model')
-FE_ut.set_field1d(nodes=xsp, degree=1)
+FE_ut.set_field1d(nodes=xsp, degree=3)
 # FE_ut.set_gaussian_quadrature(2)
 FE_ut.set_initial_states(initial_states)
 FE_ut.set_systemfluxfunction(fluxf.richards_equation, kfun=conductivity_func)
