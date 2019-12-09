@@ -12,14 +12,6 @@ waterflow.flow1d.flowFE1d module
    :undoc-members:
    :show-inheritance:
 
-waterflow.flow1d.flowFV1d module
---------------------------------
-
-.. automodule:: waterflow.flow1d.flowFV1d
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 
 Module contents
 ---------------

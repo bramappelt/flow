@@ -86,9 +86,9 @@ class Flow1DFE:
         Contains state dependent spatial fluxes on the model domain. # !! explain form
 
     internal_forcing : `dict`
-        The internal forcing of the system as calculated with the
-        system flux function and saved in :py:attr:`~systemfluxfunc`,
-        using the selected Gaussian quadrature :py:attr:`~degree_degree`.
+        The internal forcing of the system as calculated with
+        :py:attr:`~systemfluxfunc`, using the selected Gaussian quadrature
+        :py:attr:`~degree`.
 
     forcing : `numpy.ndarray`
         All the forcing fluxes applied to the system. The dimension of this
@@ -101,18 +101,18 @@ class Flow1DFE:
         pass
 
     fluxes : `numpy.ndarray`
-        Fluxes through the :py:attr:`~nodes` are defined to be positive to the
+        Fluxes through the :py:attr:`~nodes`, defined to be positive to the
         right.
 
     isinitial : `bool`, default is True
-        No calculations are performed on the input data yet.
+        First object for which was solved.
 
     isconverged : `bool`, default is False
         The system has converged to a solution.
 
     solve_data : `dict`
-        Holds the solve information of the system if :py:attr:`~isinitial`
-        equals False including the following key-value pairs:
+        Holds the solve information of the system including the following
+        key-value pairs:
 
         * solved_objects - A `list` of Flow1DFE objects at solved time steps.
 
@@ -143,38 +143,45 @@ class Flow1DFE:
         calculated with :py:meth:`~transient_dataframeify`.
 
     dft_states : `dict`
-        Collection of all :py:attr:`~df_states` dataframes at
-        :py:attr:`~solved_times` or at :py:attr:~`print_times` if not `None`.
+        Collection of all :py:attr:`~df_states` dataframes for the times in
+        :py:attr:`~dft_solved_times` or at :py:attr:`~print_times` if not
+        `None`.
 
     dft_nodes : `dict`
         Nodes that are selected in :py:meth:`~transient_dataframeify` are
-        saved at :py:attr:`~solved_times` or at :py:attr:~`print_times`
+        saved at :py:attr:`~dft_solved_times` or at :py:attr:`~print_times`
         if not `None`.
 
     dft_balance : `dict`
         Collection of all :py:attr:`~df_balance` dataframes at
-        :py:attr:`~solved_times` or at :py:attr:~`print_times` if not `None`.
+        :py:attr:`~dft_solved_times` or at :py:attr:`~print_times` if not
+        `None`.
 
     dft_balance_summary : `pandas.core.frame.DataFrame`
         Collection of all :py:attr:`~df_balance_summary` dataframes at
-        :py:attr:`~solved_times` or at :py:attr:~`print_times` if not `None`.
+        :py:attr:`~dft_solved_times` or at :py:attr:`~print_times` if not
+        `None`.
 
     _west : `int`
-        pass
+        Internal value that differentiates between a Dirichlet or Neumann
+        boundary condition on the western side of the domain.
 
     _east : `int`
-        pass
+        Internal value that differentiates between a Dirichlet or Neumann
+        boundary condition on the eastern side of the domain.
 
     _delta : `float`
-        pass
+        Fixed value used for the finite displacement in the derivatives of the
+        jacobian matrix, :py:attr:`~coefmatr`. This value may be changed
+        manually for extremeley steep gradients.
 
-    gauss_degree : `str`
+    gauss_degree : `int`
         Degree or number of points used in the Gaussian quadrature procedure
         for integral approximation.
 
     _xgauss : `tuple`
         Roots of Legendre polynomial on the interval [0, 1] for the selected
-        :py:attr:~`gauss_degree`.
+        :py:attr:`~gauss_degree`.
 
     _wgauss : `tuple`
         Weights that correspond to :py:attr:`~_xgauss`.
@@ -185,11 +192,11 @@ class Flow1DFE:
 
     xintegration : `list`
         Absolute positions of the Gaussian quadrature points in the domain
-        :py:attr:`~nodes`. The shape of this list is :py:attr:`~degree` by
-        length :py:attr:`~nodes~` minus 1.
+        :py:attr:`~nodes`. The shape of this list is
+        :math:`[\\Lambda \\times N-1]`.
 
     summarystring : `str`
-        Model information.
+        Model information obtained by :py:meth:`~summary`.
 
     """
     def __init__(self, id_, savepath=OUTPUT_DIR):
@@ -382,8 +389,8 @@ class Flow1DFE:
 
         The values calculated with this method are stored in the object's
         :py:attr:`~_xgauss` and :py:attr:`~_wgauss` attributes. The absolute
-        positions of the Gaussian quadrature points in the :py:attr:`~domain`
-        are calculated and saved in ~xintegration`.
+        positions of the Gaussian quadrature points in the ~domain are
+        calculated and saved in ~xintegration`.
 
         Parameters
         ----------
@@ -392,20 +399,14 @@ class Flow1DFE:
 
         Notes
         -----
+        .. math::
+            P_{\\Lambda}(p) = \\text{Legendre polynomials of degree $\\Lambda$}
 
         .. math::
-                P_{n}(x) = \\text{Legendre polynomials of degree n}
-
-        .. math::
-                w_{i} = \\frac{2}{\\left(\\left(1 - x_{i}^{2}\\right) *
-                (P_{n}^{'}(x_{i})^{2}\\right)}
-
+            w_{\\lambda} = \\frac{2}{\\left(\\left(1 - p_{\\lambda}^{2}\\right) *
+            P_{\\Lambda}^{'}(p_{\\lambda})^{2}\\right)}
 
         See :cite:`Strunk1979` for an introduction to stylish blah, blah...
-
-        References
-        ----------
-        .. bibliography:: bibliography.bib
 
         """
         # calculate roots of Legendre polynomial for degree n
@@ -539,10 +540,6 @@ class Flow1DFE:
 
         Both arrays should consist of zeros because of the applied
         equilibrium situation with no flow over the boundaries.
-
-        References
-        ----------
-        .. bibliography:: bibliography.bib
 
         """
         # internal fluxes from previous iteration
@@ -701,6 +698,15 @@ class Flow1DFE:
             self._update_storage_change(self.states_to_function(), dt=1)
 
     def _FE_precalc(self):
+        """ Discretization dependent finite element scheme properties
+
+        Calculate the values for :py:attr:`~nframe` and :py:attr:`~lengths`.
+
+        Examples
+        --------
+        pass
+
+        """
         nodes = self.nodes
         middle = []
         nodal_distances = []
@@ -725,8 +731,8 @@ class Flow1DFE:
         """ Build the jacobian matrix
 
         Build the complete jacobian matrix according to the finite elements
-        scheme for the selected degree. The jacobian matrix :math:`A` is
-        assigned to :py:attr:`~coefmatr`.
+        scheme for the selected degree :math:`\\Lambda`. The jacobian matrix
+        :math:`A` is assigned to :py:attr:`~coefmatr`.
 
         Parameters
         ----------
@@ -1728,10 +1734,6 @@ class Flow1DFE:
         net                1.716294e-12
         dtype: float64
 
-        References
-        ----------
-        .. bibliography:: bibliography.bib
-
         """
         data = {}
         # internal fluxes
@@ -1888,10 +1890,6 @@ class Flow1DFE:
         8       1.0   -8.0 -1.814469  0.419698        9.201041        0.030729         -0.030729
         9       1.0   -9.0 -0.912220  0.419888       10.126956        0.012064         -0.012064
         10      0.5  -10.0  0.000000  0.420000       12.980000        0.002066          0.951906
-
-        References
-        ----------
-        .. bibliography:: bibliography.bib
 
         """
         self._calc_theta_k()

@@ -36,7 +36,7 @@ release = 'v1.0'
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.napoleon',
               'sphinx.ext.coverage',
-	      'sphinx.ext.imgmath',
+              'sphinx.ext.imgmath',
               'sphinx.ext.mathjax',
               'sphinx.ext.doctest',
               'sphinx.ext.githubpages',

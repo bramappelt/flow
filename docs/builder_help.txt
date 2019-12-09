@@ -1,4 +1,0 @@
-# execute from docs directory with docs at sphinx root
-
-sphinx-apidoc -f -o ./source ..
-sphinx-build -b html ./source ./build

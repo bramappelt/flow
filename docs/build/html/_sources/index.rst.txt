@@ -11,6 +11,7 @@ Welcome to Flow's documentation!
    :caption: Contents:
    
    modules
+   glossary
 
 What is this *Flow* software package for?
 -----------------------------------------
@@ -23,12 +24,18 @@ how
   
 what not
   This is not a complete fully dimensional flow simulator.
+  
+Which
+  Which calculation techniques are used in this software package.
 
 Second order heading
 --------------------
 
 .. warning::
-	This is a text warning!
+	Be aware of the system's orientation change between saturated and
+	unsaturated flow problems. The orientation rotates counter clockwise
+	for 90 degrees which means that western and eastern boundaries become
+	lower and upper boundaries respectively.
 
 .. tip::
 	This is a tip text!

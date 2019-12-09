@@ -97,10 +97,12 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="waterflow.html#submodules">Submodules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="waterflow.html#module-waterflow">Module contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="waterflow.html#references">References</a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Symbol Glossary</a></li>
 </ul>
 
             
@@ -353,9 +355,9 @@ following format:</p>
 <dl class="attribute">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.internal_forcing">
 <code class="sig-name descname">internal_forcing</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.internal_forcing" title="Permalink to this definition">¶</a></dt>
-<dd><p>The internal forcing of the system as calculated with the
-system flux function and saved in <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.systemfluxfunc" title="waterflow.flow1d.flowFE1d.Flow1DFE.systemfluxfunc"><code class="xref py py-attr docutils literal notranslate"><span class="pre">systemfluxfunc</span></code></a>,
-using the selected Gaussian quadrature <code class="xref py py-attr docutils literal notranslate"><span class="pre">degree_degree</span></code>.</p>
+<dd><p>The internal forcing of the system as calculated with
+<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.systemfluxfunc" title="waterflow.flow1d.flowFE1d.Flow1DFE.systemfluxfunc"><code class="xref py py-attr docutils literal notranslate"><span class="pre">systemfluxfunc</span></code></a>, using the selected Gaussian quadrature
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">degree</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><cite>dict</cite></p>
@@ -400,7 +402,7 @@ matrix is <img class="math" src="_images/math/12617a66745b1b5f689f3a466529a4c201
 <dl class="attribute">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.fluxes">
 <code class="sig-name descname">fluxes</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.fluxes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fluxes through the <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.nodes" title="waterflow.flow1d.flowFE1d.Flow1DFE.nodes"><code class="xref py py-attr docutils literal notranslate"><span class="pre">nodes</span></code></a> are defined to be positive to the
+<dd><p>Fluxes through the <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.nodes" title="waterflow.flow1d.flowFE1d.Flow1DFE.nodes"><code class="xref py py-attr docutils literal notranslate"><span class="pre">nodes</span></code></a>, defined to be positive to the
 right.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -412,7 +414,7 @@ right.</p>
 <dl class="attribute">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.isinitial">
 <code class="sig-name descname">isinitial</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.isinitial" title="Permalink to this definition">¶</a></dt>
-<dd><p>No calculations are performed on the input data yet.</p>
+<dd><p>First object for which was solved.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><cite>bool</cite>, default is True</p>
@@ -434,8 +436,8 @@ right.</p>
 <dl class="attribute">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.solve_data">
 <code class="sig-name descname">solve_data</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.solve_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Holds the solve information of the system if <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.isinitial" title="waterflow.flow1d.flowFE1d.Flow1DFE.isinitial"><code class="xref py py-attr docutils literal notranslate"><span class="pre">isinitial</span></code></a>
-equals False including the following key-value pairs:</p>
+<dd><p>Holds the solve information of the system including the following
+key-value pairs:</p>
 <ul>
 <li><p>solved_objects - A <cite>list</cite> of Flow1DFE objects at solved time steps.</p></li>
 <li><p>time - A <cite>list</cite> of times at which the model states are calculated.</p></li>
@@ -523,8 +525,9 @@ calculated with <a class="reference internal" href="#waterflow.flow1d.flowFE1d.F
 <dl class="attribute">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.dft_states">
 <code class="sig-name descname">dft_states</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.dft_states" title="Permalink to this definition">¶</a></dt>
-<dd><p>Collection of all <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.df_states" title="waterflow.flow1d.flowFE1d.Flow1DFE.df_states"><code class="xref py py-attr docutils literal notranslate"><span class="pre">df_states</span></code></a> dataframes at
-<code class="xref py py-attr docutils literal notranslate"><span class="pre">solved_times</span></code> or at :py:attr:~`print_times` if not <cite>None</cite>.</p>
+<dd><p>Collection of all <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.df_states" title="waterflow.flow1d.flowFE1d.Flow1DFE.df_states"><code class="xref py py-attr docutils literal notranslate"><span class="pre">df_states</span></code></a> dataframes for the times in
+<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.dft_solved_times" title="waterflow.flow1d.flowFE1d.Flow1DFE.dft_solved_times"><code class="xref py py-attr docutils literal notranslate"><span class="pre">dft_solved_times</span></code></a> or at <code class="xref py py-attr docutils literal notranslate"><span class="pre">print_times</span></code> if not
+<cite>None</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><cite>dict</cite></p>
@@ -536,7 +539,7 @@ calculated with <a class="reference internal" href="#waterflow.flow1d.flowFE1d.F
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.dft_nodes">
 <code class="sig-name descname">dft_nodes</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.dft_nodes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Nodes that are selected in <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.transient_dataframeify" title="waterflow.flow1d.flowFE1d.Flow1DFE.transient_dataframeify"><code class="xref py py-meth docutils literal notranslate"><span class="pre">transient_dataframeify()</span></code></a> are
-saved at <code class="xref py py-attr docutils literal notranslate"><span class="pre">solved_times</span></code> or at :py:attr:~`print_times`
+saved at <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.dft_solved_times" title="waterflow.flow1d.flowFE1d.Flow1DFE.dft_solved_times"><code class="xref py py-attr docutils literal notranslate"><span class="pre">dft_solved_times</span></code></a> or at <code class="xref py py-attr docutils literal notranslate"><span class="pre">print_times</span></code>
 if not <cite>None</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -549,7 +552,8 @@ if not <cite>None</cite>.</p>
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.dft_balance">
 <code class="sig-name descname">dft_balance</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.dft_balance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Collection of all <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.df_balance" title="waterflow.flow1d.flowFE1d.Flow1DFE.df_balance"><code class="xref py py-attr docutils literal notranslate"><span class="pre">df_balance</span></code></a> dataframes at
-<code class="xref py py-attr docutils literal notranslate"><span class="pre">solved_times</span></code> or at :py:attr:~`print_times` if not <cite>None</cite>.</p>
+<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.dft_solved_times" title="waterflow.flow1d.flowFE1d.Flow1DFE.dft_solved_times"><code class="xref py py-attr docutils literal notranslate"><span class="pre">dft_solved_times</span></code></a> or at <code class="xref py py-attr docutils literal notranslate"><span class="pre">print_times</span></code> if not
+<cite>None</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><cite>dict</cite></p>
@@ -561,7 +565,8 @@ if not <cite>None</cite>.</p>
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.dft_balance_summary">
 <code class="sig-name descname">dft_balance_summary</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.dft_balance_summary" title="Permalink to this definition">¶</a></dt>
 <dd><p>Collection of all <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.df_balance_summary" title="waterflow.flow1d.flowFE1d.Flow1DFE.df_balance_summary"><code class="xref py py-attr docutils literal notranslate"><span class="pre">df_balance_summary</span></code></a> dataframes at
-<code class="xref py py-attr docutils literal notranslate"><span class="pre">solved_times</span></code> or at :py:attr:~`print_times` if not <cite>None</cite>.</p>
+<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.dft_solved_times" title="waterflow.flow1d.flowFE1d.Flow1DFE.dft_solved_times"><code class="xref py py-attr docutils literal notranslate"><span class="pre">dft_solved_times</span></code></a> or at <code class="xref py py-attr docutils literal notranslate"><span class="pre">print_times</span></code> if not
+<cite>None</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><cite>pandas.core.frame.DataFrame</cite></p>
@@ -572,7 +577,8 @@ if not <cite>None</cite>.</p>
 <dl class="attribute">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE._west">
 <code class="sig-name descname">_west</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE._west" title="Permalink to this definition">¶</a></dt>
-<dd><p>pass</p>
+<dd><p>Internal value that differentiates between a Dirichlet or Neumann
+boundary condition on the western side of the domain.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><cite>int</cite></p>
@@ -583,7 +589,8 @@ if not <cite>None</cite>.</p>
 <dl class="attribute">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE._east">
 <code class="sig-name descname">_east</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE._east" title="Permalink to this definition">¶</a></dt>
-<dd><p>pass</p>
+<dd><p>Internal value that differentiates between a Dirichlet or Neumann
+boundary condition on the eastern side of the domain.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><cite>int</cite></p>
@@ -594,7 +601,9 @@ if not <cite>None</cite>.</p>
 <dl class="attribute">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE._delta">
 <code class="sig-name descname">_delta</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE._delta" title="Permalink to this definition">¶</a></dt>
-<dd><p>pass</p>
+<dd><p>Fixed value used for the finite displacement in the derivatives of the
+jacobian matrix, <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.coefmatr" title="waterflow.flow1d.flowFE1d.Flow1DFE.coefmatr"><code class="xref py py-attr docutils literal notranslate"><span class="pre">coefmatr</span></code></a>. This value may be changed
+manually for extremeley steep gradients.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><cite>float</cite></p>
@@ -609,7 +618,7 @@ if not <cite>None</cite>.</p>
 for integral approximation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><cite>str</cite></p>
+<dd class="field-odd"><p><cite>int</cite></p>
 </dd>
 </dl>
 </dd></dl>
@@ -618,7 +627,7 @@ for integral approximation.</p>
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE._xgauss">
 <code class="sig-name descname">_xgauss</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE._xgauss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Roots of Legendre polynomial on the interval [0, 1] for the selected
-:py:attr:~`gauss_degree`.</p>
+<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.gauss_degree" title="waterflow.flow1d.flowFE1d.Flow1DFE.gauss_degree"><code class="xref py py-attr docutils literal notranslate"><span class="pre">gauss_degree</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><cite>tuple</cite></p>
@@ -653,8 +662,8 @@ for integral approximation.</p>
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.xintegration">
 <code class="sig-name descname">xintegration</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.xintegration" title="Permalink to this definition">¶</a></dt>
 <dd><p>Absolute positions of the Gaussian quadrature points in the domain
-<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.nodes" title="waterflow.flow1d.flowFE1d.Flow1DFE.nodes"><code class="xref py py-attr docutils literal notranslate"><span class="pre">nodes</span></code></a>. The shape of this list is <code class="xref py py-attr docutils literal notranslate"><span class="pre">degree</span></code> by
-length <code class="xref py py-attr docutils literal notranslate"><span class="pre">nodes~</span></code> minus 1.</p>
+<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.nodes" title="waterflow.flow1d.flowFE1d.Flow1DFE.nodes"><code class="xref py py-attr docutils literal notranslate"><span class="pre">nodes</span></code></a>. The shape of this list is
+<img class="math" src="_images/math/cd91f55f653b1050f917727c2ffa358b5241d989.png" alt="[\Lambda \times N-1]"/>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><cite>list</cite></p>
@@ -665,7 +674,7 @@ length <code class="xref py py-attr docutils literal notranslate"><span class="p
 <dl class="attribute">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.summarystring">
 <code class="sig-name descname">summarystring</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.summarystring" title="Permalink to this definition">¶</a></dt>
-<dd><p>Model information.</p>
+<dd><p>Model information obtained by <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.summary" title="waterflow.flow1d.flowFE1d.Flow1DFE.summary"><code class="xref py py-meth docutils literal notranslate"><span class="pre">summary()</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><cite>str</cite></p>
@@ -678,8 +687,8 @@ length <code class="xref py py-attr docutils literal notranslate"><span class="p
 <code class="sig-name descname">_CMAT</code><span class="sig-paren">(</span><em class="sig-param">nodes</em>, <em class="sig-param">states</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE._CMAT" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build the jacobian matrix</p>
 <p>Build the complete jacobian matrix according to the finite elements
-scheme for the selected degree. The jacobian matrix <img class="math" src="_images/math/211284f68205c3e66773eaf026f32a0acdd3dfb3.png" alt="A"/> is
-assigned to <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.coefmatr" title="waterflow.flow1d.flowFE1d.Flow1DFE.coefmatr"><code class="xref py py-attr docutils literal notranslate"><span class="pre">coefmatr</span></code></a>.</p>
+scheme for the selected degree <img class="math" src="_images/math/65e60d95fc7bc06725cb967be10982e4bf310122.png" alt="\Lambda"/>. The jacobian matrix
+<img class="math" src="_images/math/211284f68205c3e66773eaf026f32a0acdd3dfb3.png" alt="A"/> is assigned to <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.coefmatr" title="waterflow.flow1d.flowFE1d.Flow1DFE.coefmatr"><code class="xref py py-attr docutils literal notranslate"><span class="pre">coefmatr</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -784,7 +793,11 @@ all state dependent pointflux functions is shown below:</p>
 <dl class="method">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE._FE_precalc">
 <code class="sig-name descname">_FE_precalc</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE._FE_precalc" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Discretization dependent finite element scheme properties</p>
+<p>Calculate the values for <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.nframe" title="waterflow.flow1d.flowFE1d.Flow1DFE.nframe"><code class="xref py py-attr docutils literal notranslate"><span class="pre">nframe</span></code></a> and <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.lengths" title="waterflow.flow1d.flowFE1d.Flow1DFE.lengths"><code class="xref py py-attr docutils literal notranslate"><span class="pre">lengths</span></code></a>.</p>
+<p class="rubric">Examples</p>
+<p>pass</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.__repr__">
@@ -898,7 +911,7 @@ when called with default arguments.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="k">import</span> <span class="n">initializer</span>
 </pre></div>
 </div>
-<p>Select soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="#id12" id="id1">[SW79]</a>
+<p>Select soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="waterflow.html#strunk1979" id="id1">[SW79]</a>
 and prepare the conductivity function with the soil parameters.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">condf</span><span class="o">.</span><span class="n">soilselector</span><span class="p">([</span><span class="mi">13</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">kfun</span> <span class="o">=</span> <span class="n">initializer</span><span class="p">(</span><span class="n">condf</span><span class="o">.</span><span class="n">VG_conductivity</span><span class="p">,</span> <span class="n">ksat</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">ksat</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
@@ -921,13 +934,6 @@ and prepare the conductivity function with the soil parameters.</p>
 </div>
 <p>Both arrays should consist of zeros because of the applied
 equilibrium situation with no flow over the boundaries.</p>
-<p class="rubric">References</p>
-<p id="bibtex-bibliography-waterflow.flow1d-0"><dl class="citation">
-<dt class="bibtex label" id="strunk1979"><span class="brackets">SW79</span></dt>
-<dd><p>William Strunk, Jr. and E. B. White. <em>The Elements of Style</em>. Macmillan, third edition, 1979.</p>
-</dd>
-</dl>
-</p>
 </dd></dl>
 
 <dl class="method">
@@ -1115,7 +1121,7 @@ the <img class="math" src="_images/math/6fd2860318fa09d7c44f574ad52a40cdf7ba79cf
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="k">import</span> <span class="n">initializer</span>
 </pre></div>
 </div>
-<p>Select soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="#id12" id="id2">[SW79]</a>
+<p>Select soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="waterflow.html#strunk1979" id="id2">[SW79]</a>
 and prepare the conductivity function and theta-h relation with the
 soil parameters. These functions are the arguments to the fluxfunction
 and the storage change function repectively.</p>
@@ -1165,13 +1171,6 @@ and the storage change function repectively.</p>
 <span class="go">dtype: float64</span>
 </pre></div>
 </div>
-<p class="rubric">References</p>
-<p id="bibtex-bibliography-waterflow.flow1d-1"><dl class="citation">
-<dt class="bibtex label" id="id10"><span class="brackets">SW79</span></dt>
-<dd><p>William Strunk, Jr. and E. B. White. <em>The Elements of Style</em>. Macmillan, third edition, 1979.</p>
-</dd>
-</dl>
-</p>
 </dd></dl>
 
 <dl class="method">
@@ -1194,7 +1193,7 @@ to the dataframe.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="k">import</span> <span class="n">initializer</span>
 </pre></div>
 </div>
-<p>Select soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="#id12" id="id3">[SW79]</a>
+<p>Select soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="waterflow.html#strunk1979" id="id3">[SW79]</a>
 and prepare the conductivity function and theta-h relation with the
 soil parameters. These functions are the arguments to the fluxfunction
 and the storage change function repectively.</p>
@@ -1233,13 +1232,6 @@ and the storage change function repectively.</p>
 <span class="go">10      0.5  -10.0  0.000000  0.420000       12.980000        0.002066          0.951906</span>
 </pre></div>
 </div>
-<p class="rubric">References</p>
-<p id="bibtex-bibliography-waterflow.flow1d-2"><dl class="citation">
-<dt class="bibtex label" id="id11"><span class="brackets">SW79</span></dt>
-<dd><p>William Strunk, Jr. and E. B. White. <em>The Elements of Style</em>. Macmillan, third edition, 1979.</p>
-</dd>
-</dl>
-</p>
 </dd></dl>
 
 <dl class="method">
@@ -1389,8 +1381,8 @@ towards the right of the domain.</p>
 <dd><p>Calculates Gaussian quadrature roots and weights</p>
 <p>The values calculated with this method are stored in the object’s
 <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE._xgauss" title="waterflow.flow1d.flowFE1d.Flow1DFE._xgauss"><code class="xref py py-attr docutils literal notranslate"><span class="pre">_xgauss</span></code></a> and <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE._wgauss" title="waterflow.flow1d.flowFE1d.Flow1DFE._wgauss"><code class="xref py py-attr docutils literal notranslate"><span class="pre">_wgauss</span></code></a> attributes. The absolute
-positions of the Gaussian quadrature points in the <code class="xref py py-attr docutils literal notranslate"><span class="pre">domain</span></code>
-are calculated and saved in ~xintegration`.</p>
+positions of the Gaussian quadrature points in the ~domain are
+calculated and saved in ~xintegration`.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>degree</strong> (<cite>int</cite>, default is 1) – Number of points used in the Gaussian quadrature procedure.</p>
@@ -1398,18 +1390,11 @@ are calculated and saved in ~xintegration`.</p>
 </dl>
 <p class="rubric">Notes</p>
 <div class="math" id="equation-waterflow-flow1d-22">
-<p><span class="eqno">(23)<a class="headerlink" href="#equation-waterflow-flow1d-22" title="Permalink to this equation">¶</a></span><img src="_images/math/10495f922b4438d88fb2380843624b4f0737ca55.png" alt="P_{n}(x) = \text{Legendre polynomials of degree n}"/></p>
+<p><span class="eqno">(23)<a class="headerlink" href="#equation-waterflow-flow1d-22" title="Permalink to this equation">¶</a></span><img src="_images/math/a52ba99d3986691e2aad20e8ccad1d9d7c17db43.png" alt="P_{\Lambda}(p) = \text{Legendre polynomials of degree $\Lambda$}"/></p>
 </div><div class="math" id="equation-waterflow-flow1d-23">
-<p><span class="eqno">(24)<a class="headerlink" href="#equation-waterflow-flow1d-23" title="Permalink to this equation">¶</a></span><img src="_images/math/912abce415df10710cd8edd6114717bb0d3d165e.png" alt="w_{i} = \frac{2}{\left(\left(1 - x_{i}^{2}\right) *
-(P_{n}^{'}(x_{i})^{2}\right)}"/></p>
-</div><p>See <a class="bibtex reference internal" href="#id12" id="id4">[SW79]</a> for an introduction to stylish blah, blah…</p>
-<p class="rubric">References</p>
-<p id="bibtex-bibliography-waterflow.flow1d-3"><dl class="citation">
-<dt class="bibtex label" id="id12"><span class="brackets">SW79</span></dt>
-<dd><p>William Strunk, Jr. and E. B. White. <em>The Elements of Style</em>. Macmillan, third edition, 1979.</p>
-</dd>
-</dl>
-</p>
+<p><span class="eqno">(24)<a class="headerlink" href="#equation-waterflow-flow1d-23" title="Permalink to this equation">¶</a></span><img src="_images/math/4e3010d8c0c2496f79e1cc6a58332c2d24a634bc.png" alt="w_{\lambda} = \frac{2}{\left(\left(1 - p_{\lambda}^{2}\right) *
+P_{\Lambda}^{'}(p_{\lambda})^{2}\right)}"/></p>
+</div><p>See <a class="bibtex reference internal" href="waterflow.html#strunk1979" id="id4">[SW79]</a> for an introduction to stylish blah, blah…</p>
 </dd></dl>
 
 <dl class="method">
@@ -1470,8 +1455,8 @@ remains the same.</p></li>
 </pre></div>
 </div>
 <p>Implement the Richards equation for unsturated flow, herein the
-Van Genuchten conductivity function is used. <a class="bibtex reference internal" href="#id12" id="id5">[SW79]</a>.
-Soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="#id12" id="id6">[SW79]</a> is selected.
+Van Genuchten conductivity function is used. <a class="bibtex reference internal" href="waterflow.html#strunk1979" id="id5">[SW79]</a>.
+Soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="waterflow.html#strunk1979" id="id6">[SW79]</a> is selected.
 See <a class="reference internal" href="waterflow.utility.html#waterflow.utility.fluxfunctions.richards_equation" title="waterflow.utility.fluxfunctions.richards_equation"><code class="xref py py-func docutils literal notranslate"><span class="pre">richards_equation()</span></code></a> for
 the full definition of the fluxfunction.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">condf</span><span class="o">.</span><span class="n">soilselector</span><span class="p">([</span><span class="mi">13</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
@@ -1482,7 +1467,7 @@ the full definition of the fluxfunction.</p>
 </pre></div>
 </div>
 <p>For saturated flow the Darcy equation with a constant saturated
-conductivity can be used. <a class="bibtex reference internal" href="#id12" id="id7">[SW79]</a>. See
+conductivity can be used. <a class="bibtex reference internal" href="waterflow.html#strunk1979" id="id7">[SW79]</a>. See
 <a class="reference internal" href="waterflow.utility.html#waterflow.utility.fluxfunctions.darcy" title="waterflow.utility.fluxfunctions.darcy"><code class="xref py py-func docutils literal notranslate"><span class="pre">darcy()</span></code></a> for the full
 definition of the fluxfunction.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">darcy</span> <span class="o">=</span> <span class="n">fluxf</span><span class="o">.</span><span class="n">darcy</span>
@@ -1570,7 +1555,7 @@ extension. The string version of the description is also available via
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="k">import</span> <span class="n">initializer</span>
 </pre></div>
 </div>
-<p>Select soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="#id12" id="id8">[SW79]</a>
+<p>Select soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="waterflow.html#strunk1979" id="id8">[SW79]</a>
 and prepare the conductivity function and theta-h relation with the
 soil parameters. These functions are the arguments to the fluxfunction
 and the storage change function repectively.</p>
@@ -1653,7 +1638,7 @@ known object that was solved for in terms of time
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="k">import</span> <span class="n">initializer</span>
 </pre></div>
 </div>
-<p>Select soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="#id12" id="id9">[SW79]</a>
+<p>Select soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="waterflow.html#strunk1979" id="id9">[SW79]</a>
 and prepare the conductivity function and theta-h relation with the
 soil parameters. These functions are the arguments to the fluxfunction
 and the storage change function repectively.</p>
@@ -1750,114 +1735,6 @@ and the storage change function repectively.</p>
 <dl class="method">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.wrap_bf_linear">
 <code class="sig-name descname">wrap_bf_linear</code><span class="sig-paren">(</span><em class="sig-param">node</em>, <em class="sig-param">where</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.wrap_bf_linear" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-waterflow.flow1d.flowFV1d">
-<span id="waterflow-flow1d-flowfv1d-module"></span><h2>waterflow.flow1d.flowFV1d module<a class="headerlink" href="#module-waterflow.flow1d.flowFV1d" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="waterflow.flow1d.flowFV1d.Flow1DFV">
-<em class="property">class </em><code class="sig-prename descclassname">waterflow.flow1d.flowFV1d.</code><code class="sig-name descname">Flow1DFV</code><span class="sig-paren">(</span><em class="sig-param">id_</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFV1d.Flow1DFV" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="method">
-<dt id="waterflow.flow1d.flowFV1d.Flow1DFV._CMAT">
-<code class="sig-name descname">_CMAT</code><span class="sig-paren">(</span><em class="sig-param">nodes</em>, <em class="sig-param">states</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFV1d.Flow1DFV._CMAT" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="waterflow.flow1d.flowFV1d.Flow1DFV._FV_precalc">
-<code class="sig-name descname">_FV_precalc</code><span class="sig-paren">(</span><em class="sig-param">nodes</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFV1d.Flow1DFV._FV_precalc" title="Permalink to this definition">¶</a></dt>
-<dd><p>Assigns middle points between the nodes and the distance between
-the nodes to the nframe class attribute. Secondly, the lenght of each
-finite volumes element is assigned to the lengths attribute</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="waterflow.flow1d.flowFV1d.Flow1DFV._aggregate_forcing">
-<code class="sig-name descname">_aggregate_forcing</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFV1d.Flow1DFV._aggregate_forcing" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="waterflow.flow1d.flowFV1d.Flow1DFV._check_boundaries">
-<code class="sig-name descname">_check_boundaries</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFV1d.Flow1DFV._check_boundaries" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="waterflow.flow1d.flowFV1d.Flow1DFV._internal_forcing">
-<code class="sig-name descname">_internal_forcing</code><span class="sig-paren">(</span><em class="sig-param">calcbal=False</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFV1d.Flow1DFV._internal_forcing" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="waterflow.flow1d.flowFV1d.Flow1DFV._statedep_forcing">
-<code class="sig-name descname">_statedep_forcing</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFV1d.Flow1DFV._statedep_forcing" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="waterflow.flow1d.flowFV1d.Flow1DFV.add_dirichlet_BC">
-<code class="sig-name descname">add_dirichlet_BC</code><span class="sig-paren">(</span><em class="sig-param">value</em>, <em class="sig-param">where</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFV1d.Flow1DFV.add_dirichlet_BC" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="waterflow.flow1d.flowFV1d.Flow1DFV.add_neumann_BC">
-<code class="sig-name descname">add_neumann_BC</code><span class="sig-paren">(</span><em class="sig-param">value</em>, <em class="sig-param">where</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFV1d.Flow1DFV.add_neumann_BC" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="waterflow.flow1d.flowFV1d.Flow1DFV.add_pointflux">
-<code class="sig-name descname">add_pointflux</code><span class="sig-paren">(</span><em class="sig-param">rate</em>, <em class="sig-param">pos</em>, <em class="sig-param">name</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFV1d.Flow1DFV.add_pointflux" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="waterflow.flow1d.flowFV1d.Flow1DFV.add_spatialflux">
-<code class="sig-name descname">add_spatialflux</code><span class="sig-paren">(</span><em class="sig-param">q</em>, <em class="sig-param">name</em>, <em class="sig-param">exact=False</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFV1d.Flow1DFV.add_spatialflux" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="waterflow.flow1d.flowFV1d.Flow1DFV.calcbalance">
-<code class="sig-name descname">calcbalance</code><span class="sig-paren">(</span><em class="sig-param">print_=False</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFV1d.Flow1DFV.calcbalance" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="waterflow.flow1d.flowFV1d.Flow1DFV.remove_BC">
-<code class="sig-name descname">remove_BC</code><span class="sig-paren">(</span><em class="sig-param">*args</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFV1d.Flow1DFV.remove_BC" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="waterflow.flow1d.flowFV1d.Flow1DFV.remove_pointflux">
-<code class="sig-name descname">remove_pointflux</code><span class="sig-paren">(</span><em class="sig-param">*args</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFV1d.Flow1DFV.remove_pointflux" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="waterflow.flow1d.flowFV1d.Flow1DFV.remove_spatialflux">
-<code class="sig-name descname">remove_spatialflux</code><span class="sig-paren">(</span><em class="sig-param">*args</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFV1d.Flow1DFV.remove_spatialflux" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="waterflow.flow1d.flowFV1d.Flow1DFV.set_field1d">
-<code class="sig-name descname">set_field1d</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFV1d.Flow1DFV.set_field1d" title="Permalink to this definition">¶</a></dt>
-<dd><p>Define the nodal structure</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="waterflow.flow1d.flowFV1d.Flow1DFV.set_initial_states">
-<code class="sig-name descname">set_initial_states</code><span class="sig-paren">(</span><em class="sig-param">states</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFV1d.Flow1DFV.set_initial_states" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="waterflow.flow1d.flowFV1d.Flow1DFV.set_systemfluxfunction">
-<code class="sig-name descname">set_systemfluxfunction</code><span class="sig-paren">(</span><em class="sig-param">function</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFV1d.Flow1DFV.set_systemfluxfunction" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="waterflow.flow1d.flowFV1d.Flow1DFV.solve">
-<code class="sig-name descname">solve</code><span class="sig-paren">(</span><em class="sig-param">maxiter=1000</em>, <em class="sig-param">rmse_threshold=1e-16</em>, <em class="sig-param">mae_threshold=1e-16</em><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFV1d.Flow1DFV.solve" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="waterflow.flow1d.flowFV1d.Flow1DFV.states_to_function">
-<code class="sig-name descname">states_to_function</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#waterflow.flow1d.flowFV1d.Flow1DFV.states_to_function" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
