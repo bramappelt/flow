@@ -31,22 +31,26 @@ Symbol Glossary
         Positional and state dependent forcing function.
 
     :math:`\Delta s`
-        Storage change.
+        Storage change w.r.t. previous time step. Matrix of dimension :math:`[1 \times N]`.
 
     :math:`F_{external}`
-        All point and spatial fluxes.
+        Accumulation of all point and spatial fluxes. Matrix of dimension :math:`[1 \times N]`.
 
     :math:`F_{internal}`
-        Internal fluxes in the system.
+        Internal fluxes in the system. Matrix of dimension :math:`[1 \times N]`.
 
     :math:`F_{total}`
-        :math:`F_{internal} + F{external}`, sum of all forcing fluxes.
+        :math:`F_{internal} + F_{external}`, sum of all forcing fluxes, **excluding** the storage change forcing.
 
     :math:`F_{net}`
         :math:`F_{total} - \Delta s`, net fluxes in the system.
 
+    :math:`F_{forcing}`
+        :math:`F_{internal} + F_{external}`, sum of all forcing fluxes, **including** the storage change forcing.
+
+
     :math:`A`
-        Sum of all jacobian matrices.
+        :math:`A = A_{sys} + A_{spat} + A_{point}`, sum of all jacobian matrices. Matrix of dimension :math:`[1 \times N]`.
 
     :math:`A_{sys}`
         Jacobian system flux function.

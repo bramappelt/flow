@@ -91,21 +91,28 @@ class Flow1DFE:
         :py:attr:`~degree`.
 
     forcing : `numpy.ndarray`
-        All the forcing fluxes applied to the system. The dimension of this
-        matrix is :math:`[1 \\times N]`.
+        All the forcing fluxes applied to the system including the storage
+        change forcing. This is the matrix that will be used for the
+        Newton-Raphson solving procedure. The dimension of this matrix is
+        :math:`[1 \\times N]`.
 
     conductivities : `numpy.ndarray`
-        pass
+        Hydraulic conductivities at the nodal positions, :py:attr:`~nodes`.
+        These values are calculated with the conductivity function as
+        given in the :py:attr:`~systemfluxfunc`.
 
     moisture : `numpy.ndarray`
-        pass
+        Moisture contents at the nodal positions, :py:attr:`~nodes`. These
+        values are calculated with the explicitly assigned :py:attr:`~tfun`.
 
     fluxes : `numpy.ndarray`
         Fluxes through the :py:attr:`~nodes`, defined to be positive to the
         right.
 
     isinitial : `bool`, default is True
-        First object for which was solved.
+        First object that contains initial input which has not been solved for
+        yet. This attribute is set to ``False`` when the model object has been
+        solved for.
 
     isconverged : `bool`, default is False
         The system has converged to a solution.
@@ -389,8 +396,8 @@ class Flow1DFE:
 
         The values calculated with this method are stored in the object's
         :py:attr:`~_xgauss` and :py:attr:`~_wgauss` attributes. The absolute
-        positions of the Gaussian quadrature points in the ~domain are
-        calculated and saved in ~xintegration`.
+        positions of the Gaussian quadrature points in the domain are
+        calculated and saved in :py:attr:`~xintegration`.
 
         Parameters
         ----------
@@ -399,14 +406,22 @@ class Flow1DFE:
 
         Notes
         -----
+        The integration points :math:`p_{\\lambda}` for the Gaussian
+        quadrature method are obtained by finding the roots of the Legendre
+        polynomial of degree :math:`\\Lambda`.
+
         .. math::
             P_{\\Lambda}(p) = \\text{Legendre polynomials of degree $\\Lambda$}
+
+        The corresponding weights :math:`w_{\\lambda}` are calculated with the
+        following closed form equation.
 
         .. math::
             w_{\\lambda} = \\frac{2}{\\left(\\left(1 - p_{\\lambda}^{2}\\right) *
             P_{\\Lambda}^{'}(p_{\\lambda})^{2}\\right)}
 
-        See :cite:`Strunk1979` for an introduction to stylish blah, blah...
+        A full description of the theory behind this Gaussain quadrature method
+        is documented in :cite:`Strunk1979`.
 
         """
         # calculate roots of Legendre polynomial for degree n
@@ -435,7 +450,34 @@ class Flow1DFE:
         self.gauss_degree = degree
 
     def _aggregate_forcing(self):
-        """ Aggregation of state independent forcing """
+        """ Aggregation of state independent forcing
+
+        The state independent forcing saved in :py:attr:`~pointflux` and
+        :py:attr:`~spatflux` is accumulated into one matrix :math:`F_{forcing}`
+        and is saved as :py:attr:`~forcing` in the object. In the case of a
+        Neumann boundary condition, the value of this flux is added to
+        either the left or the right side of the domain.
+
+        Examples
+        --------
+
+        >>> from waterflow.flow1d.flowFE1d import Flow1DFE
+        >>> FE = Flow1DFE("Calculate water balance")
+        >>> FE.set_field1d(nodes=(-10, 0, 11))
+        >>> FE.add_dirichlet_BC(0.0, 'west')
+        >>> # Constant boundary flow of 0.3 cm/d out of the system
+        >>> FE.add_neumann_BC(-0.3, 'east')
+        >>> # Add spatial extraction of -0.001 cm/d
+        >>> FE.add_spatialflux(-0.001, 'extraction')
+        >>> # add a point extraction of -0.05 cm/d at 5.5 cm depth
+        >>> FE.add_pointflux(-0.05, -5.5, 'sink')
+        >>> # Aggregate state independent forcing and account for Neumann BC
+        >>> FE._aggregate_forcing()
+        >>> FE.forcing
+        array([-0.0005, -0.001 , -0.001 , -0.001 , -0.026 , -0.026 , -0.001 ,
+               -0.001 , -0.001 , -0.001 , -0.3005])
+
+        """
         self.forcing = np.repeat(0.0, len(self.nodes))
         # aggregate state independent forcing
         for flux in [self.pointflux, self.spatflux]:
@@ -453,7 +495,8 @@ class Flow1DFE:
 
         This is a core method for the numerical finite elements scheme. The
         default behavior is to calculate the system's internal forcing and
-        assign the values to :py:attr:`~forcing`.
+        accumulate the values to :math:`F_{forcing}` which is saved in the
+        model as :py:attr:`~forcing`.
 
         Parameters
         ----------
@@ -566,6 +609,7 @@ class Flow1DFE:
             self.internal_forcing["internal_forcing"] = [None, np.array(f)]
 
     def _statedep_forcing(self):
+        """ Calculation of state dependent forcing values """
         # point state dependent forcing
         f = [0.0 for x in range(len(self.nodes))]
         for key in self.Spointflux.keys():
@@ -615,7 +659,7 @@ class Flow1DFE:
         """ Check for proper boundary conditions
 
         The system is checked for singularity. When a boundary condition
-        is not set explicitly a natural boundary condition (no flow) is
+        is not explicitly set, a natural boundary condition (no flow) is
         set as default.
 
         Raises
@@ -675,6 +719,61 @@ class Flow1DFE:
                 self.states[pos] = val
 
     def _calc_theta_k(self):
+        """ Conductivities and moisture contents
+
+        Calculation of conductivities and moisture contents in the system.
+        The results are saved in :py:attr:`~conductivities` and
+        :py:attr:`~moisture` and will be included in :py:attr:`~df_states`.
+
+        Notes
+        -----
+        The conductivity function is part of the :py:attr:`~systemfluxfunc`.
+        The moisture content function should be assigned to the model
+        explicitly.
+
+        Examples
+        --------
+
+        >>> from waterflow.flow1d.flowFE1d import Flow1DFE
+        >>> from waterflow.utility import conductivityfunctions as condf
+        >>> from waterflow.utility import fluxfunctions as fluxf
+        >>> from waterflow.utility.helper import initializer
+
+        Select soil 13, 'loam', from De Staringreeks :cite:`Strunk1979`
+        and prepare the conductivity function and theta-h relation with the
+        soil parameters. These functions are the arguments to the fluxfunction
+        and the storage change function repectively.
+
+        >>> s, *_ = condf.soilselector([13])[0]
+        >>> theta_h = initializer(condf.VG_pressureh, theta_r=s.t_res,
+        ...                       theta_s=s.t_sat, a=s.alpha, n=s.n)
+        >>> kfun = initializer(condf.VG_conductivity, ksat=s.ksat, a=s.alpha, n=s.n)
+
+        >>> FE = Flow1DFE("Calculate water balance")
+        >>> FE.set_field1d(nodes=(-10, 0, 11))
+        >>> # The conductivity function is added as argument to the systemfluxfunction
+        >>> FE.set_systemfluxfunction(fluxf.richards_equation, kfun=kfun)
+        >>> FE._calc_theta_k()
+        >>> FE.conductivities
+        array([12.98, 12.98, 12.98, 12.98, 12.98, 12.98, 12.98, 12.98, 12.98,
+               12.98, 12.98])
+        >>> # Omitting a function will skip the calculation (e.g. in case of saturated flow)
+        >>> FE.moisture
+        []
+        >>> # Create an equilibrium situation
+        >>> FE.set_initial_states([0 - i for i in range(10)])
+        >>> # Now add the moisture content function
+        >>> FE.tfun = theta_h
+        >>> # Calculate again
+        >>> FE._calc_theta_k()
+        >>> FE.conductivities
+        array([12.98      , 10.01657823,  9.05018386,  8.36428965,  7.8189874 ,
+                7.36164639,  6.96580186,  6.61596642,  6.30216943,  6.01755319])
+        >>> FE.moisture
+        array([0.42      , 0.41987202, 0.41965291, 0.41937832, 0.41906052,
+               0.41870661, 0.41832137, 0.41790836, 0.41747038, 0.4170097 ])
+
+        """
         if hasattr(self, 'kfun'):
             k = [self.kfun(n, s) for n, s in zip(self.nodes, self.states)]
             self.conductivities = np.array(k)
@@ -683,7 +782,37 @@ class Flow1DFE:
             self.moisture = np.array(t)
 
     def _update_storage_change(self, prevstate, dt):
-        ''' feed new previous states function and timestep '''
+        """ Update states function and time step size of storage change function
+
+        The storage change function is implemented as a spatial state
+        dependent flux function. Therefore, it needs to match its mandatory
+        function signature as described in :py:meth:`~add_spatialflux`. This
+        method updates the ``prevstate`` and ``dt`` arguments by changing these
+        default arguments of the storage change function so that the calling
+        signature remains the same.
+
+        Parameters
+        ----------
+        prevstate : `func`
+            Function that calculates the system's states :math:`s` for a given
+            position :math:`x`.
+        dt : `float` or `int`
+            Time step over which the storage change will be calculated.
+
+        Notes
+        -----
+        The storage change function, if present, is stored in
+        :py:attr:`~Sspatialflux`. The calling signature may look as follows:
+
+        ..  math::
+            storage\_change(x, s, prevstate, dt, fun=lambda\\text{ }x: 1, S=1)
+
+        The :math:`prevstate` and :math:`dt` argument needs to be updated at
+        every iteration and are set as default values so the storage
+        change function can be called with the signature demanded by
+        :py:meth:`~add_spatialflux`.
+
+        """
         storagechange = self.Sspatflux.get('storage_change', None)
         if storagechange:
             storagechange[0] = partial(storagechange[0],
@@ -691,6 +820,23 @@ class Flow1DFE:
                                        dt=dt)
 
     def _solve_initial_object(self):
+        """ Calculation on first model input
+
+        Basic calculations on the input data for the first object, used as
+        first entry in any of the model's dataframes.
+
+        Notes
+        -----
+        If :py:attr:`~isinitial` equals ``True`` the boundaries of the model
+        are checked, the internal forcing is calculated and the storage change
+        function is updated, if present.
+
+        .. note::
+            The values calculated by this method and included in the model's
+            dataframes as first entries not need to make any sense because the
+            user can set any unrealistic combination of initial input.
+
+        """
         if self.isinitial:
             self._check_boundaries()
             self.forcing = np.repeat(0, len(self.states))
@@ -701,6 +847,23 @@ class Flow1DFE:
         """ Discretization dependent finite element scheme properties
 
         Calculate the values for :py:attr:`~nframe` and :py:attr:`~lengths`.
+
+        Notes
+        -----
+
+        .. math::
+            x_{i+\\frac{1}{2}} = \\frac{x_{i} + x_{i+1}}{2} \\text{ for } i=1,2,\\dotsc,N-1
+
+        .. math::
+            L_{i} = x_{i+1} - x_{i} \\text{ for } i=1,2,\\dotsc,N-1
+
+        .. math::
+            lengths_{i} =
+                \\begin{cases}
+                \\frac{x_{i}+x_{i+1}}{2} - x_{i}                  & \\text{ for } i=1 \\\\
+                \\frac{x_{i+1}+x_{i-1}}{2}                & \\text{ for } i=2,3,\\dotsc,N-1 \\\\
+                x_{i}-\\frac{x_{i-1}+x_{i}}{2}                  & \\text{ for } i=N
+                \\end{cases}
 
         Examples
         --------
@@ -950,8 +1113,8 @@ class Flow1DFE:
         -----
 
         .. warning::
-            Make sure that the absolute positions of the nodes increase
-            towards the right of the domain.
+            Make sure that the positions of the nodes increase towards the
+            right of the domain.
 
         Examples
         --------
@@ -1310,6 +1473,7 @@ class Flow1DFE:
                                      np.array(f)]
 
     def add_spatialflux(self, q, name=None, exact=False):
+        """ Add a spatialflux to the system """
         if isinstance(q, int) or isinstance(q, float):
             Q = np.repeat(q, len(self.nodes)).astype(np.float64)
         elif isinstance(q, list) or isinstance(q, np.ndarray):
@@ -1474,7 +1638,12 @@ class Flow1DFE:
             return partial(np.interp, xp=self.nodes, fp=states)
 
     def dt_solve(self, dt, maxiter=500, threshold=1e-3):
-        """ solve the system for one specific time step """
+        """ solve the system for one specific time step
+
+        Performs the Newton Rapson method, :cite:`Strunk1979`, for a solution
+        to the linear system of equations.
+
+        """
         self._check_boundaries()
         west = self._west
         east = self._east
@@ -1517,7 +1686,12 @@ class Flow1DFE:
     def solve(self, dt=0.001, dt_min=1e-5, dt_max=0.5, end_time=1, maxiter=500,
               dtitlow=1.5, dtithigh=0.5, itermin=5, itermax=10, threshold=1e-3,
               verbosity=True):
-        """ solve the system for a given period of time """
+        """ solve the system for a given period of time 
+
+        Combination of sequential calls to :py:meth:`~dt_solve`. This is the
+        outer loop that progresses the model over time.
+
+        """
 
         solved_objs = [deepcopy(self)]
         time_data = [0]
@@ -1620,53 +1794,53 @@ class Flow1DFE:
         and spatial fluxes.
 
         .. math::
-            F_{external} = \\sum_{j=1}^{n} F_{p_j} +
-            \\sum_{j=1}^{m} F_{s_j}
+            F_{external} = \\sum_{j=1}^{n} S_{j} + \\sum_{k=1}^{m} P{j}
 
-        The calculation of the point flux, :math:`F_{p_j}`, depends on its
-        nature. If the point flux depends on position only, the accumulation is
-        straightforward. When the point flux is dependend on the state of the
+        The calculation of the pointflux, :math:`P_{k}`, depends on its
+        nature. If the pointflux depends on position only, the accumulation is
+        straightforward. When the pointflux is dependent on the state of the
         the system, the distribution towards the surrounding nodes needs to be
-        calculated before values can be accumulated to its total. The
-        distribution to the nearest nodes is calculated as follows:
+        calculated before values can be accumulated. The distribution to the
+        nearest nodes is calculated as follows:
 
         .. math::
-            node_{i} = F_{p_j}(s) * lfac
+            node_{i} = P_{k}(s) * lfac
 
         .. math::
-            node_{i+1} = F_{p_j}(s) * rfac
+            node_{i+1} = P_{k}(s) * rfac
 
-        where :math:`s` equals the state at the position of the point flux
-        which is calculated by linear interpolation. The calculation of the
-        fractions, that distribute the flux, :math:`rfac` and :math:`lfac`
-        are described in :py:meth:`~add_pointflux`.
+        where :math:`s` equals the state at the position of the pointflux
+        which is calculated by linear interpolation between the nearest nodes.
+        The calculation of the fractions, that distribute the flux,
+        :math:`rfac` and :math:`lfac` are described in
+        :py:meth:`~add_pointflux`.
 
-        For the calculation of the spatial flux, :math:`F_{s_j}`, a similar
+        For the calculation of the spatial flux, :math:`S_{j}`, a similar
         distinction exists. If the spatial flux is not dependend on state,
         straightforward addition takes place. When there is a state
         dependency, distributions towards the nodes is calculated as
         described in :py:meth:`~_internal_forcing` where
-        :math:`F_{s_j}(x, s)` is substituted for the :py:attr:`~systemfluxfunc`
+        :math:`S_{j}(x, s)` is substituted for the :py:attr:`~systemfluxfunc`
         :math:`Q(x, s, grad)`. This calculation accounts for the selected
         :py:attr:`~gauss_degree` and the state argument :math:`s` is linearly
         interpolated between the neareast nodes.
 
-        The internal forcing in the water balance is the sum of the internal
+        The total forcing in the water balance is the sum of the internal
         forcing as described in :py:meth:`~_internal_forcing` and the external
         forcing.
 
         .. math::
-            F_{total\_internal} = F_{internal} + F_{external}
+            F_{total} = F_{internal} + F_{external}
 
-        The top and bottom values in :math:`F_{total\_internal}` are corrected
+        The top and bottom values in :math:`F_{total}` are corrected
         for the flow over the boundaries. The flow over the boundaries is
-        calculated as the difference of :math:`F_{total\_internal}` -
+        calculated as the difference of :math:`F_{total}` -
         :math:`\\Delta s` at those boundary nodes.
 
         The net flux is calculated as follows:
 
         .. math::
-            F_{net} = F_{total\_internal} - \\Delta s
+            F_{net} = F_{total} - \\Delta s
 
         Where :math:`\\Delta s` represents the storage change between
         iterations at every node in the domain.

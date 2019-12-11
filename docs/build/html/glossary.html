@@ -38,7 +38,6 @@
   <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Bibliography" href="bibliography.html" />
     <link rel="prev" title="waterflow.utility package" href="waterflow.utility.html" /> 
 </head>
 
@@ -90,7 +89,6 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="modules.html">flow</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Symbol Glossary</a></li>
-<li class="toctree-l1"><a class="reference internal" href="bibliography.html">Bibliography</a></li>
 </ul>
 
             
@@ -176,17 +174,19 @@
 </dd>
 <dt id="term-p"><img class="math" src="_images/math/c2aa3dff9bffb099e9dff196fd36aed56ec16baf.png" alt="P"/></dt><dd><p>Positional and state dependent forcing function.</p>
 </dd>
-<dt id="term-delta-s"><img class="math" src="_images/math/82f8146372613edd07fa9be8b9227bdde1c42ac4.png" alt="\Delta s"/></dt><dd><p>Storage change.</p>
+<dt id="term-delta-s"><img class="math" src="_images/math/82f8146372613edd07fa9be8b9227bdde1c42ac4.png" alt="\Delta s"/></dt><dd><p>Storage change w.r.t. previous time step. Matrix of dimension <img class="math" src="_images/math/12617a66745b1b5f689f3a466529a4c201e26bac.png" alt="[1 \times N]"/>.</p>
 </dd>
-<dt id="term-f-external"><img class="math" src="_images/math/6fd2860318fa09d7c44f574ad52a40cdf7ba79cf.png" alt="F_{external}"/></dt><dd><p>All point and spatial fluxes.</p>
+<dt id="term-f-external"><img class="math" src="_images/math/6fd2860318fa09d7c44f574ad52a40cdf7ba79cf.png" alt="F_{external}"/></dt><dd><p>Accumulation of all point and spatial fluxes. Matrix of dimension <img class="math" src="_images/math/12617a66745b1b5f689f3a466529a4c201e26bac.png" alt="[1 \times N]"/>.</p>
 </dd>
-<dt id="term-f-internal"><img class="math" src="_images/math/a63b15b3f47108102dc35d041637fc9ef296a36e.png" alt="F_{internal}"/></dt><dd><p>Internal fluxes in the system.</p>
+<dt id="term-f-internal"><img class="math" src="_images/math/a63b15b3f47108102dc35d041637fc9ef296a36e.png" alt="F_{internal}"/></dt><dd><p>Internal fluxes in the system. Matrix of dimension <img class="math" src="_images/math/12617a66745b1b5f689f3a466529a4c201e26bac.png" alt="[1 \times N]"/>.</p>
 </dd>
-<dt id="term-f-total"><img class="math" src="_images/math/6cd6e92096aed06aa0087092dc1082f3b9fe79eb.png" alt="F_{total}"/></dt><dd><p><img class="math" src="_images/math/bc727d7094f2581d7400e1a3279005246ceb617b.png" alt="F_{internal} + F{external}"/>, sum of all forcing fluxes.</p>
+<dt id="term-f-total"><img class="math" src="_images/math/6cd6e92096aed06aa0087092dc1082f3b9fe79eb.png" alt="F_{total}"/></dt><dd><p><img class="math" src="_images/math/a950cb3e1a4ac56b8681e8f4cb16a5ea42cd7f66.png" alt="F_{internal} + F_{external}"/>, sum of all forcing fluxes, <strong>excluding</strong> the storage change forcing.</p>
 </dd>
 <dt id="term-f-net"><img class="math" src="_images/math/229447d2d62ba1c223ee2b0cab96ce793aaf5d83.png" alt="F_{net}"/></dt><dd><p><img class="math" src="_images/math/0e3410f42d41be9d924f999f150cd9fc5fb786b7.png" alt="F_{total} - \Delta s"/>, net fluxes in the system.</p>
 </dd>
-<dt id="term-a"><img class="math" src="_images/math/211284f68205c3e66773eaf026f32a0acdd3dfb3.png" alt="A"/></dt><dd><p>Sum of all jacobian matrices.</p>
+<dt id="term-f-forcing"><img class="math" src="_images/math/07c2fe8b2af4295e3e38a3db73d25cb3d556481c.png" alt="F_{forcing}"/></dt><dd><p><img class="math" src="_images/math/a950cb3e1a4ac56b8681e8f4cb16a5ea42cd7f66.png" alt="F_{internal} + F_{external}"/>, sum of all forcing fluxes, <strong>including</strong> the storage change forcing.</p>
+</dd>
+<dt id="term-a"><img class="math" src="_images/math/211284f68205c3e66773eaf026f32a0acdd3dfb3.png" alt="A"/></dt><dd><p><img class="math" src="_images/math/37ee300ba3c36bf541e186bc3d0f0711239ba4f5.png" alt="A = A_{sys} + A_{spat} + A_{point}"/>, sum of all jacobian matrices. Matrix of dimension <img class="math" src="_images/math/12617a66745b1b5f689f3a466529a4c201e26bac.png" alt="[1 \times N]"/>.</p>
 </dd>
 <dt id="term-a-sys"><img class="math" src="_images/math/8cd2b1f5dce2b3c2ead0dc1e50cbb896ebcb5cff.png" alt="A_{sys}"/></dt><dd><p>Jacobian system flux function.</p>
 </dd>
@@ -234,8 +234,6 @@
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="bibliography.html" class="btn btn-neutral float-right" title="Bibliography" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="waterflow.utility.html" class="btn btn-neutral float-left" title="waterflow.utility package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
