@@ -52,15 +52,15 @@ class Flow1DFE:
     states : `numpy.ndarray`
         State solutions at the nodal positions as defined in :py:attr:`~nodes`.
 
-    nframe : `numpy.ndarray`
-        Two dimensional array that contains the midpoints and the lengths of
-        the nodal discretization in its columns respectively.
+    seg_lengths : `numpy.ndarray`
+        Lengths of segments between the nodes in the shape
+        :math:`[1 \\times N - 1]`.
 
     lengths : `numpy.ndarray`
-        The same data as in the seconds column of :py:attr:`~nframe` but
-        in a different representation. This representation has the same length
-        as :py:attr:`~nodes` which is more convenient for certain forcing
-        calculations at the nodal positions.
+        The same data as in :py:attr:`~seg_lengths` but in a different
+        representation. This representation has the shape
+        :math:`[1 \\times N]`. This is more convenient for static
+        state independent spatial forcing calculations.
 
     coefmatr : `numpy.ndarray`
         Square jacobian matrix used in the finite elements solution procedure.
@@ -73,14 +73,20 @@ class Flow1DFE:
 
         * (boundary_condition_value, type, domain_index).
 
-    spatflux : `dict`
-        Contains the spatial fluxes on the model domain. # !! explain form
-
     pointflux : `dict`
-        Contains the point fluxes on the model domain. # !! explain form
+        Contains the scalar point fluxes on the model domain. The key : value
+        pairs in the dictionary have the following format:
+
+            'Flux name' : [:math:`F` of shape :math:`[1 \\times N]`]
 
     Spointflux : `dict`
-        Contains state dependent point fluxes on the model domain. # !! explain form
+        Contains state dependent point flux functions on the model domain. The
+        key : value pairs in the dictionary have the following format:
+
+            'Flux name' : [(:math:`func`, (:math:`node_{l}`, :math:`node_{r}`, :math:`lfac`, :math:`rfac`)), :math:`F` of shape :math:`[1 \\times N]`]
+
+    spatflux : `dict`
+        Contains the spatial fluxes on the model domain. # !! explain form
 
     Sspatialflux : `dict`
         Contains state dependent spatial fluxes on the model domain. # !! explain form
@@ -212,7 +218,7 @@ class Flow1DFE:
         self.systemfluxfunc = None
         self.nodes = None
         self.states = None
-        self.nframe = None
+        self.seg_lenghts = None
         self.lengths = None
         self.coefmatr = None
         self.BCs = {}
@@ -589,7 +595,7 @@ class Flow1DFE:
         pos, weight = self.gaussquad
         f = [0.0 for x in range(len(self.nodes))]
         for i in range(len(self.nodes) - 1):
-            L = self.nframe[i, 1]
+            L = self.seg_lengths[i]
             for idx in range(len(pos)):
                 x = self.xintegration[i][idx]
                 s = self.states[i] * pos[-idx-1] + self.states[i+1] * pos[idx]
@@ -629,7 +635,7 @@ class Flow1DFE:
             f = [0.0 for x in range(len(self.nodes))]
             Sfunc = self.Sspatflux[key][0]
             for i in range(len(self.nodes) - 1):
-                L = self.nframe[i, 1]
+                L = self.seg_lengths[i]
                 for idx in range(len(pos)):
                     x = self.xintegration[i][idx]
                     ds = self.states[i+1] - self.states[i]
@@ -844,51 +850,69 @@ class Flow1DFE:
             self._update_storage_change(self.states_to_function(), dt=1)
 
     def _FE_precalc(self):
-        """ Discretization dependent finite element scheme properties
+        """ Discretization lengths
 
-        Calculate the values for :py:attr:`~nframe` and :py:attr:`~lengths`.
+        Calculate the values for :py:attr:`~seg_lengths` and
+        :py:attr:`~lengths`.
 
         Notes
         -----
-
-        .. math::
-            x_{i+\\frac{1}{2}} = \\frac{x_{i} + x_{i+1}}{2} \\text{ for } i=1,2,\\dotsc,N-1
+        The lengths of the segments between the nodes are calculated a follows.
+        The number of segments is always one less than the number of nodes in
+        the system.
 
         .. math::
             L_{i} = x_{i+1} - x_{i} \\text{ for } i=1,2,\\dotsc,N-1
 
+        To assign a length to every node in the system, a different approach
+        has been used. Except for the boundary cases, the differences of the
+        midpoints between the nodes has been taken as a segment length. See the
+        exact definition:
+
         .. math::
-            lengths_{i} =
+            nL_{i} =
                 \\begin{cases}
                 \\frac{x_{i}+x_{i+1}}{2} - x_{i}                  & \\text{ for } i=1 \\\\
-                \\frac{x_{i+1}+x_{i-1}}{2}                & \\text{ for } i=2,3,\\dotsc,N-1 \\\\
-                x_{i}-\\frac{x_{i-1}+x_{i}}{2}                  & \\text{ for } i=N
+                \\frac{x_{i+1}-x_{i-1}}{2}                        & \\text{ for } i=2,3,\\dotsc,N-1 \\\\
+                x_{i}-\\frac{x_{i-1}+x_{i}}{2}                    & \\text{ for } i=N
                 \\end{cases}
+
+        Multiplication of :math:`nL_{i}` with scalar or sequence like
+        spatial fluxes results in a forcing array that has the shape
+        :math:`[1 \\times N]` which is convenient for direct addition to the
+        global :math:`F_{forcing}` matrix.
 
         Examples
         --------
-        pass
+
+        >>> from waterflow.flow1d.flowFE1d import Flow1DFE
+        >>> FE = Flow1DFE("Flow equations")
+        >>> # FE_precalc() is called implicitly by set_field1d()
+        >>> FE.set_field1d((-10, 0, 11))
+        >>> FE.seg_lengths
+        array([1., 1., 1., 1., 1., 1., 1., 1., 1., 1.])
+        >>> FE.lengths
+        array([0.5, 1. , 1. , 1. , 1. , 1. , 1. , 1. , 1. , 1. , 0.5])
 
         """
-        nodes = self.nodes
-        middle = []
-        nodal_distances = []
+        slen = np.repeat(0.0, len(self.nodes) - 1)
+        nlen = np.repeat(0.0, len(self.nodes))
 
-        # calculate positions of midpoints and nodal distances
-        for i in range(0, len(nodes) - 1):
-            middle.append((nodes[i] + nodes[i+1]) / 2)
-            nodal_distances.append(nodes[i+1] - nodes[i])
+        # calculate both arrays in one loop & catch boundary cases
+        for i in range(len(self.nodes)):
+            if i == 0:
+                nlen[i] = (self.nodes[i] + self.nodes[i+1]) / 2 - self.nodes[i]
+            elif i == len(self.nodes) - 1:
+                nlen[i] = self.nodes[i] - (self.nodes[i-1] + self.nodes[i]) / 2
+            else:
+                nlen[i] = (self.nodes[i+1] - self.nodes[i-1]) / 2
 
-        # calculate the length of each 1d finite element
-        length = []
-        length.append(middle[0] - nodes[0])
-        for i in range(1, len(nodes) - 1):
-            length.append(middle[i] - middle[i-1])
-        length.append(nodes[-1] - middle[-1])
+            if i != len(self.nodes) - 1:
+                slen[i] = self.nodes[i+1] - self.nodes[i]
 
         # assign to class attributes
-        self.nframe = np.array(list((zip(middle, nodal_distances))))
-        self.lengths = np.array(length)
+        self.seg_lengths = slen
+        self.lengths = nlen
 
     def _CMAT(self, nodes, states):
         """ Build the jacobian matrix
@@ -1417,17 +1441,77 @@ class Flow1DFE:
     def add_pointflux(self, rate, pos, name=None):
         """ Add a pointflux to the system
 
+        Pointflux values and pointflux functions are accepted. Multiple
+        point fluxes can be combined in a list. Scalar pointflux values
+        are accumulated to its local matrix :math:`F` at the correct indices.
+        The state dependent pointflux functions are prepared and saved for
+        calculation in a context where :math:`s` is available.
 
         Parameters
         ----------
+        rate : `float`, `int`, `list` or `func`
+            *   Scalar pointflux value(s)
+            *   Pointflux function(s) of the form :math:`P(s)`.
+        pos : `float`, `int` or `list`
+            Position(s) of the pointflux value(s)/function(s)
+        name : `str`, default is None
+            Name of the pointflux. If omitted, a unique key is
+            generated or rate.__name__ is used in case of a
+            function argument.
 
         Notes
         -----
-        Describe the calculation of :math:`rfac` and :math:`lfac` here.
+        :math:`node_{r}` is the index of the right node that is nearest
+        the position of the pointflux and is calculated by
+        :py:meth:`~numpy.searchsorted`. :math:`node_{l} = node_{r} - 1`,
+        which is the left node that is most near the position of the pointflux.
+
+        :math:`lfac` and :math:`rfac` represent the fractions of the pointflux
+        that contribute to the nearest left and right node repectively.
+
+        .. math::
+            lfac = 1 - (pos - x_{node_{l}}) / (x_{node_{r}} - x_{node_{l}})
+
+        .. math::
+            rfac = 1 - lfac
+
+        In case of a scalar pointflux the distributed values are assigned to
+        its local forcing array at the correct nodal positions and saved in
+        :py:attr:`~pointflux`. See the formulas below:
+
+        .. math::
+            F_{node_{l}} = rate * lfac
+
+        .. math::
+            F_{node_{r}} = rate * rfac
+
+        For the state dependent pointflux function the calculated values of
+        :math:`node_{l}`, :math:`node_{r}`, :math:`lfac`, and :math:`rfac` are
+        saved in :py:attr:`~Spointflux` in addition to the state dependent
+        pointflux function itself and an empty local forcing array :math:`F`.
+
+        .. warning::
+            Multiple functions, unlike scalar point fluxes, should be
+            implemented separately and cannot be combined in a list argument.
 
         Examples
         --------
+        >>> from waterflow.flow1d.flowFE1d import Flow1DFE
+        >>> FE = Flow1DFE("Point fluxes")
+        >>> FE.set_field1d((-10, 0, 11))
 
+        >>> # Add a scalar pointflux
+        >>> FE.add_pointflux(-0.003, -5.5, 'pflux')
+        >>> FE.pointflux
+        {'pflux': [array([ 0.    ,  0.    ,  0.    ,  0.    , -0.0015, -0.0015,  0.    ,
+                0.    ,  0.    ,  0.    ,  0.    ])]}
+
+        >>> # Define a state dependent point flux function
+        >>> def Spflux(s):
+        ...     return abs(np.sin(s)) * -0.1
+        >>> FE.add_pointflux(Spflux, -3.1)
+        >>> FE.Spointflux #doctest: +ELLIPSIS
+        {'Spflux': [(<function Spflux at 0x...>, (6, 7, 0.10000000000000009, 0.8999999999999999)), array([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.])]}
 
         """
         f = [x*0.0 for x in range(len(self.nodes))]
@@ -1508,7 +1592,7 @@ class Flow1DFE:
                     pos, weight = self.gaussquad
                     for i in range(len(self.nodes) - 1):
                         # distance between nodes
-                        L = self.nframe[i, 1]
+                        L = self.seg_lengths[i]
                         for idx in range(len(pos)):
                             x = self.xintegration[i][idx]
                             # to left node (no pos negatives?)
@@ -1946,7 +2030,7 @@ class Flow1DFE:
                 f = [0.0 for x in range(len(self.nodes))]
                 Sfunc = self.Sspatflux[key][0]
                 for i in range(len(self.nodes) - 1):
-                    L = self.nframe[i, 1]
+                    L = self.seg_lengths[i]
                     for idx in range(len(pos)):
                         x = self.xintegration[i][idx]
                         ds = self.states[i+1] - self.states[i]

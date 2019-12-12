@@ -158,7 +158,11 @@
 <dl class="glossary simple">
 <dt id="term-n"><img class="math" src="_images/math/3bfb3a64189a14b2704f4610827762d5e3145114.png" alt="N"/></dt><dd><p>Total number of nodes.</p>
 </dd>
-<dt id="term-l"><img class="math" src="_images/math/19eef1966f7c545af3ac8c0fa486974d873e3c65.png" alt="L"/></dt><dd><p>Length of segment between two nodes.</p>
+<dt id="term-l"><img class="math" src="_images/math/19eef1966f7c545af3ac8c0fa486974d873e3c65.png" alt="L"/></dt><dd><p>Lengths of segments between the nodes in the shape <img class="math" src="_images/math/8352963b428c449130710d8c0c9efa6fc9f3e7f8.png" alt="[1 \times N - 1]"/>.
+See <a class="reference internal" href="waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE._FE_precalc" title="waterflow.flow1d.flowFE1d.Flow1DFE._FE_precalc"><code class="xref py py-meth docutils literal notranslate"><span class="pre">_FE_precalc()</span></code></a> for the exact definition.</p>
+</dd>
+<dt id="term-nl"><img class="math" src="_images/math/af67d7c701f81fefc5046bb1ff7877c0c5832dd1.png" alt="nL"/></dt><dd><p>Segment lengths in the shape <img class="math" src="_images/math/12617a66745b1b5f689f3a466529a4c201e26bac.png" alt="[1 \times N]"/>. See
+See <a class="reference internal" href="waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE._FE_precalc" title="waterflow.flow1d.flowFE1d.Flow1DFE._FE_precalc"><code class="xref py py-meth docutils literal notranslate"><span class="pre">_FE_precalc()</span></code></a> for the exact definition.</p>
 </dd>
 <dt id="term-x"><img class="math" src="_images/math/888f7c323ac0341871e867220ae2d76467d74d6e.png" alt="x"/></dt><dd><p>Position.</p>
 </dd>
@@ -184,7 +188,7 @@
 </dd>
 <dt id="term-f-net"><img class="math" src="_images/math/229447d2d62ba1c223ee2b0cab96ce793aaf5d83.png" alt="F_{net}"/></dt><dd><p><img class="math" src="_images/math/0e3410f42d41be9d924f999f150cd9fc5fb786b7.png" alt="F_{total} - \Delta s"/>, net fluxes in the system.</p>
 </dd>
-<dt id="term-f-forcing"><img class="math" src="_images/math/07c2fe8b2af4295e3e38a3db73d25cb3d556481c.png" alt="F_{forcing}"/></dt><dd><p><img class="math" src="_images/math/a950cb3e1a4ac56b8681e8f4cb16a5ea42cd7f66.png" alt="F_{internal} + F_{external}"/>, sum of all forcing fluxes, <strong>including</strong> the storage change forcing.</p>
+<dt id="term-f-forcing"><img class="math" src="_images/math/07c2fe8b2af4295e3e38a3db73d25cb3d556481c.png" alt="F_{forcing}"/></dt><dd><p><img class="math" src="_images/math/a950cb3e1a4ac56b8681e8f4cb16a5ea42cd7f66.png" alt="F_{internal} + F_{external}"/>, global sum of all forcing fluxes, <strong>including</strong> the storage change forcing.</p>
 </dd>
 <dt id="term-a"><img class="math" src="_images/math/211284f68205c3e66773eaf026f32a0acdd3dfb3.png" alt="A"/></dt><dd><p><img class="math" src="_images/math/37ee300ba3c36bf541e186bc3d0f0711239ba4f5.png" alt="A = A_{sys} + A_{spat} + A_{point}"/>, sum of all jacobian matrices. Matrix of dimension <img class="math" src="_images/math/12617a66745b1b5f689f3a466529a4c201e26bac.png" alt="[1 \times N]"/>.</p>
 </dd>

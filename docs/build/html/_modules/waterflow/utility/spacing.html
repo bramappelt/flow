@@ -1,0 +1,485 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>waterflow.utility.spacing &mdash; Flow v1.0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../../_static/drop.bmp"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Flow
+          
+
+          
+            
+            <img src="../../../_static/drop.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">flow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../glossary.html">Symbol Glossary</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Flow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>waterflow.utility.spacing</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for waterflow.utility.spacing</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39; This package contains functions for the generation of nodal</span>
+<span class="sd">distributions &#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<div class="viewcode-block" id="spacing"><a class="viewcode-back" href="../../../waterflow.utility.html#waterflow.utility.spacing.spacing">[docs]</a><span class="k">def</span> <span class="nf">spacing</span><span class="p">(</span><span class="n">nx</span><span class="p">,</span> <span class="n">Lx</span><span class="p">,</span> <span class="n">ny</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">Ly</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">linear</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">power</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; One and two dimensional nodal spacing function.</span>
+
+<span class="sd">    Return two arrays that contain a discretization which may be focussed on</span>
+<span class="sd">    selected locations.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nx : :obj:`int`</span>
+<span class="sd">        Number of nodes in the x-direction.</span>
+<span class="sd">    Lx : :obj:`int` of :obj:`float`</span>
+<span class="sd">        Total length in the x-direction.</span>
+<span class="sd">    ny : :obj:`int`</span>
+<span class="sd">        Number of nodes in the y-direction.</span>
+<span class="sd">    Ly: :obj:`int` of :obj:`float`</span>
+<span class="sd">        Total length in the y-direction.</span>
+<span class="sd">    linear : :obj:`bool`, default is True</span>
+<span class="sd">        Distinguish between linear and non-linear nodal distributions.</span>
+<span class="sd">    loc : :obj:`list`, default is None</span>
+<span class="sd">        A list of nodes or coördinate tuples on which to concentrate nodal</span>
+<span class="sd">        discretization.</span>
+<span class="sd">    power : :obj:`int`, default is None</span>
+<span class="sd">        The number of nodes that are influenced by the nodal concentrations</span>
+<span class="sd">        given at the `loc` parameter.</span>
+<span class="sd">    weight : :obj:`int` of :obj:`float`</span>
+<span class="sd">        The degree of nodal concentration around a given `loc`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    x-dim : numpy.ndarray</span>
+<span class="sd">        Numpy Array that contains nodal positions in the x-direction.</span>
+<span class="sd">    y-dim : numpy.ndarray</span>
+<span class="sd">        Numpy Array that contains nodal positions in the y-direction.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Make sure that the `power` argument does not collide with</span>
+<span class="sd">    adjacent nodes or boundary nodes that define the domain.</span>
+<span class="sd">    Improper use will result in wrongly defined domains.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    One dimensional linear example</span>
+
+<span class="sd">    &gt;&gt;&gt; nx, Lx = (11, 10)</span>
+<span class="sd">    &gt;&gt;&gt; x, _ = spacing(nx, Lx)</span>
+<span class="sd">    &gt;&gt;&gt; x</span>
+<span class="sd">    array([ 0.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9., 10.])</span>
+
+<span class="sd">    One dimensional non-linear example, 1 node around the locations of</span>
+<span class="sd">    interest are influenced by a factor weight</span>
+
+<span class="sd">    &gt;&gt;&gt; x, _ = spacing(nx, Lx, linear=False, loc=[4, 7], power=1, weight=3)</span>
+<span class="sd">    &gt;&gt;&gt; x</span>
+<span class="sd">    array([ 0.        ,  1.22222222,  2.44444444,  3.66666667,  4.        ,</span>
+<span class="sd">            4.33333333,  6.66666667,  7.        ,  7.33333333,  8.66666667,</span>
+<span class="sd">           10.        ])</span>
+
+<span class="sd">    .. plot::</span>
+
+<span class="sd">        import matplotlib.pyplot as plt</span>
+<span class="sd">        from waterflow.utility.spacing import spacing</span>
+
+<span class="sd">        fig, ax = plt.subplots(figsize=(9.0, 2))</span>
+<span class="sd">        fig.suptitle(&#39;Nodal discretization of 1D spacing function&#39;)</span>
+<span class="sd">        x, _ = spacing(10, 10, linear=False, loc=[4, 7], power=1, weight=3)</span>
+<span class="sd">        ax.scatter(x, [0 for i in range(len(x))], marker=&#39;*&#39;, color=&#39;blue&#39;)</span>
+<span class="sd">        ax.set_xlabel(&#39;Distance (x)&#39;)</span>
+<span class="sd">        ax.grid()</span>
+
+<span class="sd">    Two dimensional non-linear example, 2 nodes around the location of interest</span>
+<span class="sd">    are influenced by a factor weight.</span>
+
+<span class="sd">    &gt;&gt;&gt; ny, Ly = (11, 10)</span>
+<span class="sd">    &gt;&gt;&gt; x, y = spacing(nx, Lx, ny, Ly, linear=False, loc=[(4, 5)], power=2, weight=4)</span>
+<span class="sd">    &gt;&gt;&gt; x</span>
+<span class="sd">    array([ 0.      ,  1.65625 ,  3.3125  ,  3.75    ,  4.      ,  4.25    ,</span>
+<span class="sd">            4.6875  ,  6.015625,  7.34375 ,  8.671875, 10.      ])</span>
+<span class="sd">    &gt;&gt;&gt; y</span>
+<span class="sd">    array([ 0.    ,  1.4375,  2.875 ,  4.3125,  4.75  ,  5.    ,  5.25  ,</span>
+<span class="sd">            5.6875,  7.125 ,  8.5625, 10.    ])</span>
+
+<span class="sd">    .. plot::</span>
+
+<span class="sd">        import matplotlib.pyplot as plt</span>
+<span class="sd">        from waterflow.utility.spacing import spacing</span>
+
+<span class="sd">        x, y = spacing(11, 10, 11, 10, linear=False, loc=[(4, 5)], power=2, weight=4)</span>
+
+<span class="sd">        fig, ax = plt.subplots(figsize=(9, 9))</span>
+<span class="sd">        for i in y:</span>
+<span class="sd">            ax.scatter(x, [i for _ in range(len(x))], marker=&#39;*&#39;, color=&#39;blue&#39;)</span>
+
+<span class="sd">        ax.set_title(&#39;Nodal discretization of 2D spacing function&#39;)</span>
+<span class="sd">        ax.set_xlabel(&#39;Distance (x)&#39;)</span>
+<span class="sd">        ax.set_ylabel(&#39;Distance (y)&#39;)</span>
+<span class="sd">        ax.grid()</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">axes_args</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Lx</span><span class="p">,</span> <span class="n">nx</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Ly</span><span class="p">,</span> <span class="n">ny</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">linear</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">axes_args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axes_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># check dimensions</span>
+        <span class="n">loc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">loc</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">loc</span><span class="p">))</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">xloc</span> <span class="o">=</span> <span class="n">loc</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">loc</span><span class="p">)]</span>
+            <span class="n">yloc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">loc</span><span class="p">))</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">xloc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">loc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">][</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">loc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])])</span>
+            <span class="n">yloc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">loc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">][</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">loc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])])</span>
+        <span class="c1"># start populating the axes</span>
+        <span class="n">axes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">nx</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">ny</span><span class="p">)])</span>
+        <span class="k">for</span> <span class="n">iloc</span><span class="p">,</span> <span class="n">loc</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="n">xloc</span><span class="p">,</span> <span class="n">yloc</span><span class="p">]):</span>
+            <span class="c1"># dimension is not calculated if axis is empty</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">loc</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="c1"># select new axis</span>
+            <span class="n">ax_arg</span> <span class="o">=</span> <span class="n">axes_args</span><span class="p">[</span><span class="n">iloc</span><span class="p">]</span>
+            <span class="n">axis</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="n">iloc</span><span class="p">]</span>
+            <span class="c1"># per positions on the axis</span>
+            <span class="k">for</span> <span class="n">pts_i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">loc</span><span class="p">)):</span>
+                <span class="n">p</span> <span class="o">=</span> <span class="n">loc</span><span class="p">[</span><span class="n">pts_i</span><span class="p">]</span>
+                <span class="c1"># add the center starting point</span>
+                <span class="n">axis</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="n">axes_args</span><span class="p">[</span><span class="n">iloc</span><span class="p">][</span><span class="n">p</span><span class="p">]</span>
+                <span class="c1"># continue with populating the other positions in range power</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">power</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="c1"># to right</span>
+                    <span class="n">axis</span><span class="p">[</span><span class="n">p</span><span class="o">+</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">axis</span><span class="p">[</span><span class="n">p</span><span class="o">+</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">ax_arg</span><span class="p">[</span><span class="n">p</span><span class="o">+</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">axis</span><span class="p">[</span><span class="n">p</span><span class="o">+</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">weight</span>
+                    <span class="c1"># to left</span>
+                    <span class="n">axis</span><span class="p">[</span><span class="n">p</span><span class="o">-</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">axis</span><span class="p">[</span><span class="n">p</span><span class="o">-</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">axis</span><span class="p">[</span><span class="n">p</span><span class="o">-</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">ax_arg</span><span class="p">[</span><span class="n">p</span><span class="o">-</span><span class="n">i</span><span class="p">])</span> <span class="o">/</span> <span class="n">weight</span>
+                <span class="c1"># fill axis left of the point to zero with linear distance</span>
+                <span class="k">if</span> <span class="n">pts_i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">fill_left</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">axis</span><span class="p">[</span><span class="n">p</span><span class="o">-</span><span class="n">power</span><span class="p">],</span> <span class="n">p</span> <span class="o">-</span> <span class="n">power</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="n">axis</span><span class="p">[:</span><span class="n">p</span><span class="o">-</span><span class="n">power</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">fill_left</span>
+                <span class="c1"># fill axis left to previous point with linear distance</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">fill_left</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">axis</span><span class="p">[</span><span class="n">loc</span><span class="p">[</span><span class="n">pts_i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">power</span><span class="p">],</span>
+                                            <span class="n">axis</span><span class="p">[</span><span class="n">p</span><span class="o">-</span><span class="n">power</span><span class="p">],</span>
+                                            <span class="p">(</span><span class="n">p</span><span class="o">-</span><span class="n">power</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">loc</span><span class="p">[</span><span class="n">pts_i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">power</span><span class="p">))</span>
+                    <span class="n">axis</span><span class="p">[</span><span class="n">loc</span><span class="p">[</span><span class="n">pts_i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">power</span><span class="p">:</span><span class="n">p</span><span class="o">-</span><span class="n">power</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">fill_left</span>
+            <span class="c1"># fill axis right of the point with linear distance</span>
+            <span class="n">fill_right</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">axis</span><span class="p">[</span><span class="n">p</span><span class="o">+</span><span class="n">power</span><span class="p">],</span>
+                                     <span class="n">ax_arg</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                                     <span class="nb">len</span><span class="p">(</span><span class="n">axis</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">p</span><span class="o">+</span><span class="n">power</span><span class="p">))</span>
+            <span class="n">axis</span><span class="p">[</span><span class="n">p</span><span class="o">+</span><span class="n">power</span><span class="p">:]</span> <span class="o">=</span> <span class="n">fill_right</span>
+            <span class="c1"># reassign axis at which spacing is completed</span>
+            <span class="n">axes</span><span class="p">[</span><span class="n">iloc</span><span class="p">]</span> <span class="o">=</span> <span class="n">axis</span>
+    <span class="k">return</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="biasedspacing"><a class="viewcode-back" href="../../../waterflow.utility.html#waterflow.utility.spacing.biasedspacing">[docs]</a><span class="k">def</span> <span class="nf">biasedspacing</span><span class="p">(</span><span class="n">numnodes</span><span class="p">,</span> <span class="n">power</span><span class="p">,</span> <span class="n">lb</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">rb</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">maxdist</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; One dimensional nodal spacing function</span>
+
+<span class="sd">    Returns an array that contains a biased nodal distribution in</span>
+<span class="sd">    which distances increase from left to right.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    numnodes : :obj:`int`</span>
+<span class="sd">        Total number of nodes that is used for the nodal spacing.</span>
+<span class="sd">    power : :obj:`int` or :obj:`float`</span>
+<span class="sd">        Degree of nodal shifting to the left of the domain.</span>
+<span class="sd">    lb : :obj:`int` or :obj:`float`, default is 0</span>
+<span class="sd">        Left bound of the domain.</span>
+<span class="sd">    rb : :obj:`int` or :obj:`float`, default = 1</span>
+<span class="sd">        Right bound of the domain.</span>
+<span class="sd">    maxdist : :obj:`int` or :obj:`float`, default is None</span>
+<span class="sd">        Maximum distance allowed between two nodes. The value of</span>
+<span class="sd">        the `length` argument should be accounted for if given.</span>
+<span class="sd">    length : :obj:`int` or :obj:`float`, default is 1</span>
+<span class="sd">        Multiplier to scale the nodal positions.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    x-dim : numpy.ndarray</span>
+<span class="sd">        Positions of the nodes.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The nodal discretization is calculated iteratively. Note that</span>
+<span class="sd">    aliases of the function arguments are used.</span>
+
+<span class="sd">    .. centered::</span>
+<span class="sd">            :math:`N = numnodes` ; :math:`p = power` ; :math:`x_{N} = rb`</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">            x_{i + 1} = \\frac{x_{N} - x_{i}}{p * \\left(N - 2 - i\\right)}</span>
+<span class="sd">            \\text{ for } i = 0, 1, \\dots ,N - 1</span>
+
+<span class="sd">    When `maxdist` is given and any of the nodal distances exceed this limit</span>
+<span class="sd">    the nodes are shifted towards the right boundary of the domain until</span>
+<span class="sd">    the `maxdist` condition is met. Shifting occurs proportionally.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Linear spacing with scaling</span>
+
+<span class="sd">    &gt;&gt;&gt; biasedspacing(11, 1, length=10)</span>
+<span class="sd">    array([ 0.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9., 10.])</span>
+
+<span class="sd">    Non-linear spacing without scaling</span>
+
+<span class="sd">    &gt;&gt;&gt; biasedspacing(11, 3)</span>
+<span class="sd">    array([0.        , 0.03703704, 0.07716049, 0.12110523, 0.16993272,</span>
+<span class="sd">           0.22527054, 0.28983133, 0.36873896, 0.47394913, 0.64929942,</span>
+<span class="sd">           1.        ])</span>
+
+<span class="sd">    Non-linear spacing with scaling and custom domain boundaries</span>
+
+<span class="sd">    &gt;&gt;&gt; biasedspacing(11, 2, lb=-1, rb=1, length=10)</span>
+<span class="sd">    array([-10.        ,  -8.88888889,  -7.70833333,  -6.44345238,</span>
+<span class="sd">            -5.07316468,  -3.56584821,  -1.87011719,   0.10823568,</span>
+<span class="sd">             2.58117676,   6.29058838,  10.        ])</span>
+
+<span class="sd">    Non-linear spacing with maximum nodal distance limitation</span>
+
+<span class="sd">    &gt;&gt;&gt; biasedspacing(11, 5, maxdist=0.4, length=2)</span>
+<span class="sd">    array([0.        , 0.04815903, 0.09747244, 0.15250051, 0.21499075,</span>
+<span class="sd">           0.29019617, 0.4       , 0.8       , 1.2       , 1.6       ,</span>
+<span class="sd">           2.        ])</span>
+
+<span class="sd">    .. plot::</span>
+
+<span class="sd">        import matplotlib.pyplot as plt</span>
+<span class="sd">        from waterflow.utility.spacing import spacing, biasedspacing</span>
+
+<span class="sd">        fig, [ax1, ax2] = plt.subplots(figsize=(9, 9), nrows=2, ncols=1, sharex=True)</span>
+<span class="sd">        powers = list(range(1, 7))</span>
+<span class="sd">        maxdists = [0.10 + 0.03 * i for i in range(len(powers))]</span>
+<span class="sd">        for i, j in zip(powers, maxdists):</span>
+<span class="sd">            a1, a2 = biasedspacing(11, i), biasedspacing(11, powers[-1], maxdist=j)</span>
+<span class="sd">            ax1.scatter(a1, [i for _ in range(len(a1))], marker=&#39;*&#39;, color=&#39;blue&#39;)</span>
+<span class="sd">            ax2.scatter(a2, [j for _ in range(len(a2))], marker=&#39;*&#39;, color=&#39;blue&#39;)</span>
+
+<span class="sd">        ax1.set_title(&#39;Nodal discretization of 1D biasedspacing function&#39;)</span>
+<span class="sd">        ax1.set_yticks(powers)</span>
+<span class="sd">        ax1.set_ylabel(&#39;variable power, no maxdist&#39;)</span>
+<span class="sd">        ax1.grid()</span>
+<span class="sd">        ax2.set_yticks(maxdists)</span>
+<span class="sd">        ax2.set_xlabel(&#39;Distance (x)&#39;)</span>
+<span class="sd">        ax2.set_ylabel(f&#39;Variable maxdist, fixed power({powers[-1]})&#39;)</span>
+<span class="sd">        ax2.grid()</span>
+<span class="sd">        plt.show()</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># at least two nodes are needed to define a domain</span>
+    <span class="k">if</span> <span class="n">numnodes</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">lb</span><span class="p">,</span> <span class="n">rb</span><span class="p">])</span> <span class="o">*</span> <span class="n">length</span>
+    <span class="c1"># equal spacing</span>
+    <span class="k">if</span> <span class="n">power</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">lb</span><span class="p">,</span> <span class="n">rb</span><span class="p">,</span> <span class="n">numnodes</span><span class="p">)</span> <span class="o">*</span> <span class="n">length</span>
+
+    <span class="n">arr</span> <span class="o">=</span> <span class="p">[</span><span class="n">lb</span><span class="p">]</span>
+    <span class="c1"># build discretization iteratively</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numnodes</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="p">(</span><span class="n">rb</span> <span class="o">-</span> <span class="n">lb</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">power</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span>
+        <span class="n">arr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="n">arr</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">lb</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">arr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rb</span><span class="p">)</span>
+    <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span> <span class="o">*</span> <span class="n">length</span>
+
+    <span class="c1"># if maxdist is exceeded, shift nodes proportionally</span>
+    <span class="k">if</span> <span class="n">maxdist</span><span class="p">:</span>
+        <span class="n">sign</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">rb</span> <span class="o">-</span> <span class="n">lb</span><span class="p">)</span>
+        <span class="n">fraction_prev</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numnodes</span> <span class="o">-</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="n">idxl</span><span class="p">,</span> <span class="n">idxr</span> <span class="o">=</span> <span class="n">numnodes</span> <span class="o">-</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="n">numnodes</span> <span class="o">-</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">dist</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="n">idxr</span><span class="p">]</span> <span class="o">-</span> <span class="n">arr</span><span class="p">[</span><span class="n">idxl</span><span class="p">])</span>
+            <span class="n">fraction</span> <span class="o">=</span> <span class="p">(</span><span class="n">dist</span> <span class="o">-</span> <span class="n">maxdist</span><span class="p">)</span> <span class="o">/</span> <span class="n">dist</span>
+            <span class="k">if</span> <span class="n">fraction</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">fraction_prev</span> <span class="o">=</span> <span class="n">fraction</span>
+                <span class="n">arr</span><span class="p">[</span><span class="n">idxl</span><span class="p">]</span> <span class="o">+=</span> <span class="n">fraction</span> <span class="o">*</span> <span class="n">dist</span> <span class="o">*</span> <span class="n">sign</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">diff</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="n">idxr</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">arr</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">idxr</span><span class="p">]</span>
+                <span class="n">arr</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">idxr</span><span class="p">]</span> <span class="o">+=</span> <span class="n">diff</span> <span class="o">*</span> <span class="n">fraction_prev</span>
+                <span class="k">break</span>
+    <span class="k">return</span> <span class="n">arr</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">doctest</span>
+    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Bram Berendsen
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

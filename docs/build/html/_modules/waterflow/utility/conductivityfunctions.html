@@ -1,0 +1,306 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>waterflow.utility.conductivityfunctions &mdash; Flow v1.0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../../_static/drop.bmp"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Flow
+          
+
+          
+            
+            <img src="../../../_static/drop.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">flow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../glossary.html">Symbol Glossary</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Flow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>waterflow.utility.conductivityfunctions</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for waterflow.utility.conductivityfunctions</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot; This package contains several conductivity functions</span>
+<span class="sd">and a soil selector function &quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">waterflow</span> <span class="k">import</span> <span class="n">DATA_DIR</span>
+
+
+<div class="viewcode-block" id="soilselector"><a class="viewcode-back" href="../../../waterflow.utility.html#waterflow.utility.conductivityfunctions.soilselector">[docs]</a><span class="k">def</span> <span class="nf">soilselector</span><span class="p">(</span><span class="n">soils</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Select soil(s) from the Staringreeks &quot;&quot;&quot;</span>
+    <span class="n">staringreeks</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_table</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DATA_DIR</span><span class="p">,</span> <span class="s2">&quot;StaringReeks.txt&quot;</span><span class="p">),</span>
+                                 <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">soildata</span> <span class="o">=</span> <span class="n">staringreeks</span><span class="o">.</span><span class="n">iloc</span><span class="p">[[</span><span class="n">s</span><span class="o">-</span><span class="mi">1</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">soils</span><span class="p">]]</span>
+
+    <span class="c1"># useful for a plotting domain</span>
+    <span class="n">minima</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;min&#39;</span><span class="p">,</span> <span class="n">staringreeks</span><span class="o">.</span><span class="n">columns</span><span class="p">)(</span><span class="o">*</span><span class="n">soildata</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
+    <span class="n">maxima</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;max&#39;</span><span class="p">,</span> <span class="n">staringreeks</span><span class="o">.</span><span class="n">columns</span><span class="p">)(</span><span class="o">*</span><span class="n">soildata</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+    <span class="n">extrema</span> <span class="o">=</span> <span class="p">(</span><span class="n">minima</span><span class="p">,</span> <span class="n">maxima</span><span class="p">)</span>
+
+    <span class="c1"># turn row(s) to namedtuple</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">soildata</span><span class="o">.</span><span class="n">itertuples</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;soil&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">rows</span><span class="p">,</span> <span class="n">soildata</span><span class="p">,</span> <span class="n">extrema</span></div>
+
+
+<span class="c1"># Van Genuchten (theta)</span>
+<div class="viewcode-block" id="VG_theta"><a class="viewcode-back" href="../../../waterflow.utility.html#waterflow.utility.conductivityfunctions.VG_theta">[docs]</a><span class="k">def</span> <span class="nf">VG_theta</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">theta_r</span><span class="p">,</span> <span class="n">theta_s</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; h-theta relation as described by Van Genuchten</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        m = 1 - \\frac{1}{n}</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        h(\\theta) = \\left(\\frac{(\\theta_{s} - \\theta_r) /</span>
+<span class="sd">        (\\theta - \\theta_{r})^{\\frac{1}{m}} - 1}</span>
+<span class="sd">        {a^{n}}\\right)^{\\frac{1}{n}}</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="mi">1</span><span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="n">n</span>
+    <span class="n">THETA</span> <span class="o">=</span> <span class="p">(</span><span class="n">theta_s</span> <span class="o">-</span> <span class="n">theta_r</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">theta</span> <span class="o">-</span> <span class="n">theta_r</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">((</span><span class="n">THETA</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">m</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">a</span><span class="o">**</span><span class="n">n</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">n</span><span class="p">)</span></div>
+
+
+<span class="c1"># Van Genuchten (h)</span>
+<div class="viewcode-block" id="VG_pressureh"><a class="viewcode-back" href="../../../waterflow.utility.html#waterflow.utility.conductivityfunctions.VG_pressureh">[docs]</a><span class="k">def</span> <span class="nf">VG_pressureh</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">theta_r</span><span class="p">,</span> <span class="n">theta_s</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; theta-h relation as described by Van Genuchten</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+
+<span class="sd">    .. math ::</span>
+
+<span class="sd">        m = 1-\\frac{1}{n}</span>
+
+<span class="sd">    .. math ::</span>
+
+<span class="sd">            \\theta(h) =</span>
+<span class="sd">        \\begin{cases}</span>
+<span class="sd">            \\theta_{r} + \\frac{\\theta_{s} - \\theta_{r}}{(1+(a*-h)^{n})^m},</span>
+<span class="sd">            &amp; \\text{if } h &lt; 0\\\\</span>
+<span class="sd">            \\theta_s, &amp; \\text{otherwise}</span>
+<span class="sd">        \\end{cases}</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># to theta</span>
+    <span class="k">if</span> <span class="n">h</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">theta_s</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="mi">1</span><span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="n">n</span>
+    <span class="k">return</span> <span class="n">theta_r</span> <span class="o">+</span> <span class="p">(</span><span class="n">theta_s</span><span class="o">-</span><span class="n">theta_r</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="p">(</span><span class="n">a</span><span class="o">*-</span><span class="n">h</span><span class="p">)</span><span class="o">**</span><span class="n">n</span><span class="p">)</span><span class="o">**</span><span class="n">m</span></div>
+
+
+<span class="c1"># Van Genuchten (x, h)</span>
+<div class="viewcode-block" id="VG_conductivity"><a class="viewcode-back" href="../../../waterflow.utility.html#waterflow.utility.conductivityfunctions.VG_conductivity">[docs]</a><span class="k">def</span> <span class="nf">VG_conductivity</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">ksat</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; k-h relation as described by Van Genuchten</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+
+<span class="sd">    .. math ::</span>
+
+<span class="sd">        m = 1 - \\frac{1}{n}</span>
+
+<span class="sd">    .. math ::</span>
+
+<span class="sd">            k(h) =</span>
+<span class="sd">        \\begin{cases}</span>
+<span class="sd">            \\frac{\\left(1 - (a*-h)^{n-1}*(1+(a*-h)^{n})^{-m}\\right)^{2}}</span>
+<span class="sd">            {(1 + (a*-h)^{n})^{\\frac{m}{2}}} * ksat, &amp; \\text{if } h&lt;0\\\\</span>
+<span class="sd">            ksat, &amp; \\text{otherwise}</span>
+<span class="sd">        \\end{cases}</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">h</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ksat</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="mi">1</span><span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="n">n</span>
+    <span class="n">h_up</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="o">-</span><span class="n">h</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="o">-</span><span class="n">h</span><span class="p">)</span><span class="o">**</span><span class="n">n</span><span class="p">)</span><span class="o">**-</span><span class="n">m</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">h_down</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="o">-</span><span class="n">h</span><span class="p">)</span><span class="o">**</span><span class="n">n</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="n">m</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">h_up</span> <span class="o">/</span> <span class="n">h_down</span><span class="p">)</span> <span class="o">*</span> <span class="n">ksat</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="k">pass</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Bram Berendsen
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

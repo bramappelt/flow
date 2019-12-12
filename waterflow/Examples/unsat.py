@@ -45,6 +45,7 @@ FE_ut.add_spatialflux(-0.001, 'extraction')
 
 FE_ut.add_spatialflux(storage_change)
 FE_ut.add_pointflux(Spflux, -3.1)
+FE_ut.add_pointflux(-0.003, -5.5, 'pflux')
 
 
 FE_ut.solve(dt_min=1e-5, dt_max=2, end_time=10, maxiter=500,

@@ -7,7 +7,12 @@ Symbol Glossary
         Total number of nodes.
 
     :math:`L`
-        Length of segment between two nodes.
+        Lengths of segments between the nodes in the shape :math:`[1 \times N - 1]`.
+        See :py:meth:`~waterflow.flow1d.flowFE1d.Flow1DFE._FE_precalc` for the exact definition.
+
+    :math:`nL`
+        Segment lengths in the shape :math:`[1 \times N]`. See
+        See :py:meth:`~waterflow.flow1d.flowFE1d.Flow1DFE._FE_precalc` for the exact definition.
 
     :math:`x`
         Position.
@@ -46,7 +51,7 @@ Symbol Glossary
         :math:`F_{total} - \Delta s`, net fluxes in the system.
 
     :math:`F_{forcing}`
-        :math:`F_{internal} + F_{external}`, sum of all forcing fluxes, **including** the storage change forcing.
+        :math:`F_{internal} + F_{external}`, global sum of all forcing fluxes, **including** the storage change forcing.
 
 
     :math:`A`
