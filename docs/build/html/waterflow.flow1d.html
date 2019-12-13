@@ -329,7 +329,7 @@ pairs in the dictionary have the following format:</p>
 <dd><p>Contains state dependent point flux functions on the model domain. The
 key : value pairs in the dictionary have the following format:</p>
 <blockquote>
-<div><p>‘Flux name’ : [(<img class="math" src="_images/math/697d7344c9274ea0be5abc33120562227f918f24.png" alt="func"/>, (<img class="math" src="_images/math/69ef1c924bcf86682c64b712c0a51a2dc015fa24.png" alt="node_{l}"/>, <img class="math" src="_images/math/2373bbe3b79c85cbb454720d66cd1c1e6e42263d.png" alt="node_{r}"/>, <img class="math" src="_images/math/05f849c308f3b3287a5b63a095df2e3247025c1f.png" alt="lfac"/>, <img class="math" src="_images/math/0ac002b95bdf53f34b0324be11dda0527b39cda1.png" alt="rfac"/>)), <img class="math" src="_images/math/df00656702b70b4b6f7ffbf6a9aa9a334bab1914.png" alt="F"/> of shape <img class="math" src="_images/math/12617a66745b1b5f689f3a466529a4c201e26bac.png" alt="[1 \times N]"/>]]</p>
+<div><p>‘Flux name’ : [(<img class="math" src="_images/math/c2aa3dff9bffb099e9dff196fd36aed56ec16baf.png" alt="P"/>, (<img class="math" src="_images/math/69ef1c924bcf86682c64b712c0a51a2dc015fa24.png" alt="node_{l}"/>, <img class="math" src="_images/math/2373bbe3b79c85cbb454720d66cd1c1e6e42263d.png" alt="node_{r}"/>, <img class="math" src="_images/math/05f849c308f3b3287a5b63a095df2e3247025c1f.png" alt="lfac"/>, <img class="math" src="_images/math/0ac002b95bdf53f34b0324be11dda0527b39cda1.png" alt="rfac"/>)), <img class="math" src="_images/math/df00656702b70b4b6f7ffbf6a9aa9a334bab1914.png" alt="F"/> of shape <img class="math" src="_images/math/12617a66745b1b5f689f3a466529a4c201e26bac.png" alt="[1 \times N]"/>]</p>
 </div></blockquote>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -341,7 +341,12 @@ key : value pairs in the dictionary have the following format:</p>
 <dl class="attribute">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.spatflux">
 <code class="sig-name descname">spatflux</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.spatflux" title="Permalink to this definition">¶</a></dt>
-<dd><p>Contains the spatial fluxes on the model domain. # !! explain form</p>
+<dd><p>Contains the spatial fluxes on the model domain. Either the scalar and
+the calculated position dependent spatial flux function values. The
+key : value pairs in the dictionary have the following format:</p>
+<blockquote>
+<div><p>name : [<img class="math" src="_images/math/df00656702b70b4b6f7ffbf6a9aa9a334bab1914.png" alt="F"/> of shape <img class="math" src="_images/math/12617a66745b1b5f689f3a466529a4c201e26bac.png" alt="[1 \times N]"/>]</p>
+</div></blockquote>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><cite>dict</cite></p>
@@ -350,9 +355,13 @@ key : value pairs in the dictionary have the following format:</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="waterflow.flow1d.flowFE1d.Flow1DFE.Sspatialflux">
-<code class="sig-name descname">Sspatialflux</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.Sspatialflux" title="Permalink to this definition">¶</a></dt>
-<dd><p>Contains state dependent spatial fluxes on the model domain. # !! explain form</p>
+<dt id="waterflow.flow1d.flowFE1d.Flow1DFE.Sspatflux">
+<code class="sig-name descname">Sspatflux</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.Sspatflux" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains state dependent spatial fluxes on the model domain. The key :
+value pairs in the dictionary have the following format:</p>
+<blockquote>
+<div><p>name : [<img class="math" src="_images/math/b988975be41fd13b4d091c10202ba19374643586.png" alt="S"/>, <img class="math" src="_images/math/df00656702b70b4b6f7ffbf6a9aa9a334bab1914.png" alt="F"/> of shape <img class="math" src="_images/math/12617a66745b1b5f689f3a466529a4c201e26bac.png" alt="[1 \times N]"/>]</p>
+</div></blockquote>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><cite>dict</cite></p>
@@ -452,7 +461,7 @@ solved for.</p>
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.solve_data">
 <code class="sig-name descname">solve_data</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.solve_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Holds the solve information of the system including the following
-key-value pairs:</p>
+key : value pairs:</p>
 <ul>
 <li><p>solved_objects - A <cite>list</cite> of Flow1DFE objects at solved time steps.</p></li>
 <li><p>time - A <cite>list</cite> of times at which the model states are calculated.</p></li>
@@ -718,7 +727,7 @@ scheme for the selected degree <img class="math" src="_images/math/65e60d95fc7bc
 <p><span class="eqno">(1)<a class="headerlink" href="#equation-waterflow-flow1d-0" title="Permalink to this equation">¶</a></span><img src="_images/math/72a6e445b022047bd98fe9062df9516053b61c63.png" alt="A = A_{sys} + A_{spat} + A_{point}"/></p>
 </div><ul class="simple">
 <li><p><img class="math" src="_images/math/8cd2b1f5dce2b3c2ead0dc1e50cbb896ebcb5cff.png" alt="A_{sys}"/>, derivatives of the <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.systemfluxfunc" title="waterflow.flow1d.flowFE1d.Flow1DFE.systemfluxfunc"><code class="xref py py-attr docutils literal notranslate"><span class="pre">systemfluxfunc</span></code></a>.</p></li>
-<li><p><img class="math" src="_images/math/2eeefdbab0e80111b8ea826710e919ab469655b2.png" alt="A_{spat}"/>, derivatives of functions in <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.Sspatialflux" title="waterflow.flow1d.flowFE1d.Flow1DFE.Sspatialflux"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Sspatialflux</span></code></a>.</p></li>
+<li><p><img class="math" src="_images/math/2eeefdbab0e80111b8ea826710e919ab469655b2.png" alt="A_{spat}"/>, derivatives of functions in <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.Sspatflux" title="waterflow.flow1d.flowFE1d.Flow1DFE.Sspatflux"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Sspatflux</span></code></a>.</p></li>
 <li><p><img class="math" src="_images/math/dbb4b0a4cbd3282fe3f4bfc0ce9f7875679dac6f.png" alt="A_{point}"/>, derivatives of functions in <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.Spointflux" title="waterflow.flow1d.flowFE1d.Flow1DFE.Spointflux"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Spointflux</span></code></a>.</p></li>
 </ul>
 <p><strong>System’s flow equation jacobian</strong></p>
@@ -1101,7 +1110,7 @@ position <img class="math" src="_images/math/888f7c323ac0341871e867220ae2d76467d
 </dl>
 <p class="rubric">Notes</p>
 <p>The storage change function, if present, is stored in
-<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.Sspatialflux" title="waterflow.flow1d.flowFE1d.Flow1DFE.Sspatialflux"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Sspatialflux</span></code></a>. The calling signature may look as follows:</p>
+<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.Sspatflux" title="waterflow.flow1d.flowFE1d.Flow1DFE.Sspatflux"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Sspatflux</span></code></a>. The calling signature may look as follows:</p>
 <div class="math" id="equation-waterflow-flow1d-19">
 <p><span class="eqno">(20)<a class="headerlink" href="#equation-waterflow-flow1d-19" title="Permalink to this equation">¶</a></span><img src="_images/math/0c898ecabe1b9d5d7532d6781b25558b02f1c4e3.png" alt="storage\_change(x, s, prevstate, dt, fun=lambda\text{ }x: 1, S=1)"/></p>
 </div><p>The <img class="math" src="_images/math/c6c7f8f57be24d933621e654baeaf92418aca986.png" alt="prevstate"/> and <img class="math" src="_images/math/a679bbf1184a6019c0b0085a592d1c7fc64335cf.png" alt="dt"/> argument needs to be updated at
@@ -1205,11 +1214,11 @@ calculation in a context where <img class="math" src="_images/math/106b04b320e75
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rate</strong> (<cite>float</cite>, <cite>int</cite>, <cite>list</cite> or <cite>func</cite>) – <ul>
-<li><p>Scalar pointflux value(s)</p></li>
+<li><p>Scalar pointflux value(s).</p></li>
 <li><p>Pointflux function(s) of the form <img class="math" src="_images/math/730a464377986323b7df85568e8e4ff5fe1e8086.png" alt="P(s)"/>.</p></li>
 </ul>
 </p></li>
-<li><p><strong>pos</strong> (<cite>float</cite>, <cite>int</cite> or <cite>list</cite>) – Position(s) of the pointflux value(s)/function(s)</p></li>
+<li><p><strong>pos</strong> (<cite>float</cite>, <cite>int</cite> or <cite>list</cite>) – Position(s) of the pointflux value(s)/function(s).</p></li>
 <li><p><strong>name</strong> (<cite>str</cite>, default is None) – Name of the pointflux. If omitted, a unique key is
 generated or rate.__name__ is used in case of a
 function argument.</p></li>
@@ -1270,6 +1279,107 @@ implemented separately and cannot be combined in a list argument.</p>
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.add_spatialflux">
 <code class="sig-name descname">add_spatialflux</code><span class="sig-paren">(</span><em class="sig-param">q</em>, <em class="sig-param">name=None</em>, <em class="sig-param">exact=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/flow1d/flowFE1d.html#Flow1DFE.add_spatialflux"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.add_spatialflux" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a spatialflux to the system</p>
+<p>Spatial fluxes of several types are accepted by this method.
+Direct calculation of the forcing values is performed where
+possible. State dependent forcing functions will be
+calculated in a different context. The storage change function
+for the simulation of a transient system should be implemented
+here.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>q</strong> (<cite>int</cite>, <cite>float, `list</cite> or <cite>func</cite>) – <ul>
+<li><p>Scalar spatial flux value applied over the complete domain.</p></li>
+<li><p>Sequence of different spatial flux values for every nodal
+position.</p></li>
+<li><p>Positional and/or state dependent spatial flux function.</p></li>
+<li><p>Storage change function for a transient simulation.</p></li>
+</ul>
+</p></li>
+<li><p><strong>name</strong> (<cite>str</cite>, default is None) – Name of the pointflux. If omitted, a unique key is generated or
+q.__name__ is used in case of a function argument.</p></li>
+<li><p><strong>exact</strong> (<cite>bool</cite>, default is False) – Calculate the exact integral of the spatial forcing function.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>When <code class="docutils literal notranslate"><span class="pre">q</span></code> is a scalar or sequence like argument the forcing array
+is calculated by multiplication with the corrosponding lengths.</p>
+<div class="math" id="equation-waterflow-flow1d-24">
+<p><span class="eqno">(25)<a class="headerlink" href="#equation-waterflow-flow1d-24" title="Permalink to this equation">¶</a></span><img src="_images/math/55686eb0c6e3bb3f2568f94744c957a09e4ff19f.png" alt="F = q * nL"/></p>
+</div><p>If <code class="docutils literal notranslate"><span class="pre">q</span></code> is a function of position, <img class="math" src="_images/math/df28fe4cdf64cf9ccd09192f839c74522ccfea4f.png" alt="S(x)"/>, the flux is
+calculated per segment. Below the exact definition of this calculation
+is presented, taking into account the Gaussian quadrature.
+degree.</p>
+<div class="math" id="equation-waterflow-flow1d-25">
+<p><span class="eqno">(26)<a class="headerlink" href="#equation-waterflow-flow1d-25" title="Permalink to this equation">¶</a></span><img src="_images/math/84b03e1378722b1a2c4819288e5e4335b442320a.png" alt="F_{l_{i}} = \sum_{\lambda =1}^{\Lambda} S(X_{i, \lambda}) * (1-p_{\lambda}) * w_{\lambda} * L_{i}"/></p>
+</div><div class="math" id="equation-waterflow-flow1d-26">
+<p><span class="eqno">(27)<a class="headerlink" href="#equation-waterflow-flow1d-26" title="Permalink to this equation">¶</a></span><img src="_images/math/92308ef77c1b9eb8229fab545b331f1f9a88cfad.png" alt="F_{r_{i}} = \sum_{\lambda =1}^{\Lambda} S(X_{i, \lambda}) * p_{\lambda} * w_{\lambda} * L_{i}"/></p>
+</div><p>After the calculation of the distribution towards the nearest nodes the
+local forcing matrix <img class="math" src="_images/math/df00656702b70b4b6f7ffbf6a9aa9a334bab1914.png" alt="F"/> is populated and the will be saved in
+<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.spatflux" title="waterflow.flow1d.flowFE1d.Flow1DFE.spatflux"><code class="xref py py-attr docutils literal notranslate"><span class="pre">spatflux</span></code></a>.</p>
+<div class="math" id="equation-waterflow-flow1d-27">
+<p><span class="eqno">(28)<a class="headerlink" href="#equation-waterflow-flow1d-27" title="Permalink to this equation">¶</a></span><img src="_images/math/f1f98092a4892f784c25fa688b2a60e97228709e.png" alt="F = \begin{bmatrix}
+        F_{l_{i}}                   \\
+        F_{r_{i}} + F_{l_{i+1}}     \\
+        F_{r_{i+1}} + F_{l_{i+2}}   \\
+        \vdots                     \\
+        F_{r_{N-1}} + F_{l_{N}}     \\
+        F_{r_{N}}
+    \end{bmatrix}"/></p>
+</div><p>Possibility of the <code class="docutils literal notranslate"><span class="pre">exact</span></code> implementation ???</p>
+<p>In the case of <code class="docutils literal notranslate"><span class="pre">q</span></code> being a function of position and state,
+<img class="math" src="_images/math/840152868590975370e620b92e70d94702e19c3c.png" alt="S(x, s)"/>, the function will be assigned to <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.Sspatflux" title="waterflow.flow1d.flowFE1d.Flow1DFE.Sspatflux"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Sspatflux</span></code></a>
+for later processing in a context where <img class="math" src="_images/math/106b04b320e75010b1d8029e59244f234f75e6f9.png" alt="s"/> is available.</p>
+<p><code class="docutils literal notranslate"><span class="pre">q</span></code> can have four arguments, <img class="math" src="_images/math/c0655a6820f7ce7f54ddca21d3f140c16b8d5a61.png" alt="S(x, s, prevstate, dt)"/>. This is
+a special case reserved for the storage change function.
+The function signature may have keyword arguments but they need to
+be optional having a default argument. See a possible definition of
+a storage change function,
+<a class="reference internal" href="waterflow.utility.html#waterflow.utility.fluxfunctions.storage_change" title="waterflow.utility.fluxfunctions.storage_change"><code class="xref py py-func docutils literal notranslate"><span class="pre">storage_change()</span></code></a>, that can
+be used for both saturated and unsaturated conditions depending on its
+default keyword arguments. The storage change function is saved in
+<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.Sspatflux" title="waterflow.flow1d.flowFE1d.Flow1DFE.Sspatflux"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Sspatflux</span></code></a> and will carry the default name ‘storage_change’.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.flow1d.flowFE1d</span> <span class="k">import</span> <span class="n">Flow1DFE</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.fluxfunctions</span> <span class="k">import</span> <span class="n">storage_change</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span> <span class="o">=</span> <span class="n">Flow1DFE</span><span class="p">(</span><span class="s2">&quot;spatial fluxes&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">set_field1d</span><span class="p">((</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">11</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Add a scalar spatialflux</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">add_spatialflux</span><span class="p">(</span><span class="o">-</span><span class="mf">0.001</span><span class="p">,</span> <span class="s1">&#39;Root extraction&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">spatflux</span>
+<span class="go">{&#39;Root extraction&#39;: [array([-0.0005, -0.001 , -0.001 , -0.001 , -0.001 , -0.001 , -0.001 ,</span>
+<span class="go">       -0.001 , -0.001 , -0.001 , -0.0005])]}</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Add position dependent spatial flux function</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">linear_extraction</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="o">-</span><span class="mf">0.001</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">add_spatialflux</span><span class="p">(</span><span class="n">linear_extraction</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">spatflux</span>
+<span class="go">{&#39;Root extraction&#39;: [array([-0.0005, -0.001 , -0.001 , -0.001 , -0.001 , -0.001 , -0.001 ,</span>
+<span class="go">       -0.001 , -0.001 , -0.001 , -0.0005])], &#39;linear_extraction&#39;: [array([-0.00475, -0.009  , -0.008  , -0.007  , -0.006  , -0.005  ,</span>
+<span class="go">       -0.004  , -0.003  , -0.002  , -0.001  , -0.00025])]}</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Add position and state dependent spatial flux function</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">linear_s_extraction</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="o">-</span><span class="mf">0.001</span> <span class="o">*</span> <span class="n">x</span> <span class="o">-</span> <span class="mf">0.001</span> <span class="o">*</span> <span class="n">s</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">add_spatialflux</span><span class="p">(</span><span class="n">linear_s_extraction</span><span class="p">,</span> <span class="s1">&#39;Sfunc&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Note that the local forcing array will always be empty and is only initialized</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">Sspatflux</span> 
+<span class="go">{&#39;Sfunc&#39;: [&lt;function linear_s_extraction at 0x...&gt;, array([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.])]}</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># The storage change function is imported and passed to the model</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># note that the name argument is ignored.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">add_spatialflux</span><span class="p">(</span><span class="n">storage_change</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;My_storage_change&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">Sspatflux</span> 
+<span class="go">{&#39;Sfunc&#39;: [&lt;function linear_s_extraction at 0x...&gt;, array([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.])], &#39;storage_change&#39;: [&lt;function storage_change at 0x...&gt;, array([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.])]}</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="method">
@@ -1291,18 +1401,18 @@ relevant columns, is saved in <a class="reference internal" href="#waterflow.flo
 <p class="rubric">Notes</p>
 <p>The external fluxes, <img class="math" src="_images/math/6fd2860318fa09d7c44f574ad52a40cdf7ba79cf.png" alt="F_{external}"/>, are the sum of all point
 and spatial fluxes.</p>
-<div class="math" id="equation-waterflow-flow1d-24">
-<p><span class="eqno">(25)<a class="headerlink" href="#equation-waterflow-flow1d-24" title="Permalink to this equation">¶</a></span><img src="_images/math/31daa8a6ce96f13bda35b6eb6d484c23f96791cc.png" alt="F_{external} = \sum_{j=1}^{n} S_{j} + \sum_{k=1}^{m} P{j}"/></p>
+<div class="math" id="equation-waterflow-flow1d-28">
+<p><span class="eqno">(29)<a class="headerlink" href="#equation-waterflow-flow1d-28" title="Permalink to this equation">¶</a></span><img src="_images/math/31daa8a6ce96f13bda35b6eb6d484c23f96791cc.png" alt="F_{external} = \sum_{j=1}^{n} S_{j} + \sum_{k=1}^{m} P{j}"/></p>
 </div><p>The calculation of the pointflux, <img class="math" src="_images/math/0f38882f0b64b4e3a80316c7ea2720a1d5957cdb.png" alt="P_{k}"/>, depends on its
 nature. If the pointflux depends on position only, the accumulation is
 straightforward. When the pointflux is dependent on the state of the
 the system, the distribution towards the surrounding nodes needs to be
 calculated before values can be accumulated. The distribution to the
 nearest nodes is calculated as follows:</p>
-<div class="math" id="equation-waterflow-flow1d-25">
-<p><span class="eqno">(26)<a class="headerlink" href="#equation-waterflow-flow1d-25" title="Permalink to this equation">¶</a></span><img src="_images/math/997d071e4a6ce8c0ce31d0a85977b89cd7671549.png" alt="node_{i} = P_{k}(s) * lfac"/></p>
-</div><div class="math" id="equation-waterflow-flow1d-26">
-<p><span class="eqno">(27)<a class="headerlink" href="#equation-waterflow-flow1d-26" title="Permalink to this equation">¶</a></span><img src="_images/math/0c3184561d43fd4e9b095e36f99cd35ee81dadfd.png" alt="node_{i+1} = P_{k}(s) * rfac"/></p>
+<div class="math" id="equation-waterflow-flow1d-29">
+<p><span class="eqno">(30)<a class="headerlink" href="#equation-waterflow-flow1d-29" title="Permalink to this equation">¶</a></span><img src="_images/math/997d071e4a6ce8c0ce31d0a85977b89cd7671549.png" alt="node_{i} = P_{k}(s) * lfac"/></p>
+</div><div class="math" id="equation-waterflow-flow1d-30">
+<p><span class="eqno">(31)<a class="headerlink" href="#equation-waterflow-flow1d-30" title="Permalink to this equation">¶</a></span><img src="_images/math/0c3184561d43fd4e9b095e36f99cd35ee81dadfd.png" alt="node_{i+1} = P_{k}(s) * rfac"/></p>
 </div><p>where <img class="math" src="_images/math/106b04b320e75010b1d8029e59244f234f75e6f9.png" alt="s"/> equals the state at the position of the pointflux
 which is calculated by linear interpolation between the nearest nodes.
 The calculation of the fractions, that distribute the flux,
@@ -1320,15 +1430,15 @@ interpolated between the neareast nodes.</p>
 <p>The total forcing in the water balance is the sum of the internal
 forcing as described in <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE._internal_forcing" title="waterflow.flow1d.flowFE1d.Flow1DFE._internal_forcing"><code class="xref py py-meth docutils literal notranslate"><span class="pre">_internal_forcing()</span></code></a> and the external
 forcing.</p>
-<div class="math" id="equation-waterflow-flow1d-27">
-<p><span class="eqno">(28)<a class="headerlink" href="#equation-waterflow-flow1d-27" title="Permalink to this equation">¶</a></span><img src="_images/math/35b3ad29c7ea6e9817abcf03a869e7556faa1d06.png" alt="F_{total} = F_{internal} + F_{external}"/></p>
+<div class="math" id="equation-waterflow-flow1d-31">
+<p><span class="eqno">(32)<a class="headerlink" href="#equation-waterflow-flow1d-31" title="Permalink to this equation">¶</a></span><img src="_images/math/35b3ad29c7ea6e9817abcf03a869e7556faa1d06.png" alt="F_{total} = F_{internal} + F_{external}"/></p>
 </div><p>The top and bottom values in <img class="math" src="_images/math/6cd6e92096aed06aa0087092dc1082f3b9fe79eb.png" alt="F_{total}"/> are corrected
 for the flow over the boundaries. The flow over the boundaries is
 calculated as the difference of <img class="math" src="_images/math/6cd6e92096aed06aa0087092dc1082f3b9fe79eb.png" alt="F_{total}"/> -
 <img class="math" src="_images/math/82f8146372613edd07fa9be8b9227bdde1c42ac4.png" alt="\Delta s"/> at those boundary nodes.</p>
 <p>The net flux is calculated as follows:</p>
-<div class="math" id="equation-waterflow-flow1d-28">
-<p><span class="eqno">(29)<a class="headerlink" href="#equation-waterflow-flow1d-28" title="Permalink to this equation">¶</a></span><img src="_images/math/f208ed0d9add3b775bd17e9e1989f7ff253fe763.png" alt="F_{net} = F_{total} - \Delta s"/></p>
+<div class="math" id="equation-waterflow-flow1d-32">
+<p><span class="eqno">(33)<a class="headerlink" href="#equation-waterflow-flow1d-32" title="Permalink to this equation">¶</a></span><img src="_images/math/f208ed0d9add3b775bd17e9e1989f7ff253fe763.png" alt="F_{net} = F_{total} - \Delta s"/></p>
 </div><p>Where <img class="math" src="_images/math/82f8146372613edd07fa9be8b9227bdde1c42ac4.png" alt="\Delta s"/> represents the storage change between
 iterations at every node in the domain.</p>
 <div class="admonition note">
@@ -1618,12 +1728,12 @@ calculated and saved in <a class="reference internal" href="#waterflow.flow1d.fl
 <p>The integration points <img class="math" src="_images/math/5741e13b80d552079df6266e844e125454ddc7bb.png" alt="p_{\lambda}"/> for the Gaussian
 quadrature method are obtained by finding the roots of the Legendre
 polynomial of degree <img class="math" src="_images/math/65e60d95fc7bc06725cb967be10982e4bf310122.png" alt="\Lambda"/>.</p>
-<div class="math" id="equation-waterflow-flow1d-29">
-<p><span class="eqno">(30)<a class="headerlink" href="#equation-waterflow-flow1d-29" title="Permalink to this equation">¶</a></span><img src="_images/math/a52ba99d3986691e2aad20e8ccad1d9d7c17db43.png" alt="P_{\Lambda}(p) = \text{Legendre polynomials of degree $\Lambda$}"/></p>
+<div class="math" id="equation-waterflow-flow1d-33">
+<p><span class="eqno">(34)<a class="headerlink" href="#equation-waterflow-flow1d-33" title="Permalink to this equation">¶</a></span><img src="_images/math/a52ba99d3986691e2aad20e8ccad1d9d7c17db43.png" alt="P_{\Lambda}(p) = \text{Legendre polynomials of degree $\Lambda$}"/></p>
 </div><p>The corresponding weights <img class="math" src="_images/math/934e807b3b58e532b5466b277ce06bc330b1594b.png" alt="w_{\lambda}"/> are calculated with the
 following closed form equation.</p>
-<div class="math" id="equation-waterflow-flow1d-30">
-<p><span class="eqno">(31)<a class="headerlink" href="#equation-waterflow-flow1d-30" title="Permalink to this equation">¶</a></span><img src="_images/math/4e3010d8c0c2496f79e1cc6a58332c2d24a634bc.png" alt="w_{\lambda} = \frac{2}{\left(\left(1 - p_{\lambda}^{2}\right) *
+<div class="math" id="equation-waterflow-flow1d-34">
+<p><span class="eqno">(35)<a class="headerlink" href="#equation-waterflow-flow1d-34" title="Permalink to this equation">¶</a></span><img src="_images/math/4e3010d8c0c2496f79e1cc6a58332c2d24a634bc.png" alt="w_{\lambda} = \frac{2}{\left(\left(1 - p_{\lambda}^{2}\right) *
 P_{\Lambda}^{'}(p_{\lambda})^{2}\right)}"/></p>
 </div><p>A full description of the theory behind this Gaussain quadrature method
 is documented in <span class="bibtex" id="id6">[Strunk1979]</span>.</p>

@@ -83,13 +83,20 @@ class Flow1DFE:
         Contains state dependent point flux functions on the model domain. The
         key : value pairs in the dictionary have the following format:
 
-            'Flux name' : [(:math:`func`, (:math:`node_{l}`, :math:`node_{r}`, :math:`lfac`, :math:`rfac`)), :math:`F` of shape :math:`[1 \\times N]`]
+            'Flux name' : [(:math:`P`, (:math:`node_{l}`, :math:`node_{r}`, :math:`lfac`, :math:`rfac`)), :math:`F` of shape :math:`[1 \\times N]`]
 
     spatflux : `dict`
-        Contains the spatial fluxes on the model domain. # !! explain form
+        Contains the spatial fluxes on the model domain. Both the scalar and
+        the calculated position dependent spatial flux function values. The
+        key : value pairs in the dictionary have the following format:
 
-    Sspatialflux : `dict`
-        Contains state dependent spatial fluxes on the model domain. # !! explain form
+            name : [:math:`F` of shape :math:`[1 \\times N]`]
+
+    Sspatflux : `dict`
+        Contains state dependent spatial fluxes on the model domain. The key :
+        value pairs in the dictionary have the following format:
+
+            name : [:math:`S`, :math:`F` of shape :math:`[1 \\times N]`]
 
     internal_forcing : `dict`
         The internal forcing of the system as calculated with
@@ -125,7 +132,7 @@ class Flow1DFE:
 
     solve_data : `dict`
         Holds the solve information of the system including the following
-        key-value pairs:
+        key : value pairs:
 
         * solved_objects - A `list` of Flow1DFE objects at solved time steps.
 
@@ -336,7 +343,7 @@ class Flow1DFE:
         net                1.716294e-12
 
         """
-        # build key-value pairs where data is available
+        # build key : value pairs where data is available
         id_ = f"{self.id_}"
         if self.nodes is not None:
             len_ = str(self.nodes[-1] - self.nodes[0])
@@ -808,7 +815,7 @@ class Flow1DFE:
         Notes
         -----
         The storage change function, if present, is stored in
-        :py:attr:`~Sspatialflux`. The calling signature may look as follows:
+        :py:attr:`~Sspatflux`. The calling signature may look as follows:
 
         ..  math::
             storage\_change(x, s, prevstate, dt, fun=lambda\\text{ }x: 1, S=1)
@@ -936,7 +943,7 @@ class Flow1DFE:
             A = A_{sys} + A_{spat} + A_{point}
 
         * :math:`A_{sys}`, derivatives of the :py:attr:`~systemfluxfunc`.
-        * :math:`A_{spat}`, derivatives of functions in :py:attr:`~Sspatialflux`.
+        * :math:`A_{spat}`, derivatives of functions in :py:attr:`~Sspatflux`.
         * :math:`A_{point}`, derivatives of functions in :py:attr:`~Spointflux`.
 
         **System's flow equation jacobian**
@@ -1450,10 +1457,10 @@ class Flow1DFE:
         Parameters
         ----------
         rate : `float`, `int`, `list` or `func`
-            *   Scalar pointflux value(s)
+            *   Scalar pointflux value(s).
             *   Pointflux function(s) of the form :math:`P(s)`.
         pos : `float`, `int` or `list`
-            Position(s) of the pointflux value(s)/function(s)
+            Position(s) of the pointflux value(s)/function(s).
         name : `str`, default is None
             Name of the pointflux. If omitted, a unique key is
             generated or rate.__name__ is used in case of a
@@ -1557,7 +1564,115 @@ class Flow1DFE:
                                      np.array(f)]
 
     def add_spatialflux(self, q, name=None, exact=False):
-        """ Add a spatialflux to the system """
+        """ Add a spatialflux to the system
+
+        Spatial fluxes of several types are accepted by this method.
+        Direct calculation of the forcing values is performed where
+        possible. State dependent forcing functions will be
+        calculated in a different context. The storage change function
+        for the simulation of a transient system should be implemented
+        here.
+
+        Parameters
+        ----------
+        q : `int`, `float, `list` or `func`
+            * Scalar spatial flux value applied over the complete domain.
+            * Sequence of different spatial flux values for every nodal
+              position.
+            * Positional and/or state dependent spatial flux function.
+            * Storage change function for a transient simulation.
+        name : `str`, default is None
+            Name of the pointflux. If omitted, a unique key is generated or
+            q.__name__ is used in case of a function argument.
+        exact : `bool`, default is False
+            Calculate the exact integral of the spatial forcing function.
+
+        Notes
+        -----
+        When ``q`` is a scalar or sequence like argument the forcing array
+        is calculated by multiplication with the corrosponding lengths.
+
+        .. math::
+            F = q * nL
+
+        If ``q`` is a function of position, :math:`S(x)`, the flux is
+        calculated per segment. Below the exact definition of this calculation
+        is presented, taking into account the Gaussian quadrature.
+        degree.
+
+        .. math::
+            F_{l_{i}} = \\sum_{\\lambda =1}^{\\Lambda} S(X_{i, \\lambda}) * (1-p_{\\lambda}) * w_{\\lambda} * L_{i}
+
+        .. math::
+            F_{r_{i}} = \\sum_{\\lambda =1}^{\\Lambda} S(X_{i, \\lambda}) * p_{\\lambda} * w_{\\lambda} * L_{i}
+
+        After the calculation of the distribution towards the nearest nodes the
+        local forcing matrix :math:`F` is populated and the will be saved in
+        :py:attr:`~spatflux`.
+
+        .. math::
+            F = \\begin{bmatrix}
+                    F_{l_{i}}                   \\\\
+                    F_{r_{i}} + F_{l_{i+1}}     \\\\
+                    F_{r_{i+1}} + F_{l_{i+2}}   \\\\
+                    \\vdots                     \\\\
+                    F_{r_{N-1}} + F_{l_{N}}     \\\\
+                    F_{r_{N}}
+                \\end{bmatrix}
+
+        Possibility of the ``exact`` implementation ???
+
+        In the case of ``q`` being a function of position and state,
+        :math:`S(x, s)`, the function will be assigned to :py:attr:`~Sspatflux`
+        for later processing in a context where :math:`s` is available.
+
+        ``q`` can have four arguments, :math:`S(x, s, prevstate, dt)`. This is
+        a special case reserved for the storage change function.
+        The function signature may have keyword arguments but they need to
+        be optional having a default argument. See a possible definition of
+        a storage change function,
+        :py:func:`~waterflow.utility.fluxfunctions.storage_change`, that can
+        be used for both saturated and unsaturated conditions depending on its
+        default keyword arguments. The storage change function is saved in
+        :py:attr:`~Sspatflux` and will carry the default name 'storage_change'.
+
+        Examples
+        --------
+        >>> from waterflow.flow1d.flowFE1d import Flow1DFE
+        >>> from waterflow.utility.fluxfunctions import storage_change
+        >>> FE = Flow1DFE("spatial fluxes")
+        >>> FE.set_field1d((-10, 0, 11))
+
+        >>> # Add a scalar spatialflux
+        >>> FE.add_spatialflux(-0.001, 'Root extraction')
+        >>> FE.spatflux
+        {'Root extraction': [array([-0.0005, -0.001 , -0.001 , -0.001 , -0.001 , -0.001 , -0.001 ,
+               -0.001 , -0.001 , -0.001 , -0.0005])]}
+
+        >>> # Add position dependent spatial flux function
+        >>> def linear_extraction(x):
+        ...     return -0.001 * abs(x)
+        >>> FE.add_spatialflux(linear_extraction)
+        >>> FE.spatflux
+        {'Root extraction': [array([-0.0005, -0.001 , -0.001 , -0.001 , -0.001 , -0.001 , -0.001 ,
+               -0.001 , -0.001 , -0.001 , -0.0005])], 'linear_extraction': [array([-0.00475, -0.009  , -0.008  , -0.007  , -0.006  , -0.005  ,
+               -0.004  , -0.003  , -0.002  , -0.001  , -0.00025])]}
+
+        >>> # Add position and state dependent spatial flux function
+        >>> def linear_s_extraction(x, s):
+        ...     return -0.001 * x - 0.001 * s
+        >>> FE.add_spatialflux(linear_s_extraction, 'Sfunc')
+        >>> # Note that the local forcing array will always be empty and is only initialized
+        >>> FE.Sspatflux #doctest: +ELLIPSIS
+        {'Sfunc': [<function linear_s_extraction at 0x...>, array([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.])]}
+
+        >>> # The storage change function is imported and passed to the model
+        >>> # note that the name argument is ignored.
+        >>> FE.add_spatialflux(storage_change, name='My_storage_change')
+        >>> FE.Sspatflux #doctest: +ELLIPSIS
+        {'Sfunc': [<function linear_s_extraction at 0x...>, array([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.])], 'storage_change': [<function storage_change at 0x...>, array([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.])]}
+
+        """
         if isinstance(q, int) or isinstance(q, float):
             Q = np.repeat(q, len(self.nodes)).astype(np.float64)
         elif isinstance(q, list) or isinstance(q, np.ndarray):
@@ -1567,12 +1682,11 @@ class Flow1DFE:
 
         if not callable(Q):
             f = Q * self.lengths
-            if name:
-                self.spatflux[name] = [np.array(f)]
-            else:
-                # unique key for unnamed forcing
+
+            if not name:
                 name = str(Time.time())
-                self.spatflux[name] = [np.array(f)]
+
+            self.spatflux[name] = [np.array(f)]
 
         else:
             # prepare a domain spaced and zero-ed array

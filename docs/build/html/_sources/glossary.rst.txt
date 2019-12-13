@@ -14,6 +14,13 @@ Symbol Glossary
         Segment lengths in the shape :math:`[1 \times N]`. See
         See :py:meth:`~waterflow.flow1d.flowFE1d.Flow1DFE._FE_precalc` for the exact definition.
 
+    :math:`node`
+        Index of a specific node in the domain.
+
+    :math:`X`
+        Any of the precalculated absolute Gaussian integration points as saved in
+        :py:attr:`~waterflow.flow1d.flowFE1d.Flow1DFE.xintegration`.
+
     :math:`x`
         Position.
 
@@ -52,7 +59,6 @@ Symbol Glossary
 
     :math:`F_{forcing}`
         :math:`F_{internal} + F_{external}`, global sum of all forcing fluxes, **including** the storage change forcing.
-
 
     :math:`A`
         :math:`A = A_{sys} + A_{spat} + A_{point}`, sum of all jacobian matrices. Matrix of dimension :math:`[1 \times N]`.

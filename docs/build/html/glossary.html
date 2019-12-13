@@ -164,7 +164,12 @@ See <a class="reference internal" href="waterflow.flow1d.html#waterflow.flow1d.f
 <dt id="term-nl"><img class="math" src="_images/math/af67d7c701f81fefc5046bb1ff7877c0c5832dd1.png" alt="nL"/></dt><dd><p>Segment lengths in the shape <img class="math" src="_images/math/12617a66745b1b5f689f3a466529a4c201e26bac.png" alt="[1 \times N]"/>. See
 See <a class="reference internal" href="waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE._FE_precalc" title="waterflow.flow1d.flowFE1d.Flow1DFE._FE_precalc"><code class="xref py py-meth docutils literal notranslate"><span class="pre">_FE_precalc()</span></code></a> for the exact definition.</p>
 </dd>
-<dt id="term-x"><img class="math" src="_images/math/888f7c323ac0341871e867220ae2d76467d74d6e.png" alt="x"/></dt><dd><p>Position.</p>
+<dt id="term-node"><img class="math" src="_images/math/5a11127623a893e4f7406cc4026d0d0a6d0f5600.png" alt="node"/></dt><dd><p>Index of a specific node in the domain.</p>
+</dd>
+<dt id="term-x"><img class="math" src="_images/math/ed38fa24f1c94891bd312012aab3f6673be3eb83.png" alt="X"/></dt><dd><p>Any of the precalculated absolute Gaussian integration points as saved in
+<a class="reference internal" href="waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE.xintegration" title="waterflow.flow1d.flowFE1d.Flow1DFE.xintegration"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xintegration</span></code></a>.</p>
+</dd>
+<dt id="term-0"><img class="math" src="_images/math/888f7c323ac0341871e867220ae2d76467d74d6e.png" alt="x"/></dt><dd><p>Position.</p>
 </dd>
 <dt id="term-s"><img class="math" src="_images/math/106b04b320e75010b1d8029e59244f234f75e6f9.png" alt="s"/></dt><dd><p>State.</p>
 </dd>
@@ -174,7 +179,7 @@ See <a class="reference internal" href="waterflow.flow1d.html#waterflow.flow1d.f
 </dd>
 <dt id="term-q"><img class="math" src="_images/math/90cab5ae70bdb6e45756490226ba488f522c4c4e.png" alt="Q"/></dt><dd><p>System flux function.</p>
 </dd>
-<dt id="term-0"><img class="math" src="_images/math/b988975be41fd13b4d091c10202ba19374643586.png" alt="S"/></dt><dd><p>Spatial and state dependent forcing function.</p>
+<dt id="term-1"><img class="math" src="_images/math/b988975be41fd13b4d091c10202ba19374643586.png" alt="S"/></dt><dd><p>Spatial and state dependent forcing function.</p>
 </dd>
 <dt id="term-p"><img class="math" src="_images/math/c2aa3dff9bffb099e9dff196fd36aed56ec16baf.png" alt="P"/></dt><dd><p>Positional and state dependent forcing function.</p>
 </dd>
@@ -204,7 +209,7 @@ See <a class="reference internal" href="waterflow.flow1d.html#waterflow.flow1d.f
 </dd>
 <dt id="term-k"><img class="math" src="_images/math/9630132210b904754c9ab272b61cb527d12263ca.png" alt="k"/></dt><dd><p>Index of positional state dependent forcing function number <img class="math" src="_images/math/e9bc7da808d33a16a8347f27a519bd067186aa66.png" alt="m"/>.</p>
 </dd>
-<dt id="term-1"><img class="math" src="_images/math/5a939c5280da7202ca4531f175a7780ad5e1f80a.png" alt="n"/></dt><dd><p>Total number of spatial state dependent forcing functions.</p>
+<dt id="term-2"><img class="math" src="_images/math/5a939c5280da7202ca4531f175a7780ad5e1f80a.png" alt="n"/></dt><dd><p>Total number of spatial state dependent forcing functions.</p>
 </dd>
 <dt id="term-m"><img class="math" src="_images/math/e9bc7da808d33a16a8347f27a519bd067186aa66.png" alt="m"/></dt><dd><p>Total number of positional state dependent forcing functions.</p>
 </dd>
@@ -212,11 +217,11 @@ See <a class="reference internal" href="waterflow.flow1d.html#waterflow.flow1d.f
 </dd>
 <dt id="term-lambda"><img class="math" src="_images/math/65e60d95fc7bc06725cb967be10982e4bf310122.png" alt="\Lambda"/></dt><dd><p>Gaussian Quadrature degree.</p>
 </dd>
-<dt id="term-2"><img class="math" src="_images/math/cefc603e5658facb747581f9567192993f21c7ab.png" alt="\lambda"/></dt><dd><p>Index of specific Gaussian quadrature position <img class="math" src="_images/math/141bbefb74014fc5e43499901bf78607ae335583.png" alt="p"/> and weight <img class="math" src="_images/math/cc87ee665749db882f94e0d3707eb23e39638650.png" alt="w"/>.</p>
+<dt id="term-3"><img class="math" src="_images/math/cefc603e5658facb747581f9567192993f21c7ab.png" alt="\lambda"/></dt><dd><p>Index of specific Gaussian quadrature position <img class="math" src="_images/math/141bbefb74014fc5e43499901bf78607ae335583.png" alt="p"/> and weight <img class="math" src="_images/math/cc87ee665749db882f94e0d3707eb23e39638650.png" alt="w"/>.</p>
 </dd>
-<dt id="term-3"><img class="math" src="_images/math/ed38fa24f1c94891bd312012aab3f6673be3eb83.png" alt="X"/></dt><dd><p>All absolute positions of the Gaussian integration procedure within the domain.</p>
+<dt id="term-4"><img class="math" src="_images/math/ed38fa24f1c94891bd312012aab3f6673be3eb83.png" alt="X"/></dt><dd><p>All absolute positions of the Gaussian integration procedure within the domain.</p>
 </dd>
-<dt id="term-4"><img class="math" src="_images/math/141bbefb74014fc5e43499901bf78607ae335583.png" alt="p"/></dt><dd><p>All positions of the Gaussian integration procedure for degree <img class="math" src="_images/math/65e60d95fc7bc06725cb967be10982e4bf310122.png" alt="\Lambda"/>.</p>
+<dt id="term-5"><img class="math" src="_images/math/141bbefb74014fc5e43499901bf78607ae335583.png" alt="p"/></dt><dd><p>All positions of the Gaussian integration procedure for degree <img class="math" src="_images/math/65e60d95fc7bc06725cb967be10982e4bf310122.png" alt="\Lambda"/>.</p>
 </dd>
 <dt id="term-w"><img class="math" src="_images/math/cc87ee665749db882f94e0d3707eb23e39638650.png" alt="w"/></dt><dd><p>All weights of the Gaussian integration procedure for degree <img class="math" src="_images/math/65e60d95fc7bc06725cb967be10982e4bf310122.png" alt="\Lambda"/>.</p>
 </dd>
@@ -224,7 +229,7 @@ See <a class="reference internal" href="waterflow.flow1d.html#waterflow.flow1d.f
 </dd>
 <dt id="term-rfac"><img class="math" src="_images/math/0ac002b95bdf53f34b0324be11dda0527b39cda1.png" alt="rfac"/></dt><dd><p>Distribution factor for pointflux <img class="math" src="_images/math/c2aa3dff9bffb099e9dff196fd36aed56ec16baf.png" alt="P"/> towards the nearest right node.</p>
 </dd>
-<dt id="term-5"><img class="math" src="_images/math/c6cf387acb682f6642ad6e4e95c80dfbba77f948.png" alt="_{l}"/></dt><dd><p>left node of the segment.</p>
+<dt id="term-6"><img class="math" src="_images/math/c6cf387acb682f6642ad6e4e95c80dfbba77f948.png" alt="_{l}"/></dt><dd><p>left node of the segment.</p>
 </dd>
 <dt id="term-r"><img class="math" src="_images/math/22cd79fc0a84411a4a64d0f02b113ecb166f2989.png" alt="_{r}"/></dt><dd><p>right node of the segment.</p>
 </dd>

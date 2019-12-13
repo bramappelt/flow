@@ -236,13 +236,20 @@
 <span class="sd">        Contains state dependent point flux functions on the model domain. The</span>
 <span class="sd">        key : value pairs in the dictionary have the following format:</span>
 
-<span class="sd">            &#39;Flux name&#39; : [(:math:`func`, (:math:`node_{l}`, :math:`node_{r}`, :math:`lfac`, :math:`rfac`)), :math:`F` of shape :math:`[1 \\times N]`]]</span>
+<span class="sd">            &#39;Flux name&#39; : [(:math:`P`, (:math:`node_{l}`, :math:`node_{r}`, :math:`lfac`, :math:`rfac`)), :math:`F` of shape :math:`[1 \\times N]`]</span>
 
 <span class="sd">    spatflux : `dict`</span>
-<span class="sd">        Contains the spatial fluxes on the model domain. # !! explain form</span>
+<span class="sd">        Contains the spatial fluxes on the model domain. Either the scalar and</span>
+<span class="sd">        the calculated position dependent spatial flux function values. The</span>
+<span class="sd">        key : value pairs in the dictionary have the following format:</span>
 
-<span class="sd">    Sspatialflux : `dict`</span>
-<span class="sd">        Contains state dependent spatial fluxes on the model domain. # !! explain form</span>
+<span class="sd">            name : [:math:`F` of shape :math:`[1 \\times N]`]</span>
+
+<span class="sd">    Sspatflux : `dict`</span>
+<span class="sd">        Contains state dependent spatial fluxes on the model domain. The key :</span>
+<span class="sd">        value pairs in the dictionary have the following format:</span>
+
+<span class="sd">            name : [:math:`S`, :math:`F` of shape :math:`[1 \\times N]`]</span>
 
 <span class="sd">    internal_forcing : `dict`</span>
 <span class="sd">        The internal forcing of the system as calculated with</span>
@@ -278,7 +285,7 @@
 
 <span class="sd">    solve_data : `dict`</span>
 <span class="sd">        Holds the solve information of the system including the following</span>
-<span class="sd">        key-value pairs:</span>
+<span class="sd">        key : value pairs:</span>
 
 <span class="sd">        * solved_objects - A `list` of Flow1DFE objects at solved time steps.</span>
 
@@ -489,7 +496,7 @@
 <span class="sd">        net                1.716294e-12</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># build key-value pairs where data is available</span>
+        <span class="c1"># build key : value pairs where data is available</span>
         <span class="n">id_</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{self.id_}</span><span class="s2">&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">len_</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -961,7 +968,7 @@
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        The storage change function, if present, is stored in</span>
-<span class="sd">        :py:attr:`~Sspatialflux`. The calling signature may look as follows:</span>
+<span class="sd">        :py:attr:`~Sspatflux`. The calling signature may look as follows:</span>
 
 <span class="sd">        ..  math::</span>
 <span class="sd">            storage\_change(x, s, prevstate, dt, fun=lambda\\text{ }x: 1, S=1)</span>
@@ -1089,7 +1096,7 @@
 <span class="sd">            A = A_{sys} + A_{spat} + A_{point}</span>
 
 <span class="sd">        * :math:`A_{sys}`, derivatives of the :py:attr:`~systemfluxfunc`.</span>
-<span class="sd">        * :math:`A_{spat}`, derivatives of functions in :py:attr:`~Sspatialflux`.</span>
+<span class="sd">        * :math:`A_{spat}`, derivatives of functions in :py:attr:`~Sspatflux`.</span>
 <span class="sd">        * :math:`A_{point}`, derivatives of functions in :py:attr:`~Spointflux`.</span>
 
 <span class="sd">        **System&#39;s flow equation jacobian**</span>
@@ -1603,10 +1610,10 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        rate : `float`, `int`, `list` or `func`</span>
-<span class="sd">            *   Scalar pointflux value(s)</span>
+<span class="sd">            *   Scalar pointflux value(s).</span>
 <span class="sd">            *   Pointflux function(s) of the form :math:`P(s)`.</span>
 <span class="sd">        pos : `float`, `int` or `list`</span>
-<span class="sd">            Position(s) of the pointflux value(s)/function(s)</span>
+<span class="sd">            Position(s) of the pointflux value(s)/function(s).</span>
 <span class="sd">        name : `str`, default is None</span>
 <span class="sd">            Name of the pointflux. If omitted, a unique key is</span>
 <span class="sd">            generated or rate.__name__ is used in case of a</span>
@@ -1710,7 +1717,115 @@
                                      <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">f</span><span class="p">)]</span></div>
 
 <div class="viewcode-block" id="Flow1DFE.add_spatialflux"><a class="viewcode-back" href="../../../waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE.add_spatialflux">[docs]</a>    <span class="k">def</span> <span class="nf">add_spatialflux</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exact</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Add a spatialflux to the system &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot; Add a spatialflux to the system</span>
+
+<span class="sd">        Spatial fluxes of several types are accepted by this method.</span>
+<span class="sd">        Direct calculation of the forcing values is performed where</span>
+<span class="sd">        possible. State dependent forcing functions will be</span>
+<span class="sd">        calculated in a different context. The storage change function</span>
+<span class="sd">        for the simulation of a transient system should be implemented</span>
+<span class="sd">        here.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        q : `int`, `float, `list` or `func`</span>
+<span class="sd">            * Scalar spatial flux value applied over the complete domain.</span>
+<span class="sd">            * Sequence of different spatial flux values for every nodal</span>
+<span class="sd">              position.</span>
+<span class="sd">            * Positional and/or state dependent spatial flux function.</span>
+<span class="sd">            * Storage change function for a transient simulation.</span>
+<span class="sd">        name : `str`, default is None</span>
+<span class="sd">            Name of the pointflux. If omitted, a unique key is generated or</span>
+<span class="sd">            q.__name__ is used in case of a function argument.</span>
+<span class="sd">        exact : `bool`, default is False</span>
+<span class="sd">            Calculate the exact integral of the spatial forcing function.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        When ``q`` is a scalar or sequence like argument the forcing array</span>
+<span class="sd">        is calculated by multiplication with the corrosponding lengths.</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            F = q * nL</span>
+
+<span class="sd">        If ``q`` is a function of position, :math:`S(x)`, the flux is</span>
+<span class="sd">        calculated per segment. Below the exact definition of this calculation</span>
+<span class="sd">        is presented, taking into account the Gaussian quadrature.</span>
+<span class="sd">        degree.</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            F_{l_{i}} = \\sum_{\\lambda =1}^{\\Lambda} S(X_{i, \\lambda}) * (1-p_{\\lambda}) * w_{\\lambda} * L_{i}</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            F_{r_{i}} = \\sum_{\\lambda =1}^{\\Lambda} S(X_{i, \\lambda}) * p_{\\lambda} * w_{\\lambda} * L_{i}</span>
+
+<span class="sd">        After the calculation of the distribution towards the nearest nodes the</span>
+<span class="sd">        local forcing matrix :math:`F` is populated and the will be saved in</span>
+<span class="sd">        :py:attr:`~spatflux`.</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            F = \\begin{bmatrix}</span>
+<span class="sd">                    F_{l_{i}}                   \\\\</span>
+<span class="sd">                    F_{r_{i}} + F_{l_{i+1}}     \\\\</span>
+<span class="sd">                    F_{r_{i+1}} + F_{l_{i+2}}   \\\\</span>
+<span class="sd">                    \\vdots                     \\\\</span>
+<span class="sd">                    F_{r_{N-1}} + F_{l_{N}}     \\\\</span>
+<span class="sd">                    F_{r_{N}}</span>
+<span class="sd">                \\end{bmatrix}</span>
+
+<span class="sd">        Possibility of the ``exact`` implementation ???</span>
+
+<span class="sd">        In the case of ``q`` being a function of position and state,</span>
+<span class="sd">        :math:`S(x, s)`, the function will be assigned to :py:attr:`~Sspatflux`</span>
+<span class="sd">        for later processing in a context where :math:`s` is available.</span>
+
+<span class="sd">        ``q`` can have four arguments, :math:`S(x, s, prevstate, dt)`. This is</span>
+<span class="sd">        a special case reserved for the storage change function.</span>
+<span class="sd">        The function signature may have keyword arguments but they need to</span>
+<span class="sd">        be optional having a default argument. See a possible definition of</span>
+<span class="sd">        a storage change function,</span>
+<span class="sd">        :py:func:`~waterflow.utility.fluxfunctions.storage_change`, that can</span>
+<span class="sd">        be used for both saturated and unsaturated conditions depending on its</span>
+<span class="sd">        default keyword arguments. The storage change function is saved in</span>
+<span class="sd">        :py:attr:`~Sspatflux` and will carry the default name &#39;storage_change&#39;.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; from waterflow.flow1d.flowFE1d import Flow1DFE</span>
+<span class="sd">        &gt;&gt;&gt; from waterflow.utility.fluxfunctions import storage_change</span>
+<span class="sd">        &gt;&gt;&gt; FE = Flow1DFE(&quot;spatial fluxes&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; FE.set_field1d((-10, 0, 11))</span>
+
+<span class="sd">        &gt;&gt;&gt; # Add a scalar spatialflux</span>
+<span class="sd">        &gt;&gt;&gt; FE.add_spatialflux(-0.001, &#39;Root extraction&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; FE.spatflux</span>
+<span class="sd">        {&#39;Root extraction&#39;: [array([-0.0005, -0.001 , -0.001 , -0.001 , -0.001 , -0.001 , -0.001 ,</span>
+<span class="sd">               -0.001 , -0.001 , -0.001 , -0.0005])]}</span>
+
+<span class="sd">        &gt;&gt;&gt; # Add position dependent spatial flux function</span>
+<span class="sd">        &gt;&gt;&gt; def linear_extraction(x):</span>
+<span class="sd">        ...     return -0.001 * abs(x)</span>
+<span class="sd">        &gt;&gt;&gt; FE.add_spatialflux(linear_extraction)</span>
+<span class="sd">        &gt;&gt;&gt; FE.spatflux</span>
+<span class="sd">        {&#39;Root extraction&#39;: [array([-0.0005, -0.001 , -0.001 , -0.001 , -0.001 , -0.001 , -0.001 ,</span>
+<span class="sd">               -0.001 , -0.001 , -0.001 , -0.0005])], &#39;linear_extraction&#39;: [array([-0.00475, -0.009  , -0.008  , -0.007  , -0.006  , -0.005  ,</span>
+<span class="sd">               -0.004  , -0.003  , -0.002  , -0.001  , -0.00025])]}</span>
+
+<span class="sd">        &gt;&gt;&gt; # Add position and state dependent spatial flux function</span>
+<span class="sd">        &gt;&gt;&gt; def linear_s_extraction(x, s):</span>
+<span class="sd">        ...     return -0.001 * x - 0.001 * s</span>
+<span class="sd">        &gt;&gt;&gt; FE.add_spatialflux(linear_s_extraction, &#39;Sfunc&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; # Note that the local forcing array will always be empty and is only initialized</span>
+<span class="sd">        &gt;&gt;&gt; FE.Sspatflux #doctest: +ELLIPSIS</span>
+<span class="sd">        {&#39;Sfunc&#39;: [&lt;function linear_s_extraction at 0x...&gt;, array([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.])]}</span>
+
+<span class="sd">        &gt;&gt;&gt; # The storage change function is imported and passed to the model</span>
+<span class="sd">        &gt;&gt;&gt; # note that the name argument is ignored.</span>
+<span class="sd">        &gt;&gt;&gt; FE.add_spatialflux(storage_change, name=&#39;My_storage_change&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; FE.Sspatflux #doctest: +ELLIPSIS</span>
+<span class="sd">        {&#39;Sfunc&#39;: [&lt;function linear_s_extraction at 0x...&gt;, array([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.])], &#39;storage_change&#39;: [&lt;function storage_change at 0x...&gt;, array([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.])]}</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
             <span class="n">Q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
@@ -1720,12 +1835,11 @@
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">callable</span><span class="p">(</span><span class="n">Q</span><span class="p">):</span>
             <span class="n">f</span> <span class="o">=</span> <span class="n">Q</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">lengths</span>
-            <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">spatflux</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">f</span><span class="p">)]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="c1"># unique key for unnamed forcing</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="p">:</span>
                 <span class="n">name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">spatflux</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">f</span><span class="p">)]</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">spatflux</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">f</span><span class="p">)]</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># prepare a domain spaced and zero-ed array</span>
