@@ -20,3 +20,8 @@ Module contents
    :members:
    :undoc-members:
    :show-inheritance:
+
+References
+----------
+
+.. bibliography:: bibliography.bib

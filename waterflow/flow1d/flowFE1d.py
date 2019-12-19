@@ -77,26 +77,26 @@ class Flow1DFE:
         Contains the scalar point fluxes on the model domain. The key : value
         pairs in the dictionary have the following format:
 
-            'Flux name' : [:math:`F` of shape :math:`[1 \\times N]`]
+            'Flux name' : [:math:`F_{local}` of shape :math:`[1 \\times N]`]
 
     Spointflux : `dict`
         Contains state dependent point flux functions on the model domain. The
         key : value pairs in the dictionary have the following format:
 
-            'Flux name' : [(:math:`P`, (:math:`node_{l}`, :math:`node_{r}`, :math:`lfac`, :math:`rfac`)), :math:`F` of shape :math:`[1 \\times N]`]
+            'Flux name' : [(:math:`P`, (:math:`node_{l}`, :math:`node_{r}`, :math:`lfac`, :math:`rfac`)), :math:`F_{local}` of shape :math:`[1 \\times N]`]
 
     spatflux : `dict`
         Contains the spatial fluxes on the model domain. Both the scalar and
         the calculated position dependent spatial flux function values. The
         key : value pairs in the dictionary have the following format:
 
-            name : [:math:`F` of shape :math:`[1 \\times N]`]
+            name : [:math:`F_{local}` of shape :math:`[1 \\times N]`]
 
     Sspatflux : `dict`
         Contains state dependent spatial fluxes on the model domain. The key :
         value pairs in the dictionary have the following format:
 
-            name : [:math:`S`, :math:`F` of shape :math:`[1 \\times N]`]
+            name : [:math:`S`, :math:`F_{local}` of shape :math:`[1 \\times N]`]
 
     internal_forcing : `dict`
         The internal forcing of the system as calculated with
@@ -436,6 +436,23 @@ class Flow1DFE:
         A full description of the theory behind this Gaussain quadrature method
         is documented in :cite:`Strunk1979`.
 
+        Examples
+        --------
+
+        >>> from waterflow.flow1d.flowFE1d import Flow1DFE
+        >>> FE = Flow1DFE("Gaussian quadrature")
+        >>> FE.set_field1d((-10, 0, 11))
+        >>> FE.set_gaussian_quadrature(2)
+        >>> # positions
+        >>> FE._xgauss
+        (0.21132486540518708, 0.7886751345948129)
+        >>> # weights
+        >>> FE._wgauss
+        (0.4999999999999999, 0.5000000000000002)
+        >>> # check shape of xintegration
+        >>> np.array(FE.xintegration).shape
+        (10, 2)
+
         """
         # calculate roots of Legendre polynomial for degree n
         legn = legendre(degree)
@@ -585,7 +602,7 @@ class Flow1DFE:
         >>> FE = Flow1DFE("Internal forcing example")
         >>> FE.set_systemfluxfunction(richards_equation, kfun=kfun)
         >>> FE.set_field1d(nodes=(-10, 0, 11))
-        >>> FE.set_initial_states([-1 * i for i in range(11)])
+        >>> FE.set_initial_states([-i for i in range(11)])
         >>> FE.set_gaussian_quadrature(3)
         >>> FE._internal_forcing()
         >>> FE.forcing
@@ -622,7 +639,98 @@ class Flow1DFE:
             self.internal_forcing["internal_forcing"] = [None, np.array(f)]
 
     def _statedep_forcing(self):
-        """ Calculation of state dependent forcing values """
+        """ Calculation of state dependent forcing values
+
+        State dependent forcing values saved in :py:attr:`~Sspatflux` and
+        :py:attr:`~Spointflux` are calculated. The local forcing matrices
+        :math:`F_{local}` are populated and the total of both is accumulated
+        to the global forcing matrix :math:`F_{forcing}`. Forcing values at
+        the position of a Dirichlet boundary condition are set to zero. This
+        method is called internally by :py:meth:`~dt_solve` to prepare for
+        the next iteration.
+
+        Notes
+        -----
+        Calculations of the individual spatial fluxes :math:`j` are saved in
+        the local forcing matrix :math:`F_{local}`. The following two
+        components need to be calculated over the complete domain of the
+        system for the specific spatialflux. The Gaussian quadrature degree
+        :math:`\\Lambda` is accounted for.
+
+        .. math::
+            F_{l_{i}} = \\sum_{\\lambda=1}^{\\Lambda} S(X_{i, \\lambda}, s_{i,\\lambda})_{j} * (1-p_{\\lambda}) * w_{\\lambda} * L_{i}
+
+        .. math::
+            F_{r_{i}} = \\sum_{\\lambda=1}^{\\Lambda} S(X_{i, \\lambda}, s_{i,\\lambda})_{j} * p_{\\lambda} * w_{\\lambda} * L_{i}
+
+        where the state argument :math:`s_{i,j}` is calculated by linear
+        interpolation as shown below:
+
+        .. math::
+            s_{i,\\lambda} = s_{i} + (X_{i,\\lambda} - x_{i}) * \\frac{s_{i+1} - s_{i}}{L_{i}}
+
+        Calculations of the individual point fluxes :math:`k` are also saved
+        in its local forcing matrix :math:`F_{local}`. The following two
+        components need to be calculated at the position of the specific
+        pointflux:
+
+        .. math::
+            F_{l_{i}} = P(s_{i,k})_{k} * lfac_{k}
+
+        .. math::
+            F_{r_{i}} = P(s_{i,k})_{k} * rfac_{k}
+
+        where the state argument :math:`s_{i,k}` is calculated by linear
+        interpolation as shown below:
+
+        .. math::
+            s_{i,k} = s_{i} + rfac_{k} * (s_{i+1} - s_{i})
+
+        The local forcing matrix is populated as follows, this scheme
+        is used for both the pointflux and the spatialflux calculation.
+
+        .. math::
+            F_{local} = \\begin{bmatrix}
+                          F_{l_{i}}                  \\\\
+                          F_{r_{i}} + F_{l_{i+1}}    \\\\
+                          F_{r_{i+1}} + F_{l_{i+2}}  \\\\
+                          \\vdots                    \\\\
+                          F_{r_{N-1}} + F_{l_{N-1}}  \\\\
+                          F_{r_{N}}
+                        \\end{bmatrix}
+
+        Examples
+        --------
+
+        >>> from waterflow.flow1d.flowFE1d import Flow1DFE
+        >>> FE = Flow1DFE("state dependent fluxes")
+        >>> FE.set_field1d((-10, 0, 11))
+        >>> # Set initial states other than all zeros
+        >>> FE.set_initial_states([-i for i in range(11)])
+
+        >>> # Define a state dependent pointflux function
+        >>> def Spflux(s):
+        ...     return abs(np.sin(s)) * -0.1
+        >>> FE.add_pointflux(Spflux, -3.1)
+
+        >>> # Define a state dependent spatialflux function
+        >>> def linear_s_extraction(x, s):
+        ...     return -0.001 * abs(x) - 0.001 * s
+        >>> FE.add_spatialflux(linear_s_extraction)
+
+        >>> # Calculcate state dependent forcing (for next iteration)
+        >>> FE._statedep_forcing()
+        >>> # Local forcing matrix of Spflux
+        >>> FE.Spointflux['Spflux'][1]
+        array([ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
+                0.        , -0.0057844 , -0.05205958,  0.        ,  0.        ,
+                0.        ])
+        >>> # Local forcing matrix of 'linear_s_extraction'
+        >>> FE.Sspatflux['linear_s_extraction'][1]
+        array([-0.0045, -0.008 , -0.006 , -0.004 , -0.002 ,  0.    ,  0.002 ,
+                0.004 ,  0.006 ,  0.008 ,  0.0045])
+
+        """
         # point state dependent forcing
         f = [0.0 for x in range(len(self.nodes))]
         for key in self.Spointflux.keys():
@@ -774,7 +882,7 @@ class Flow1DFE:
         >>> FE.moisture
         []
         >>> # Create an equilibrium situation
-        >>> FE.set_initial_states([0 - i for i in range(10)])
+        >>> FE.set_initial_states([-i for i in range(10)])
         >>> # Now add the moisture content function
         >>> FE.tfun = theta_h
         >>> # Calculate again
@@ -1111,16 +1219,6 @@ class Flow1DFE:
 
         self.coefmatr = A
 
-    def wrap_bf_linear(self, node, where):
-        n = self.nodes
-
-        def basis_function(x):
-            if where == "left":
-                return (n[node + 1] - x) / (n[node + 1] - n[node])
-            elif where == "right":
-                return (x - n[node]) / (n[node + 1] - n[node])
-        return basis_function
-
     def set_field1d(self, nodes, degree=1):
         """ Initialize the system's discretization
 
@@ -1266,7 +1364,7 @@ class Flow1DFE:
         >>> FE.set_field1d((-10, 0, 11))
         >>> FE.states
         array([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.])
-        >>> FE.set_initial_states([-1 * i for i in range(11)])
+        >>> FE.set_initial_states([-i for i in range(11)])
         >>> FE.states
         array([  0.,  -1.,  -2.,  -3.,  -4.,  -5.,  -6.,  -7.,  -8.,  -9., -10.])
 
@@ -1401,6 +1499,9 @@ class Flow1DFE:
         KeyError
             This exception is raised when ``*args`` contains an invalid
             boundary condition name.
+
+        Notes
+        -----
 
         .. note::
             This is the safe way to remove the boundary conditions because it
@@ -1563,7 +1664,7 @@ class Flow1DFE:
             self.Spointflux[name] = [(rate, (idx_l, idx_r, lfactor, rfactor)),
                                      np.array(f)]
 
-    def add_spatialflux(self, q, name=None, exact=False):
+    def add_spatialflux(self, q, name=None):
         """ Add a spatialflux to the system
 
         Spatial fluxes of several types are accepted by this method.
@@ -1584,21 +1685,20 @@ class Flow1DFE:
         name : `str`, default is None
             Name of the pointflux. If omitted, a unique key is generated or
             q.__name__ is used in case of a function argument.
-        exact : `bool`, default is False
-            Calculate the exact integral of the spatial forcing function.
 
         Notes
         -----
-        When ``q`` is a scalar or sequence like argument the forcing array
-        is calculated by multiplication with the corrosponding lengths.
+        When ``q`` is a scalar or sequence like argument the local forcing
+        array :math:`F_{local}` is calculated by multiplication with the
+        corresponding lengths and will be saved in :py:attr:`~spatflux`.
 
         .. math::
-            F = q * nL
+            F_{local} = q * nL
 
         If ``q`` is a function of position, :math:`S(x)`, the flux is
         calculated per segment. Below the exact definition of this calculation
-        is presented, taking into account the Gaussian quadrature.
-        degree.
+        is presented, taking into account the Gaussian quadrature degree
+        :math:`\\Lambda`.
 
         .. math::
             F_{l_{i}} = \\sum_{\\lambda =1}^{\\Lambda} S(X_{i, \\lambda}) * (1-p_{\\lambda}) * w_{\\lambda} * L_{i}
@@ -1607,20 +1707,18 @@ class Flow1DFE:
             F_{r_{i}} = \\sum_{\\lambda =1}^{\\Lambda} S(X_{i, \\lambda}) * p_{\\lambda} * w_{\\lambda} * L_{i}
 
         After the calculation of the distribution towards the nearest nodes the
-        local forcing matrix :math:`F` is populated and the will be saved in
-        :py:attr:`~spatflux`.
+        local forcing matrix :math:`F_{local}` is populated and the will be
+        saved in :py:attr:`~spatflux`.
 
         .. math::
-            F = \\begin{bmatrix}
-                    F_{l_{i}}                   \\\\
-                    F_{r_{i}} + F_{l_{i+1}}     \\\\
-                    F_{r_{i+1}} + F_{l_{i+2}}   \\\\
-                    \\vdots                     \\\\
-                    F_{r_{N-1}} + F_{l_{N}}     \\\\
-                    F_{r_{N}}
-                \\end{bmatrix}
-
-        Possibility of the ``exact`` implementation ???
+            F_{local} = \\begin{bmatrix}
+                            F_{l_{i}}                   \\\\
+                            F_{r_{i}} + F_{l_{i+1}}     \\\\
+                            F_{r_{i+1}} + F_{l_{i+2}}   \\\\
+                            \\vdots                     \\\\
+                            F_{r_{N-1}} + F_{l_{N}}     \\\\
+                            F_{r_{N}}
+                        \\end{bmatrix}
 
         In the case of ``q`` being a function of position and state,
         :math:`S(x, s)`, the function will be assigned to :py:attr:`~Sspatflux`
@@ -1634,10 +1732,18 @@ class Flow1DFE:
         :py:func:`~waterflow.utility.fluxfunctions.storage_change`, that can
         be used for both saturated and unsaturated conditions depending on its
         default keyword arguments. The storage change function is saved in
-        :py:attr:`~Sspatflux` and will carry the default name 'storage_change'.
+        :py:attr:`~Sspatflux` and will carry the default name 'storage_change',
+        see the last example.
+
+        .. note::
+            For spatial state dependent flux functions the function signature
+            will always look like this :math:`S(x, s)` whether there is a
+            positional dependency or not. This is needed to distinguish between
+            the :math:`x` and :math:`s` arguments.
 
         Examples
         --------
+
         >>> from waterflow.flow1d.flowFE1d import Flow1DFE
         >>> from waterflow.utility.fluxfunctions import storage_change
         >>> FE = Flow1DFE("spatial fluxes")
@@ -1701,38 +1807,16 @@ class Flow1DFE:
 
             # if function has one argument > f(x)
             if nargs == 1:
-                # linear appoximation integral
-                if not exact:
-                    pos, weight = self.gaussquad
-                    for i in range(len(self.nodes) - 1):
-                        # distance between nodes
-                        L = self.seg_lengths[i]
-                        for idx in range(len(pos)):
-                            x = self.xintegration[i][idx]
-                            # to left node (no pos negatives?)
-                            f[i] += Q(x) * weight[-idx-1] * pos[-idx-1] * L
-                            # to right node
-                            f[i+1] += Q(x) * weight[idx] * pos[idx] * L
-
-                # only possible if analytical solution exists
-                else:
-                    # exact integral
-                    nodes = self.nodes
-                    for i in range(len(self.nodes) - 1):
-                        l = self.wrap_bf_linear(i, "left")
-                        r = self.wrap_bf_linear(i, "right")
-
-                        def to_left(x):
-                            return l(x) * Q(x)
-
-                        def to_right(x):
-                            return r(x) * Q(x)
-
-                        # to left node
-                        f[i] += quad(to_left, nodes[i], nodes[i+1])[0]
+                pos, weight = self.gaussquad
+                for i in range(len(self.nodes) - 1):
+                    # distance between nodes
+                    L = self.seg_lengths[i]
+                    for idx in range(len(pos)):
+                        x = self.xintegration[i][idx]
+                        # to left node (no pos negatives?)
+                        f[i] += Q(x) * weight[-idx-1] * pos[-idx-1] * L
                         # to right node
-                        f[i+1] += quad(to_right, nodes[i], nodes[i+1])[0]
-
+                        f[i+1] += Q(x) * weight[idx] * pos[idx] * L
                 self.spatflux[name] = [np.array(f)]
 
             # if function has two arguments > f(x,s)
@@ -1750,12 +1834,66 @@ class Flow1DFE:
                 self.Sspatflux[name] = [Q, np.array(f)]
 
     def remove_pointflux(self, *args):
-        # remove all pointfluxes when args is empty
+        """ Remove point fluxes
+
+        Remove all or a specific point fluxes. When this method is called
+        with default arguments all point fluxes will be removed from both
+        :py:attr:`~pointflux` and :py:attr:`~Spointflux`.
+
+        Parameters
+        ----------
+        *args : `str`, optional
+            Name(s) of specific point fluxes.
+
+        Raises
+        ------
+        KeyError
+            Will be raised when the name of the pointflux does not exists.
+
+        Examples
+        --------
+        >>> from waterflow.flow1d.flowFE1d import Flow1DFE
+        >>> FE = Flow1DFE("Point flux removal")
+        >>> FE.set_field1d((-10, 0, 11))
+
+        >>> # Add a scalar pointflux
+        >>> FE.add_pointflux(-0.001, -3.3, 'Point1')
+        >>> # Add an other
+        >>> FE.add_pointflux(-0.002, -5.5, 'Point2')
+        >>> # Add a third
+        >>> FE.add_pointflux(-0.003, -7.7, 'Point3')
+        >>> # Check for all the currently available pointflux names
+        >>> FE.pointflux.keys()
+        dict_keys(['Point1', 'Point2', 'Point3'])
+        >>> def Spflux(s):
+        ...     return abs(np.sin(s)) * -0.1
+        >>> FE.add_pointflux(Spflux, -6.6)
+        >>> FE.Spointflux.keys()
+        dict_keys(['Spflux'])
+
+        >>> # Specific removal of the point fluxes
+        >>> FE.remove_pointflux('Point1', 'Point3')
+        >>> FE.pointflux.keys()
+        dict_keys(['Point2'])
+        >>> # Use an incorrect name
+        >>> FE.remove_pointflux("Point4") #doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        KeyError: "'Point4' is not a pointflux."
+        >>> # Remove the remaining point fluxes
+        >>> FE.remove_pointflux()
+        >>> FE.pointflux
+        {}
+        >>> FE.Spointflux
+        {}
+
+        """
+        # remove all point fluxes
         if len(args) == 0:
             self.pointflux = {}
             self.Spointflux = {}
         else:
-            # remove the given pointflux name(s)
+            # remove the specific pointflux name(s)
             for name in args:
                 try:
                     self.pointflux.pop(name)
@@ -1763,9 +1901,66 @@ class Flow1DFE:
                     try:
                         self.Spointflux.pop(name)
                     except KeyError as e:
-                        raise type(e)(str(name) + "is not a pointflux.")
+                        # Only raise exception at top of call stack
+                        raise KeyError('{} is not a pointflux.'.format(e)) from None
 
     def remove_spatialflux(self, *args):
+        """ Remove spatial fluxes
+
+        Remove all or a specific spatial fluxes. When this method is called
+        with default arguments all spatial fluxes will be removed from both
+        :py:attr:`~spatflux` and :py:attr:`~Sspatflux`.
+
+        Parameters
+        ----------
+        *args : `str`, optional
+            Name(s) of specific spatial fluxes.
+
+        Raises
+        ------
+        KeyError
+            Will be raised when the name of the spatialflux does not exists.
+
+        Examples
+        --------
+
+        >>> from waterflow.flow1d.flowFE1d import Flow1DFE
+        >>> from waterflow.utility.fluxfunctions import storage_change
+        >>> FE = Flow1DFE("Spatial flux removal")
+        >>> FE.set_field1d((-10, 0, 11))
+
+        >>> # Add a scalar spatialflux
+        >>> FE.add_spatialflux(-0.001, 'Spat1')
+        >>> # Add an other
+        >>> FE.add_spatialflux(-0.002, 'Spat2')
+        >>> # Add a third
+        >>> FE.add_spatialflux(-0.003, 'Spat3')
+        >>> # Check for all the currently available spatialflux names
+        >>> FE.spatflux.keys()
+        dict_keys(['Spat1', 'Spat2', 'Spat3'])
+        >>> # Add the storage change function
+        >>> FE.add_spatialflux(storage_change)
+        >>> # Check which spatial state dependent flux function is saved
+        >>> FE.Sspatflux.keys()
+        dict_keys(['storage_change'])
+
+        >>> # Specific removal of the spatial fluxes
+        >>> FE.remove_spatialflux("Spat1", "Spat2")
+        >>> FE.spatflux.keys()
+        dict_keys(['Spat3'])
+        >>> # Use an incorrect name
+        >>> FE.remove_spatialflux("Spat4") #doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        KeyError: "'Spat4' is not a spatialflux."
+        >>> # Remove the remaining spatial fluxes
+        >>> FE.remove_spatialflux()
+        >>> FE.spatflux
+        {}
+        >>> FE.Sspatflux
+        {}
+
+        """
         # remove all spatial fluxes when args is empty
         if len(args) == 0:
             self.spatflux = {}
@@ -1779,7 +1974,8 @@ class Flow1DFE:
                     try:
                         self.Sspatflux.pop(name)
                     except KeyError as e:
-                        raise type(e)(str(name) + " is not a spatialflux.")
+                        # Only raise exception at top of call stack
+                        raise KeyError('{} is not a spatialflux.'.format(e)) from None
 
     def states_to_function(self):
         """ Prepare one-dimensional interpolation function
@@ -1806,7 +2002,7 @@ class Flow1DFE:
         >>> from waterflow.flow1d.flowFE1d import Flow1DFE
         >>> FE = Flow1DFE("Continiously defined states")
         >>> FE.set_field1d((-10, 0, 11))
-        >>> FE.set_initial_states([-1 * i for i in range(11)])
+        >>> FE.set_initial_states([-i for i in range(11)])
         >>> continious_states = FE.states_to_function()
         >>> # On a boundary node
         >>> continious_states(0)
@@ -1836,10 +2032,110 @@ class Flow1DFE:
             return partial(np.interp, xp=self.nodes, fp=states)
 
     def dt_solve(self, dt, maxiter=500, threshold=1e-3):
-        """ solve the system for one specific time step
+        """ Solve the system for one specific time step
 
-        Performs the Newton Rapson method, :cite:`Strunk1979`, for a solution
-        to the linear system of equations.
+        Performs the Newton-Raphson method, :cite:`Strunk1979`, for a solution
+        to the system of equations.
+
+        Parameters
+        ----------
+        dt : `int` or `float`
+            Time step which will be solved for.
+        maxiter : `int`
+            Maximum number of iterations in which the system should
+            converge to a solution.
+        threshold : `float`, default is 1e-3
+            Threshold for conversion, the system has converged when the
+            definition below is satisfied:
+
+            .. math::
+                max(abs(s_{t-1}-s_{t})) < max(abs(threshold * s_{t}))
+
+        Notes
+        -----
+        .. note::
+            This method may also be used for stationary systems in which no
+            time step value is given. Any value of ``dt`` can be passed
+            because of the method being independent from this argument in
+            such a case.
+
+        .. warning::
+            Time step ``dt`` should not be to large. In :py:meth:`~solve`
+            a more quantitative description of time step selection is
+            described.
+
+        **Procedure**
+
+        1.  Check for proper boundary conditions (:py:meth:`~_check_boundaries`).
+        2.  Update states function and time step size of storage change
+            function if system is transient (:py:meth:`~_update_storage_change`).
+        3.  Check if current iteration does not exceed ``maxiter``, otherwise return.
+        4.  Collect all forcing in :py:attr:`~forcing`.
+
+            a.  Aggregation of state independent forcing (:py:meth:`~_aggregate_forcing`).
+            b.  Calculate the system’s internal forcing (:py:meth:`~_internal_forcing`).
+            c.  Calculation of state dependent forcing values (:py:meth:`~_statedep_forcing`).
+
+        5.  Build the jacobian matrix (:py:meth:`~_CMAT`).
+        6.  Newton-Raphson iteration :cite:`Strunk1979`.
+
+            a.  :math:`A * y + F_{forcing} = 0` is solved for :math:`y` (:py:func:`~numpy.linalg.solve`).
+            b.  :math:`y` is accumulated to :py:attr:`~states`.
+
+        7. Repeat step 3.
+        8. Check for convergence ``threshold``, if not satisfied proceed with
+           next iteration from step 3.
+
+        Returns
+        -------
+        `int`
+            Number of iterations until system convergence or ``maxiter``.
+
+        Examples
+        --------
+        >>> from waterflow.flow1d.flowFE1d import Flow1DFE
+        >>> from waterflow.utility import conductivityfunctions as condf
+        >>> from waterflow.utility import fluxfunctions as fluxf
+        >>> from waterflow.utility.helper import initializer
+
+        Select soil 13, 'loam', from De Staringreeks :cite:`Strunk1979`
+        and prepare the conductivity function and theta-h relation with the
+        soil parameters. These functions are the arguments to the fluxfunction
+        and the storage change function repectively.
+
+        >>> s, *_ = condf.soilselector([13])[0]
+        >>> theta_h = initializer(condf.VG_pressureh, theta_r=s.t_res,
+        ...                       theta_s=s.t_sat, a=s.alpha, n=s.n)
+        >>> kfun = initializer(condf.VG_conductivity, ksat=s.ksat, a=s.alpha, n=s.n)
+        >>> storage_change = initializer(fluxf.storage_change, fun=theta_h)
+
+        >>> FE = Flow1DFE("Solve for one time step")
+        >>> FE.set_systemfluxfunction(fluxf.richards_equation, kfun=kfun)
+        >>> FE.set_field1d(nodes=(-10, 0, 11))
+        >>> FE.add_dirichlet_BC(0.0, 'west')
+        >>> # Constant boundary flow of 0.3 cm/d out of the system
+        >>> FE.add_neumann_BC(-0.3, 'east')
+        >>> # Solve the stationary system, independent or dt.
+        >>> iterations = FE.dt_solve(dt=0.0)
+        >>> iterations
+        3
+        >>> FE.states
+        array([  0.        ,  -1.02794815,  -2.05972769,  -3.09448033,
+                -4.13189871,  -5.17183029,  -6.21419211,  -7.25893958,
+                -8.30605208,  -9.35552524, -10.40736646])
+
+        >>> # Add storage change function to make the system transient
+        >>> FE.add_spatialflux(storage_change)
+        >>> # Change eastern boundary to drive a change in the system
+        >>> FE.add_neumann_BC(-0.4, 'east')
+        >>> # solve for 0.01 days
+        >>> iterations = FE.dt_solve(dt=0.01)
+        >>> iterations
+        2
+        >>> FE.states
+        array([  0.        ,  -1.0353111 ,  -2.07549983,  -3.1195156 ,
+                -4.16702367,  -5.21790586,  -6.27215519,  -7.32983969,
+                -8.39108809,  -9.45608494, -10.52507089])
 
         """
         self._check_boundaries()
@@ -1884,10 +2180,55 @@ class Flow1DFE:
     def solve(self, dt=0.001, dt_min=1e-5, dt_max=0.5, end_time=1, maxiter=500,
               dtitlow=1.5, dtithigh=0.5, itermin=5, itermax=10, threshold=1e-3,
               verbosity=True):
-        """ solve the system for a given period of time 
+        """ Solve the system for an arbitrary period of time
 
-        Combination of sequential calls to :py:meth:`~dt_solve`. This is the
-        outer loop that progresses the model over time.
+        The outer loop that progresses the model over time by calling
+        :py:meth:`~dt_solve` sequentially until ``end_time`` is reached.
+
+        Parameters
+        ----------
+        dt : `int` or `float`
+            Initial time step.
+        dt_min : `int` or `float`, default is 1e-5
+            Minimum time step size for which will be solved.
+        dt_max : `int` or `float`, default is 0.5
+            Maximum time step size for which will be solved.
+        end_time : `int` or `float`, default is 1
+            Total period of time for which will be solved.
+        maxiter : `int`, default is 500
+            Maximum number of iterations in which the system should
+            converge to a solution.
+        dtitlow : `float`, default is 1.5, :math:`>1`
+            Multiplier for increasing ``dt`` for the next time step.
+        dtithigh : `float`, default is 0.5, :math:`\\langle 0,1 \\rangle`
+            Multiplier for decreasing ``dt`` for the next time step.
+        itermin : `int`, default is 5, :math:`>2`
+            Maximum number of iterations at which the time step ``dt``
+            will be multiplied with its increasing multiplier ``dtitlow``
+            for the next time step.
+        itermax : `int`, default is 10, :math:`>3`
+            Minimum number of iterations at which the time step ``dt``
+            will be multiplied with its decreasing multiplier ``dtithigh``
+            for the next time step.
+
+            .. warning::
+                ``itermin`` < ``itermin``.
+
+        threshold : `float`, default is 1e-3
+            Threshold for conversion, the system has converged when the
+            definition below is satisfied:
+
+            .. math::
+                max(abs(s_{t-1}-s_{t})) < max(abs(threshold * s_{t}))
+
+        verbosity : `bool`, default is True
+            Be descriptive about the solve process.
+
+        Notes
+        -----
+
+        Examples
+        --------
 
         """
 
@@ -1992,7 +2333,7 @@ class Flow1DFE:
         and spatial fluxes.
 
         .. math::
-            F_{external} = \\sum_{j=1}^{n} S_{j} + \\sum_{k=1}^{m} P{j}
+            F_{external} = \\sum_{j=1}^{n} S_{j} + \\sum_{k=1}^{m} P_{k}
 
         The calculation of the pointflux, :math:`P_{k}`, depends on its
         nature. If the pointflux depends on position only, the accumulation is
@@ -2017,11 +2358,9 @@ class Flow1DFE:
         distinction exists. If the spatial flux is not dependend on state,
         straightforward addition takes place. When there is a state
         dependency, distributions towards the nodes is calculated as
-        described in :py:meth:`~_internal_forcing` where
-        :math:`S_{j}(x, s)` is substituted for the :py:attr:`~systemfluxfunc`
-        :math:`Q(x, s, grad)`. This calculation accounts for the selected
-        :py:attr:`~gauss_degree` and the state argument :math:`s` is linearly
-        interpolated between the neareast nodes.
+        described in :py:meth:`~_statedep_forcing`. This calculation accounts
+        for the selected :py:attr:`~gauss_degree` and the state argument
+        :math:`s` is linearly interpolated between the neareast nodes.
 
         The total forcing in the water balance is the sum of the internal
         forcing as described in :py:meth:`~_internal_forcing` and the external

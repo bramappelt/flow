@@ -230,26 +230,26 @@
 <span class="sd">        Contains the scalar point fluxes on the model domain. The key : value</span>
 <span class="sd">        pairs in the dictionary have the following format:</span>
 
-<span class="sd">            &#39;Flux name&#39; : [:math:`F` of shape :math:`[1 \\times N]`]</span>
+<span class="sd">            &#39;Flux name&#39; : [:math:`F_{local}` of shape :math:`[1 \\times N]`]</span>
 
 <span class="sd">    Spointflux : `dict`</span>
 <span class="sd">        Contains state dependent point flux functions on the model domain. The</span>
 <span class="sd">        key : value pairs in the dictionary have the following format:</span>
 
-<span class="sd">            &#39;Flux name&#39; : [(:math:`P`, (:math:`node_{l}`, :math:`node_{r}`, :math:`lfac`, :math:`rfac`)), :math:`F` of shape :math:`[1 \\times N]`]</span>
+<span class="sd">            &#39;Flux name&#39; : [(:math:`P`, (:math:`node_{l}`, :math:`node_{r}`, :math:`lfac`, :math:`rfac`)), :math:`F_{local}` of shape :math:`[1 \\times N]`]</span>
 
 <span class="sd">    spatflux : `dict`</span>
-<span class="sd">        Contains the spatial fluxes on the model domain. Either the scalar and</span>
+<span class="sd">        Contains the spatial fluxes on the model domain. Both the scalar and</span>
 <span class="sd">        the calculated position dependent spatial flux function values. The</span>
 <span class="sd">        key : value pairs in the dictionary have the following format:</span>
 
-<span class="sd">            name : [:math:`F` of shape :math:`[1 \\times N]`]</span>
+<span class="sd">            name : [:math:`F_{local}` of shape :math:`[1 \\times N]`]</span>
 
 <span class="sd">    Sspatflux : `dict`</span>
 <span class="sd">        Contains state dependent spatial fluxes on the model domain. The key :</span>
 <span class="sd">        value pairs in the dictionary have the following format:</span>
 
-<span class="sd">            name : [:math:`S`, :math:`F` of shape :math:`[1 \\times N]`]</span>
+<span class="sd">            name : [:math:`S`, :math:`F_{local}` of shape :math:`[1 \\times N]`]</span>
 
 <span class="sd">    internal_forcing : `dict`</span>
 <span class="sd">        The internal forcing of the system as calculated with</span>
@@ -589,6 +589,23 @@
 <span class="sd">        A full description of the theory behind this Gaussain quadrature method</span>
 <span class="sd">        is documented in :cite:`Strunk1979`.</span>
 
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+
+<span class="sd">        &gt;&gt;&gt; from waterflow.flow1d.flowFE1d import Flow1DFE</span>
+<span class="sd">        &gt;&gt;&gt; FE = Flow1DFE(&quot;Gaussian quadrature&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; FE.set_field1d((-10, 0, 11))</span>
+<span class="sd">        &gt;&gt;&gt; FE.set_gaussian_quadrature(2)</span>
+<span class="sd">        &gt;&gt;&gt; # positions</span>
+<span class="sd">        &gt;&gt;&gt; FE._xgauss</span>
+<span class="sd">        (0.21132486540518708, 0.7886751345948129)</span>
+<span class="sd">        &gt;&gt;&gt; # weights</span>
+<span class="sd">        &gt;&gt;&gt; FE._wgauss</span>
+<span class="sd">        (0.4999999999999999, 0.5000000000000002)</span>
+<span class="sd">        &gt;&gt;&gt; # check shape of xintegration</span>
+<span class="sd">        &gt;&gt;&gt; np.array(FE.xintegration).shape</span>
+<span class="sd">        (10, 2)</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># calculate roots of Legendre polynomial for degree n</span>
         <span class="n">legn</span> <span class="o">=</span> <span class="n">legendre</span><span class="p">(</span><span class="n">degree</span><span class="p">)</span>
@@ -738,7 +755,7 @@
 <span class="sd">        &gt;&gt;&gt; FE = Flow1DFE(&quot;Internal forcing example&quot;)</span>
 <span class="sd">        &gt;&gt;&gt; FE.set_systemfluxfunction(richards_equation, kfun=kfun)</span>
 <span class="sd">        &gt;&gt;&gt; FE.set_field1d(nodes=(-10, 0, 11))</span>
-<span class="sd">        &gt;&gt;&gt; FE.set_initial_states([-1 * i for i in range(11)])</span>
+<span class="sd">        &gt;&gt;&gt; FE.set_initial_states([-i for i in range(11)])</span>
 <span class="sd">        &gt;&gt;&gt; FE.set_gaussian_quadrature(3)</span>
 <span class="sd">        &gt;&gt;&gt; FE._internal_forcing()</span>
 <span class="sd">        &gt;&gt;&gt; FE.forcing</span>
@@ -775,7 +792,98 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">internal_forcing</span><span class="p">[</span><span class="s2">&quot;internal_forcing&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">f</span><span class="p">)]</span></div>
 
 <div class="viewcode-block" id="Flow1DFE._statedep_forcing"><a class="viewcode-back" href="../../../waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE._statedep_forcing">[docs]</a>    <span class="k">def</span> <span class="nf">_statedep_forcing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Calculation of state dependent forcing values &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot; Calculation of state dependent forcing values</span>
+
+<span class="sd">        State dependent forcing values saved in :py:attr:`~Sspatflux` and</span>
+<span class="sd">        :py:attr:`~Spointflux` are calculated. The local forcing matrices</span>
+<span class="sd">        :math:`F_{local}` are populated and the total of both is accumulated</span>
+<span class="sd">        to the global forcing matrix :math:`F_{forcing}`. Forcing values at</span>
+<span class="sd">        the position of a Dirichlet boundary condition are set to zero. This</span>
+<span class="sd">        method is called internally by :py:meth:`~dt_solve` to prepare for</span>
+<span class="sd">        the next iteration.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Calculations of the individual spatial fluxes :math:`j` are saved in</span>
+<span class="sd">        the local forcing matrix :math:`F_{local}`. The following two</span>
+<span class="sd">        components need to be calculated over the complete domain of the</span>
+<span class="sd">        system for the specific spatialflux. The Gaussian quadrature degree</span>
+<span class="sd">        :math:`\\Lambda` is accounted for.</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            F_{l_{i}} = \\sum_{\\lambda=1}^{\\Lambda} S(X_{i, \\lambda}, s_{i,\\lambda})_{j} * (1-p_{\\lambda}) * w_{\\lambda} * L_{i}</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            F_{r_{i}} = \\sum_{\\lambda=1}^{\\Lambda} S(X_{i, \\lambda}, s_{i,\\lambda})_{j} * p_{\\lambda} * w_{\\lambda} * L_{i}</span>
+
+<span class="sd">        where the state argument :math:`s_{i,j}` is calculated by linear</span>
+<span class="sd">        interpolation as shown below:</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            s_{i,\\lambda} = s_{i} + (X_{i,\\lambda} - x_{i}) * \\frac{s_{i+1} - s_{i}}{L_{i}}</span>
+
+<span class="sd">        Calculations of the individual point fluxes :math:`k` are also saved</span>
+<span class="sd">        in its local forcing matrix :math:`F_{local}`. The following two</span>
+<span class="sd">        components need to be calculated at the position of the specific</span>
+<span class="sd">        pointflux:</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            F_{l_{i}} = P(s_{i,k})_{k} * lfac_{k}</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            F_{r_{i}} = P(s_{i,k})_{k} * rfac_{k}</span>
+
+<span class="sd">        where the state argument :math:`s_{i,k}` is calculated by linear</span>
+<span class="sd">        interpolation as shown below:</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            s_{i,k} = s_{i} + rfac_{k} * (s_{i+1} - s_{i})</span>
+
+<span class="sd">        The local forcing matrix is populated as follows, this scheme</span>
+<span class="sd">        is used for both the pointflux and the spatialflux calculation.</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            F_{local} = \\begin{bmatrix}</span>
+<span class="sd">                          F_{l_{i}}                  \\\\</span>
+<span class="sd">                          F_{r_{i}} + F_{l_{i+1}}    \\\\</span>
+<span class="sd">                          F_{r_{i+1}} + F_{l_{i+2}}  \\\\</span>
+<span class="sd">                          \\vdots                    \\\\</span>
+<span class="sd">                          F_{r_{N-1}} + F_{l_{N-1}}  \\\\</span>
+<span class="sd">                          F_{r_{N}}</span>
+<span class="sd">                        \\end{bmatrix}</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+
+<span class="sd">        &gt;&gt;&gt; from waterflow.flow1d.flowFE1d import Flow1DFE</span>
+<span class="sd">        &gt;&gt;&gt; FE = Flow1DFE(&quot;state dependent fluxes&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; FE.set_field1d((-10, 0, 11))</span>
+<span class="sd">        &gt;&gt;&gt; # Set initial states other than all zeros</span>
+<span class="sd">        &gt;&gt;&gt; FE.set_initial_states([-i for i in range(11)])</span>
+
+<span class="sd">        &gt;&gt;&gt; # Define a state dependent pointflux function</span>
+<span class="sd">        &gt;&gt;&gt; def Spflux(s):</span>
+<span class="sd">        ...     return abs(np.sin(s)) * -0.1</span>
+<span class="sd">        &gt;&gt;&gt; FE.add_pointflux(Spflux, -3.1)</span>
+
+<span class="sd">        &gt;&gt;&gt; # Define a state dependent spatialflux function</span>
+<span class="sd">        &gt;&gt;&gt; def linear_s_extraction(x, s):</span>
+<span class="sd">        ...     return -0.001 * abs(x) - 0.001 * s</span>
+<span class="sd">        &gt;&gt;&gt; FE.add_spatialflux(linear_s_extraction)</span>
+
+<span class="sd">        &gt;&gt;&gt; # Calculcate state dependent forcing (for next iteration)</span>
+<span class="sd">        &gt;&gt;&gt; FE._statedep_forcing()</span>
+<span class="sd">        &gt;&gt;&gt; # Local forcing matrix of Spflux</span>
+<span class="sd">        &gt;&gt;&gt; FE.Spointflux[&#39;Spflux&#39;][1]</span>
+<span class="sd">        array([ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,</span>
+<span class="sd">                0.        , -0.0057844 , -0.05205958,  0.        ,  0.        ,</span>
+<span class="sd">                0.        ])</span>
+<span class="sd">        &gt;&gt;&gt; # Local forcing matrix of &#39;linear_s_extraction&#39;</span>
+<span class="sd">        &gt;&gt;&gt; FE.Sspatflux[&#39;linear_s_extraction&#39;][1]</span>
+<span class="sd">        array([-0.0045, -0.008 , -0.006 , -0.004 , -0.002 ,  0.    ,  0.002 ,</span>
+<span class="sd">                0.004 ,  0.006 ,  0.008 ,  0.0045])</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># point state dependent forcing</span>
         <span class="n">f</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">))]</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">Spointflux</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
@@ -927,7 +1035,7 @@
 <span class="sd">        &gt;&gt;&gt; FE.moisture</span>
 <span class="sd">        []</span>
 <span class="sd">        &gt;&gt;&gt; # Create an equilibrium situation</span>
-<span class="sd">        &gt;&gt;&gt; FE.set_initial_states([0 - i for i in range(10)])</span>
+<span class="sd">        &gt;&gt;&gt; FE.set_initial_states([-i for i in range(10)])</span>
 <span class="sd">        &gt;&gt;&gt; # Now add the moisture content function</span>
 <span class="sd">        &gt;&gt;&gt; FE.tfun = theta_h</span>
 <span class="sd">        &gt;&gt;&gt; # Calculate again</span>
@@ -1264,16 +1372,6 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">coefmatr</span> <span class="o">=</span> <span class="n">A</span></div>
 
-<div class="viewcode-block" id="Flow1DFE.wrap_bf_linear"><a class="viewcode-back" href="../../../waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE.wrap_bf_linear">[docs]</a>    <span class="k">def</span> <span class="nf">wrap_bf_linear</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">where</span><span class="p">):</span>
-        <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span>
-
-        <span class="k">def</span> <span class="nf">basis_function</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">where</span> <span class="o">==</span> <span class="s2">&quot;left&quot;</span><span class="p">:</span>
-                <span class="k">return</span> <span class="p">(</span><span class="n">n</span><span class="p">[</span><span class="n">node</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span><span class="p">[</span><span class="n">node</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">n</span><span class="p">[</span><span class="n">node</span><span class="p">])</span>
-            <span class="k">elif</span> <span class="n">where</span> <span class="o">==</span> <span class="s2">&quot;right&quot;</span><span class="p">:</span>
-                <span class="k">return</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">n</span><span class="p">[</span><span class="n">node</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span><span class="p">[</span><span class="n">node</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">n</span><span class="p">[</span><span class="n">node</span><span class="p">])</span>
-        <span class="k">return</span> <span class="n">basis_function</span></div>
-
 <div class="viewcode-block" id="Flow1DFE.set_field1d"><a class="viewcode-back" href="../../../waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE.set_field1d">[docs]</a>    <span class="k">def</span> <span class="nf">set_field1d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Initialize the system&#39;s discretization</span>
 
@@ -1419,7 +1517,7 @@
 <span class="sd">        &gt;&gt;&gt; FE.set_field1d((-10, 0, 11))</span>
 <span class="sd">        &gt;&gt;&gt; FE.states</span>
 <span class="sd">        array([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.])</span>
-<span class="sd">        &gt;&gt;&gt; FE.set_initial_states([-1 * i for i in range(11)])</span>
+<span class="sd">        &gt;&gt;&gt; FE.set_initial_states([-i for i in range(11)])</span>
 <span class="sd">        &gt;&gt;&gt; FE.states</span>
 <span class="sd">        array([  0.,  -1.,  -2.,  -3.,  -4.,  -5.,  -6.,  -7.,  -8.,  -9., -10.])</span>
 
@@ -1554,6 +1652,9 @@
 <span class="sd">        KeyError</span>
 <span class="sd">            This exception is raised when ``*args`` contains an invalid</span>
 <span class="sd">            boundary condition name.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
 
 <span class="sd">        .. note::</span>
 <span class="sd">            This is the safe way to remove the boundary conditions because it</span>
@@ -1716,7 +1817,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">Spointflux</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[(</span><span class="n">rate</span><span class="p">,</span> <span class="p">(</span><span class="n">idx_l</span><span class="p">,</span> <span class="n">idx_r</span><span class="p">,</span> <span class="n">lfactor</span><span class="p">,</span> <span class="n">rfactor</span><span class="p">)),</span>
                                      <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">f</span><span class="p">)]</span></div>
 
-<div class="viewcode-block" id="Flow1DFE.add_spatialflux"><a class="viewcode-back" href="../../../waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE.add_spatialflux">[docs]</a>    <span class="k">def</span> <span class="nf">add_spatialflux</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exact</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="Flow1DFE.add_spatialflux"><a class="viewcode-back" href="../../../waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE.add_spatialflux">[docs]</a>    <span class="k">def</span> <span class="nf">add_spatialflux</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Add a spatialflux to the system</span>
 
 <span class="sd">        Spatial fluxes of several types are accepted by this method.</span>
@@ -1737,21 +1838,20 @@
 <span class="sd">        name : `str`, default is None</span>
 <span class="sd">            Name of the pointflux. If omitted, a unique key is generated or</span>
 <span class="sd">            q.__name__ is used in case of a function argument.</span>
-<span class="sd">        exact : `bool`, default is False</span>
-<span class="sd">            Calculate the exact integral of the spatial forcing function.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        When ``q`` is a scalar or sequence like argument the forcing array</span>
-<span class="sd">        is calculated by multiplication with the corrosponding lengths.</span>
+<span class="sd">        When ``q`` is a scalar or sequence like argument the local forcing</span>
+<span class="sd">        array :math:`F_{local}` is calculated by multiplication with the</span>
+<span class="sd">        corresponding lengths and will be saved in :py:attr:`~spatflux`.</span>
 
 <span class="sd">        .. math::</span>
-<span class="sd">            F = q * nL</span>
+<span class="sd">            F_{local} = q * nL</span>
 
 <span class="sd">        If ``q`` is a function of position, :math:`S(x)`, the flux is</span>
 <span class="sd">        calculated per segment. Below the exact definition of this calculation</span>
-<span class="sd">        is presented, taking into account the Gaussian quadrature.</span>
-<span class="sd">        degree.</span>
+<span class="sd">        is presented, taking into account the Gaussian quadrature degree</span>
+<span class="sd">        :math:`\\Lambda`.</span>
 
 <span class="sd">        .. math::</span>
 <span class="sd">            F_{l_{i}} = \\sum_{\\lambda =1}^{\\Lambda} S(X_{i, \\lambda}) * (1-p_{\\lambda}) * w_{\\lambda} * L_{i}</span>
@@ -1760,20 +1860,18 @@
 <span class="sd">            F_{r_{i}} = \\sum_{\\lambda =1}^{\\Lambda} S(X_{i, \\lambda}) * p_{\\lambda} * w_{\\lambda} * L_{i}</span>
 
 <span class="sd">        After the calculation of the distribution towards the nearest nodes the</span>
-<span class="sd">        local forcing matrix :math:`F` is populated and the will be saved in</span>
-<span class="sd">        :py:attr:`~spatflux`.</span>
+<span class="sd">        local forcing matrix :math:`F_{local}` is populated and the will be</span>
+<span class="sd">        saved in :py:attr:`~spatflux`.</span>
 
 <span class="sd">        .. math::</span>
-<span class="sd">            F = \\begin{bmatrix}</span>
-<span class="sd">                    F_{l_{i}}                   \\\\</span>
-<span class="sd">                    F_{r_{i}} + F_{l_{i+1}}     \\\\</span>
-<span class="sd">                    F_{r_{i+1}} + F_{l_{i+2}}   \\\\</span>
-<span class="sd">                    \\vdots                     \\\\</span>
-<span class="sd">                    F_{r_{N-1}} + F_{l_{N}}     \\\\</span>
-<span class="sd">                    F_{r_{N}}</span>
-<span class="sd">                \\end{bmatrix}</span>
-
-<span class="sd">        Possibility of the ``exact`` implementation ???</span>
+<span class="sd">            F_{local} = \\begin{bmatrix}</span>
+<span class="sd">                            F_{l_{i}}                   \\\\</span>
+<span class="sd">                            F_{r_{i}} + F_{l_{i+1}}     \\\\</span>
+<span class="sd">                            F_{r_{i+1}} + F_{l_{i+2}}   \\\\</span>
+<span class="sd">                            \\vdots                     \\\\</span>
+<span class="sd">                            F_{r_{N-1}} + F_{l_{N}}     \\\\</span>
+<span class="sd">                            F_{r_{N}}</span>
+<span class="sd">                        \\end{bmatrix}</span>
 
 <span class="sd">        In the case of ``q`` being a function of position and state,</span>
 <span class="sd">        :math:`S(x, s)`, the function will be assigned to :py:attr:`~Sspatflux`</span>
@@ -1787,10 +1885,18 @@
 <span class="sd">        :py:func:`~waterflow.utility.fluxfunctions.storage_change`, that can</span>
 <span class="sd">        be used for both saturated and unsaturated conditions depending on its</span>
 <span class="sd">        default keyword arguments. The storage change function is saved in</span>
-<span class="sd">        :py:attr:`~Sspatflux` and will carry the default name &#39;storage_change&#39;.</span>
+<span class="sd">        :py:attr:`~Sspatflux` and will carry the default name &#39;storage_change&#39;,</span>
+<span class="sd">        see the last example.</span>
+
+<span class="sd">        .. note::</span>
+<span class="sd">            For spatial state dependent flux functions the function signature</span>
+<span class="sd">            will always look like this :math:`S(x, s)` whether there is a</span>
+<span class="sd">            positional dependency or not. This is needed to distinguish between</span>
+<span class="sd">            the :math:`x` and :math:`s` arguments.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
+
 <span class="sd">        &gt;&gt;&gt; from waterflow.flow1d.flowFE1d import Flow1DFE</span>
 <span class="sd">        &gt;&gt;&gt; from waterflow.utility.fluxfunctions import storage_change</span>
 <span class="sd">        &gt;&gt;&gt; FE = Flow1DFE(&quot;spatial fluxes&quot;)</span>
@@ -1854,38 +1960,16 @@
 
             <span class="c1"># if function has one argument &gt; f(x)</span>
             <span class="k">if</span> <span class="n">nargs</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="c1"># linear appoximation integral</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">exact</span><span class="p">:</span>
-                    <span class="n">pos</span><span class="p">,</span> <span class="n">weight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaussquad</span>
-                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
-                        <span class="c1"># distance between nodes</span>
-                        <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seg_lengths</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-                        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">pos</span><span class="p">)):</span>
-                            <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xintegration</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span>
-                            <span class="c1"># to left node (no pos negatives?)</span>
-                            <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">Q</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">weight</span><span class="p">[</span><span class="o">-</span><span class="n">idx</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">pos</span><span class="p">[</span><span class="o">-</span><span class="n">idx</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">L</span>
-                            <span class="c1"># to right node</span>
-                            <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">Q</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">weight</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">*</span> <span class="n">pos</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">*</span> <span class="n">L</span>
-
-                <span class="c1"># only possible if analytical solution exists</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="c1"># exact integral</span>
-                    <span class="n">nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span>
-                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
-                        <span class="n">l</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wrap_bf_linear</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="s2">&quot;left&quot;</span><span class="p">)</span>
-                        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wrap_bf_linear</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">)</span>
-
-                        <span class="k">def</span> <span class="nf">to_left</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-                            <span class="k">return</span> <span class="n">l</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">Q</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-
-                        <span class="k">def</span> <span class="nf">to_right</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-                            <span class="k">return</span> <span class="n">r</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">Q</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-
-                        <span class="c1"># to left node</span>
-                        <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">quad</span><span class="p">(</span><span class="n">to_left</span><span class="p">,</span> <span class="n">nodes</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">nodes</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">pos</span><span class="p">,</span> <span class="n">weight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaussquad</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="c1"># distance between nodes</span>
+                    <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seg_lengths</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">pos</span><span class="p">)):</span>
+                        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xintegration</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span>
+                        <span class="c1"># to left node (no pos negatives?)</span>
+                        <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">Q</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">weight</span><span class="p">[</span><span class="o">-</span><span class="n">idx</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">pos</span><span class="p">[</span><span class="o">-</span><span class="n">idx</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">L</span>
                         <span class="c1"># to right node</span>
-                        <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">quad</span><span class="p">(</span><span class="n">to_right</span><span class="p">,</span> <span class="n">nodes</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">nodes</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
-
+                        <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">Q</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">weight</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">*</span> <span class="n">pos</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">*</span> <span class="n">L</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">spatflux</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">f</span><span class="p">)]</span>
 
             <span class="c1"># if function has two arguments &gt; f(x,s)</span>
@@ -1903,12 +1987,66 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">Sspatflux</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">Q</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">f</span><span class="p">)]</span></div>
 
 <div class="viewcode-block" id="Flow1DFE.remove_pointflux"><a class="viewcode-back" href="../../../waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE.remove_pointflux">[docs]</a>    <span class="k">def</span> <span class="nf">remove_pointflux</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-        <span class="c1"># remove all pointfluxes when args is empty</span>
+        <span class="sd">&quot;&quot;&quot; Remove point fluxes</span>
+
+<span class="sd">        Remove all or a specific point fluxes. When this method is called</span>
+<span class="sd">        with default arguments all point fluxes will be removed from both</span>
+<span class="sd">        :py:attr:`~pointflux` and :py:attr:`~Spointflux`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        *args : `str`, optional</span>
+<span class="sd">            Name(s) of specific point fluxes.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        KeyError</span>
+<span class="sd">            Will be raised when the name of the pointflux does not exists.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; from waterflow.flow1d.flowFE1d import Flow1DFE</span>
+<span class="sd">        &gt;&gt;&gt; FE = Flow1DFE(&quot;Point flux removal&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; FE.set_field1d((-10, 0, 11))</span>
+
+<span class="sd">        &gt;&gt;&gt; # Add a scalar pointflux</span>
+<span class="sd">        &gt;&gt;&gt; FE.add_pointflux(-0.001, -3.3, &#39;Point1&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; # Add an other</span>
+<span class="sd">        &gt;&gt;&gt; FE.add_pointflux(-0.002, -5.5, &#39;Point2&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; # Add a third</span>
+<span class="sd">        &gt;&gt;&gt; FE.add_pointflux(-0.003, -7.7, &#39;Point3&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; # Check for all the currently available pointflux names</span>
+<span class="sd">        &gt;&gt;&gt; FE.pointflux.keys()</span>
+<span class="sd">        dict_keys([&#39;Point1&#39;, &#39;Point2&#39;, &#39;Point3&#39;])</span>
+<span class="sd">        &gt;&gt;&gt; def Spflux(s):</span>
+<span class="sd">        ...     return abs(np.sin(s)) * -0.1</span>
+<span class="sd">        &gt;&gt;&gt; FE.add_pointflux(Spflux, -6.6)</span>
+<span class="sd">        &gt;&gt;&gt; FE.Spointflux.keys()</span>
+<span class="sd">        dict_keys([&#39;Spflux&#39;])</span>
+
+<span class="sd">        &gt;&gt;&gt; # Specific removal of the point fluxes</span>
+<span class="sd">        &gt;&gt;&gt; FE.remove_pointflux(&#39;Point1&#39;, &#39;Point3&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; FE.pointflux.keys()</span>
+<span class="sd">        dict_keys([&#39;Point2&#39;])</span>
+<span class="sd">        &gt;&gt;&gt; # Use an incorrect name</span>
+<span class="sd">        &gt;&gt;&gt; FE.remove_pointflux(&quot;Point4&quot;) #doctest: +IGNORE_EXCEPTION_DETAIL</span>
+<span class="sd">        Traceback (most recent call last):</span>
+<span class="sd">        ...</span>
+<span class="sd">        KeyError: &quot;&#39;Point4&#39; is not a pointflux.&quot;</span>
+<span class="sd">        &gt;&gt;&gt; # Remove the remaining point fluxes</span>
+<span class="sd">        &gt;&gt;&gt; FE.remove_pointflux()</span>
+<span class="sd">        &gt;&gt;&gt; FE.pointflux</span>
+<span class="sd">        {}</span>
+<span class="sd">        &gt;&gt;&gt; FE.Spointflux</span>
+<span class="sd">        {}</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># remove all point fluxes</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pointflux</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">Spointflux</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># remove the given pointflux name(s)</span>
+            <span class="c1"># remove the specific pointflux name(s)</span>
             <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">pointflux</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
@@ -1916,9 +2054,66 @@
                     <span class="k">try</span><span class="p">:</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">Spointflux</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
                     <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)(</span><span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;is not a pointflux.&quot;</span><span class="p">)</span></div>
+                        <span class="c1"># Only raise exception at top of call stack</span>
+                        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> is not a pointflux.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="p">))</span> <span class="kn">from</span> <span class="nn">None</span></div>
 
 <div class="viewcode-block" id="Flow1DFE.remove_spatialflux"><a class="viewcode-back" href="../../../waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE.remove_spatialflux">[docs]</a>    <span class="k">def</span> <span class="nf">remove_spatialflux</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Remove spatial fluxes</span>
+
+<span class="sd">        Remove all or a specific spatial fluxes. When this method is called</span>
+<span class="sd">        with default arguments all spatial fluxes will be removed from both</span>
+<span class="sd">        :py:attr:`~spatflux` and :py:attr:`~Sspatflux`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        *args : `str`, optional</span>
+<span class="sd">            Name(s) of specific spatial fluxes.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        KeyError</span>
+<span class="sd">            Will be raised when the name of the spatialflux does not exists.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+
+<span class="sd">        &gt;&gt;&gt; from waterflow.flow1d.flowFE1d import Flow1DFE</span>
+<span class="sd">        &gt;&gt;&gt; from waterflow.utility.fluxfunctions import storage_change</span>
+<span class="sd">        &gt;&gt;&gt; FE = Flow1DFE(&quot;Spatial flux removal&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; FE.set_field1d((-10, 0, 11))</span>
+
+<span class="sd">        &gt;&gt;&gt; # Add a scalar spatialflux</span>
+<span class="sd">        &gt;&gt;&gt; FE.add_spatialflux(-0.001, &#39;Spat1&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; # Add an other</span>
+<span class="sd">        &gt;&gt;&gt; FE.add_spatialflux(-0.002, &#39;Spat2&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; # Add a third</span>
+<span class="sd">        &gt;&gt;&gt; FE.add_spatialflux(-0.003, &#39;Spat3&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; # Check for all the currently available spatialflux names</span>
+<span class="sd">        &gt;&gt;&gt; FE.spatflux.keys()</span>
+<span class="sd">        dict_keys([&#39;Spat1&#39;, &#39;Spat2&#39;, &#39;Spat3&#39;])</span>
+<span class="sd">        &gt;&gt;&gt; # Add the storage change function</span>
+<span class="sd">        &gt;&gt;&gt; FE.add_spatialflux(storage_change)</span>
+<span class="sd">        &gt;&gt;&gt; # Check which spatial state dependent flux function is saved</span>
+<span class="sd">        &gt;&gt;&gt; FE.Sspatflux.keys()</span>
+<span class="sd">        dict_keys([&#39;storage_change&#39;])</span>
+
+<span class="sd">        &gt;&gt;&gt; # Specific removal of the spatial fluxes</span>
+<span class="sd">        &gt;&gt;&gt; FE.remove_spatialflux(&quot;Spat1&quot;, &quot;Spat2&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; FE.spatflux.keys()</span>
+<span class="sd">        dict_keys([&#39;Spat3&#39;])</span>
+<span class="sd">        &gt;&gt;&gt; # Use an incorrect name</span>
+<span class="sd">        &gt;&gt;&gt; FE.remove_spatialflux(&quot;Spat4&quot;) #doctest: +IGNORE_EXCEPTION_DETAIL</span>
+<span class="sd">        Traceback (most recent call last):</span>
+<span class="sd">        ...</span>
+<span class="sd">        KeyError: &quot;&#39;Spat4&#39; is not a spatialflux.&quot;</span>
+<span class="sd">        &gt;&gt;&gt; # Remove the remaining spatial fluxes</span>
+<span class="sd">        &gt;&gt;&gt; FE.remove_spatialflux()</span>
+<span class="sd">        &gt;&gt;&gt; FE.spatflux</span>
+<span class="sd">        {}</span>
+<span class="sd">        &gt;&gt;&gt; FE.Sspatflux</span>
+<span class="sd">        {}</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># remove all spatial fluxes when args is empty</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spatflux</span> <span class="o">=</span> <span class="p">{}</span>
@@ -1932,7 +2127,8 @@
                     <span class="k">try</span><span class="p">:</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">Sspatflux</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
                     <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)(</span><span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; is not a spatialflux.&quot;</span><span class="p">)</span></div>
+                        <span class="c1"># Only raise exception at top of call stack</span>
+                        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> is not a spatialflux.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="p">))</span> <span class="kn">from</span> <span class="nn">None</span></div>
 
 <div class="viewcode-block" id="Flow1DFE.states_to_function"><a class="viewcode-back" href="../../../waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE.states_to_function">[docs]</a>    <span class="k">def</span> <span class="nf">states_to_function</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Prepare one-dimensional interpolation function</span>
@@ -1959,7 +2155,7 @@
 <span class="sd">        &gt;&gt;&gt; from waterflow.flow1d.flowFE1d import Flow1DFE</span>
 <span class="sd">        &gt;&gt;&gt; FE = Flow1DFE(&quot;Continiously defined states&quot;)</span>
 <span class="sd">        &gt;&gt;&gt; FE.set_field1d((-10, 0, 11))</span>
-<span class="sd">        &gt;&gt;&gt; FE.set_initial_states([-1 * i for i in range(11)])</span>
+<span class="sd">        &gt;&gt;&gt; FE.set_initial_states([-i for i in range(11)])</span>
 <span class="sd">        &gt;&gt;&gt; continious_states = FE.states_to_function()</span>
 <span class="sd">        &gt;&gt;&gt; # On a boundary node</span>
 <span class="sd">        &gt;&gt;&gt; continious_states(0)</span>
@@ -1989,10 +2185,110 @@
             <span class="k">return</span> <span class="n">partial</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">,</span> <span class="n">xp</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">,</span> <span class="n">fp</span><span class="o">=</span><span class="n">states</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Flow1DFE.dt_solve"><a class="viewcode-back" href="../../../waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE.dt_solve">[docs]</a>    <span class="k">def</span> <span class="nf">dt_solve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; solve the system for one specific time step</span>
+        <span class="sd">&quot;&quot;&quot; Solve the system for one specific time step</span>
 
-<span class="sd">        Performs the Newton Rapson method, :cite:`Strunk1979`, for a solution</span>
-<span class="sd">        to the linear system of equations.</span>
+<span class="sd">        Performs the Newton-Raphson method, :cite:`Strunk1979`, for a solution</span>
+<span class="sd">        to the system of equations.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dt : `int` or `float`</span>
+<span class="sd">            Time step which will be solved for.</span>
+<span class="sd">        maxiter : `int`</span>
+<span class="sd">            Maximum number of iterations in which the system should</span>
+<span class="sd">            converge to a solution.</span>
+<span class="sd">        threshold : `float`, default is 1e-3</span>
+<span class="sd">            Threshold for conversion, the system has converged when the</span>
+<span class="sd">            definition below is satisfied:</span>
+
+<span class="sd">            .. math::</span>
+<span class="sd">                max(abs(s_{t-1}-s_{t})) &lt; max(abs(threshold * s_{t}))</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        .. note::</span>
+<span class="sd">            This method may also be used for stationary systems in which no</span>
+<span class="sd">            time step value is given. Any value of ``dt`` can be passed</span>
+<span class="sd">            because of the method being independent from this argument in</span>
+<span class="sd">            such a case.</span>
+
+<span class="sd">        .. warning::</span>
+<span class="sd">            Time step ``dt`` should not be to large. In :py:meth:`~solve`</span>
+<span class="sd">            a more quantitative description of time step selection is</span>
+<span class="sd">            described.</span>
+
+<span class="sd">        **Procedure**</span>
+
+<span class="sd">        1.  Check for proper boundary conditions (:py:meth:`~_check_boundaries`).</span>
+<span class="sd">        2.  Update states function and time step size of storage change</span>
+<span class="sd">            function if system is transient (:py:meth:`~_update_storage_change`).</span>
+<span class="sd">        3.  Check if current iteration does not exceed ``maxiter``, otherwise return.</span>
+<span class="sd">        4.  Collect all forcing in :py:attr:`~forcing`.</span>
+
+<span class="sd">            a.  Aggregation of state independent forcing (:py:meth:`~_aggregate_forcing`).</span>
+<span class="sd">            b.  Calculate the system’s internal forcing (:py:meth:`~_internal_forcing`).</span>
+<span class="sd">            c.  Calculation of state dependent forcing values (:py:meth:`~_statedep_forcing`).</span>
+
+<span class="sd">        5.  Build the jacobian matrix (:py:meth:`~_CMAT`).</span>
+<span class="sd">        6.  Newton-Raphson iteration :cite:`Strunk1979`.</span>
+
+<span class="sd">            a.  :math:`A * y + F_{forcing} = 0` is solved for :math:`y` (:py:func:`~numpy.linalg.solve`).</span>
+<span class="sd">            b.  :math:`y` is accumulated to :py:attr:`~states`.</span>
+
+<span class="sd">        7. Repeat step 3.</span>
+<span class="sd">        8. Check for convergence ``threshold``, if not satisfied proceed with</span>
+<span class="sd">           next iteration from step 3.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        `int`</span>
+<span class="sd">            Number of iterations until system convergence or ``maxiter``.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; from waterflow.flow1d.flowFE1d import Flow1DFE</span>
+<span class="sd">        &gt;&gt;&gt; from waterflow.utility import conductivityfunctions as condf</span>
+<span class="sd">        &gt;&gt;&gt; from waterflow.utility import fluxfunctions as fluxf</span>
+<span class="sd">        &gt;&gt;&gt; from waterflow.utility.helper import initializer</span>
+
+<span class="sd">        Select soil 13, &#39;loam&#39;, from De Staringreeks :cite:`Strunk1979`</span>
+<span class="sd">        and prepare the conductivity function and theta-h relation with the</span>
+<span class="sd">        soil parameters. These functions are the arguments to the fluxfunction</span>
+<span class="sd">        and the storage change function repectively.</span>
+
+<span class="sd">        &gt;&gt;&gt; s, *_ = condf.soilselector([13])[0]</span>
+<span class="sd">        &gt;&gt;&gt; theta_h = initializer(condf.VG_pressureh, theta_r=s.t_res,</span>
+<span class="sd">        ...                       theta_s=s.t_sat, a=s.alpha, n=s.n)</span>
+<span class="sd">        &gt;&gt;&gt; kfun = initializer(condf.VG_conductivity, ksat=s.ksat, a=s.alpha, n=s.n)</span>
+<span class="sd">        &gt;&gt;&gt; storage_change = initializer(fluxf.storage_change, fun=theta_h)</span>
+
+<span class="sd">        &gt;&gt;&gt; FE = Flow1DFE(&quot;Solve for one time step&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; FE.set_systemfluxfunction(fluxf.richards_equation, kfun=kfun)</span>
+<span class="sd">        &gt;&gt;&gt; FE.set_field1d(nodes=(-10, 0, 11))</span>
+<span class="sd">        &gt;&gt;&gt; FE.add_dirichlet_BC(0.0, &#39;west&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; # Constant boundary flow of 0.3 cm/d out of the system</span>
+<span class="sd">        &gt;&gt;&gt; FE.add_neumann_BC(-0.3, &#39;east&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; # Solve the stationary system, independent or dt.</span>
+<span class="sd">        &gt;&gt;&gt; iterations = FE.dt_solve(dt=0.0)</span>
+<span class="sd">        &gt;&gt;&gt; iterations</span>
+<span class="sd">        3</span>
+<span class="sd">        &gt;&gt;&gt; FE.states</span>
+<span class="sd">        array([  0.        ,  -1.02794815,  -2.05972769,  -3.09448033,</span>
+<span class="sd">                -4.13189871,  -5.17183029,  -6.21419211,  -7.25893958,</span>
+<span class="sd">                -8.30605208,  -9.35552524, -10.40736646])</span>
+
+<span class="sd">        &gt;&gt;&gt; # Add storage change function to make the system transient</span>
+<span class="sd">        &gt;&gt;&gt; FE.add_spatialflux(storage_change)</span>
+<span class="sd">        &gt;&gt;&gt; # Change eastern boundary to drive a change in the system</span>
+<span class="sd">        &gt;&gt;&gt; FE.add_neumann_BC(-0.4, &#39;east&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; # solve for 0.01 days</span>
+<span class="sd">        &gt;&gt;&gt; iterations = FE.dt_solve(dt=0.01)</span>
+<span class="sd">        &gt;&gt;&gt; iterations</span>
+<span class="sd">        2</span>
+<span class="sd">        &gt;&gt;&gt; FE.states</span>
+<span class="sd">        array([  0.        ,  -1.0353111 ,  -2.07549983,  -3.1195156 ,</span>
+<span class="sd">                -4.16702367,  -5.21790586,  -6.27215519,  -7.32983969,</span>
+<span class="sd">                -8.39108809,  -9.45608494, -10.52507089])</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_boundaries</span><span class="p">()</span>
@@ -2037,10 +2333,55 @@
 <div class="viewcode-block" id="Flow1DFE.solve"><a class="viewcode-back" href="../../../waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE.solve">[docs]</a>    <span class="k">def</span> <span class="nf">solve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">dt_min</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> <span class="n">dt_max</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">end_time</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
               <span class="n">dtitlow</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">dtithigh</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">itermin</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">itermax</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
               <span class="n">verbosity</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; solve the system for a given period of time </span>
+        <span class="sd">&quot;&quot;&quot; Solve the system for an arbitrary period of time</span>
 
-<span class="sd">        Combination of sequential calls to :py:meth:`~dt_solve`. This is the</span>
-<span class="sd">        outer loop that progresses the model over time.</span>
+<span class="sd">        The outer loop that progresses the model over time by calling</span>
+<span class="sd">        :py:meth:`~dt_solve` sequentially until ``end_time`` is reached.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dt : `int` or `float`</span>
+<span class="sd">            Initial time step.</span>
+<span class="sd">        dt_min : `int` or `float`, default is 1e-5</span>
+<span class="sd">            Minimum time step size for which will be solved.</span>
+<span class="sd">        dt_max : `int` or `float`, default is 0.5</span>
+<span class="sd">            Maximum time step size for which will be solved.</span>
+<span class="sd">        end_time : `int` or `float`, default is 1</span>
+<span class="sd">            Total period of time for which will be solved.</span>
+<span class="sd">        maxiter : `int`, default is 500</span>
+<span class="sd">            Maximum number of iterations in which the system should</span>
+<span class="sd">            converge to a solution.</span>
+<span class="sd">        dtitlow : `float`, default is 1.5, :math:`&gt;1`</span>
+<span class="sd">            Multiplier for increasing ``dt`` for the next time step.</span>
+<span class="sd">        dtithigh : `float`, default is 0.5, :math:`\\langle 0,1 \\rangle`</span>
+<span class="sd">            Multiplier for decreasing ``dt`` for the next time step.</span>
+<span class="sd">        itermin : `int`, default is 5, :math:`&gt;2`</span>
+<span class="sd">            Maximum number of iterations at which the time step ``dt``</span>
+<span class="sd">            will be multiplied with its increasing multiplier ``dtitlow``</span>
+<span class="sd">            for the next time step.</span>
+<span class="sd">        itermax : `int`, default is 10, :math:`&gt;3`</span>
+<span class="sd">            Minimum number of iterations at which the time step ``dt``</span>
+<span class="sd">            will be multiplied with its decreasing multiplier ``dtithigh``</span>
+<span class="sd">            for the next time step.</span>
+
+<span class="sd">            .. warning::</span>
+<span class="sd">                ``itermin`` &lt; ``itermin``.</span>
+
+<span class="sd">        threshold : `float`, default is 1e-3</span>
+<span class="sd">            Threshold for conversion, the system has converged when the</span>
+<span class="sd">            definition below is satisfied:</span>
+
+<span class="sd">            .. math::</span>
+<span class="sd">                max(abs(s_{t-1}-s_{t})) &lt; max(abs(threshold * s_{t}))</span>
+
+<span class="sd">        verbosity : `bool`, default is True</span>
+<span class="sd">            Be descriptive about the solve process.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -2145,7 +2486,7 @@
 <span class="sd">        and spatial fluxes.</span>
 
 <span class="sd">        .. math::</span>
-<span class="sd">            F_{external} = \\sum_{j=1}^{n} S_{j} + \\sum_{k=1}^{m} P{j}</span>
+<span class="sd">            F_{external} = \\sum_{j=1}^{n} S_{j} + \\sum_{k=1}^{m} P_{k}</span>
 
 <span class="sd">        The calculation of the pointflux, :math:`P_{k}`, depends on its</span>
 <span class="sd">        nature. If the pointflux depends on position only, the accumulation is</span>
@@ -2170,11 +2511,9 @@
 <span class="sd">        distinction exists. If the spatial flux is not dependend on state,</span>
 <span class="sd">        straightforward addition takes place. When there is a state</span>
 <span class="sd">        dependency, distributions towards the nodes is calculated as</span>
-<span class="sd">        described in :py:meth:`~_internal_forcing` where</span>
-<span class="sd">        :math:`S_{j}(x, s)` is substituted for the :py:attr:`~systemfluxfunc`</span>
-<span class="sd">        :math:`Q(x, s, grad)`. This calculation accounts for the selected</span>
-<span class="sd">        :py:attr:`~gauss_degree` and the state argument :math:`s` is linearly</span>
-<span class="sd">        interpolated between the neareast nodes.</span>
+<span class="sd">        described in :py:meth:`~_statedep_forcing`. This calculation accounts</span>
+<span class="sd">        for the selected :py:attr:`~gauss_degree` and the state argument</span>
+<span class="sd">        :math:`s` is linearly interpolated between the neareast nodes.</span>
 
 <span class="sd">        The total forcing in the water balance is the sum of the internal</span>
 <span class="sd">        forcing as described in :py:meth:`~_internal_forcing` and the external</span>
