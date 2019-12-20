@@ -1306,7 +1306,7 @@ class Flow1DFE:
         >>> from waterflow.utility.helper import initializer
 
         Implement the Richards equation for unsturated flow, herein the
-        Van Genuchten conductivity function is used. :cite:`Strunk1979`.
+        Van Genuchten conductivity function is used, :cite:`Strunk1979`.
         Soil 13, 'loam', from De Staringreeks :cite:`Strunk1979` is selected.
         See :py:func:`~waterflow.utility.fluxfunctions.richards_equation` for
         the full definition of the fluxfunction.
@@ -2034,7 +2034,7 @@ class Flow1DFE:
     def dt_solve(self, dt, maxiter=500, threshold=1e-3):
         """ Solve the system for one specific time step
 
-        Performs the Newton-Raphson method, :cite:`Strunk1979`, for a solution
+        Performs the Newton-Raphson method, :cite:`Newton1964`, for a solution
         to the system of equations.
 
         Parameters
@@ -2077,7 +2077,7 @@ class Flow1DFE:
             c.  Calculation of state dependent forcing values (:py:meth:`~_statedep_forcing`).
 
         5.  Build the jacobian matrix (:py:meth:`~_CMAT`).
-        6.  Newton-Raphson iteration :cite:`Strunk1979`.
+        6.  Newton-Raphson iteration :cite:`Newton1964`.
 
             a.  :math:`A * y + F_{forcing} = 0` is solved for :math:`y` (:py:func:`~numpy.linalg.solve`).
             b.  :math:`y` is accumulated to :py:attr:`~states`.
@@ -2098,7 +2098,7 @@ class Flow1DFE:
         >>> from waterflow.utility import fluxfunctions as fluxf
         >>> from waterflow.utility.helper import initializer
 
-        Select soil 13, 'loam', from De Staringreeks :cite:`Strunk1979`
+        Select soil 13, 'loam', from De Staringreeks :cite:`Wosten2001`
         and prepare the conductivity function and theta-h relation with the
         soil parameters. These functions are the arguments to the fluxfunction
         and the storage change function repectively.
@@ -2184,6 +2184,11 @@ class Flow1DFE:
 
         The outer loop that progresses the model over time by calling
         :py:meth:`~dt_solve` sequentially until ``end_time`` is reached.
+        Each sequential call to :py:meth:`~dt_solve` will produce a new
+        solved object that holds the current model states at the specific time.
+        This data will be saved to :py:attr:`~solve_data`. The total time that
+        it takes for this method to converge to a solution at ``end_time`` is
+        saved in :py:attr:`~runtime`.
 
         Parameters
         ----------
@@ -2212,7 +2217,9 @@ class Flow1DFE:
             for the next time step.
 
             .. warning::
-                ``itermin`` < ``itermin``.
+                ``itermin`` < ``itermin``. See the notes below for a
+                precise description of the variable time step selection
+                procedure.
 
         threshold : `float`, default is 1e-3
             Threshold for conversion, the system has converged when the
@@ -2227,11 +2234,77 @@ class Flow1DFE:
         Notes
         -----
 
+        .. note::
+            This method may also be used for stationary systems in which no
+            time step value is given. The default value for ``dt`` can be
+            passed because of the method being independent from this argument
+            in such a case.
+
+        **Variable time step selection**
+
+        The number of iterations, Niter, returned by :py:meth:`~dt_solve` will
+        decide how the time step ``dt`` will be altered for the next call to
+        :py:meth:`~dt_solve`. See the description below:
+
+        1.  If Niter > ``maxiter``, then ``dt`` * ``dtithigh``.
+        2.  If Niter < ``maxiter``, then check for the following:
+
+                A.  If Niter <= ``itermin``, then ``dt`` * ``dtitlow``.
+                B.  If Niter >= ``itermax``, then ``dt`` * ``dtithigh``.
+                C.  If ``itermin`` < Niter < ``itermax``, then ``dt``.
+
+        Note that ``dt`` cannot become smaller than ``dt_min`` or larger
+        than ``dt_max``.
+
+            .. warning::
+                The size of the last time step is not determined by this
+                procedure but will be calculated as difference between the
+                current time and the ``end_time`` so the model will
+                have its last solution on its ``end_time`` exactly.
+
         Examples
         --------
+        >>> from waterflow.flow1d.flowFE1d import Flow1DFE
+        >>> from waterflow.utility import conductivityfunctions as condf
+        >>> from waterflow.utility import fluxfunctions as fluxf
+        >>> from waterflow.utility.helper import initializer
+
+        Select soil 13, 'loam', from De Staringreeks :cite:`Strunk1979`
+        and prepare the conductivity function and theta-h relation with the
+        soil parameters. These functions are the arguments to the fluxfunction
+        and the storage change function repectively.
+
+        >>> s, *_ = condf.soilselector([13])[0]
+        >>> theta_h = initializer(condf.VG_pressureh, theta_r=s.t_res,
+        ...                       theta_s=s.t_sat, a=s.alpha, n=s.n)
+        >>> kfun = initializer(condf.VG_conductivity, ksat=s.ksat, a=s.alpha, n=s.n)
+        >>> storage_change = initializer(fluxf.storage_change, fun=theta_h)
+
+        >>> FE = Flow1DFE("Solve for a period of time")
+        >>> FE.set_systemfluxfunction(fluxf.richards_equation, kfun=kfun)
+        >>> FE.set_field1d(nodes=(-10, 0, 11))
+        >>> FE.add_dirichlet_BC(0.0, 'west')
+        >>> FE.add_neumann_BC(-0.3, 'east')
+        >>> FE.add_spatialflux(-0.001, 'Extraction')
+        >>> FE.solve(verbosity=False)
+        >>> FE.solve_data.keys()
+        dict_keys(['solved_objects', 'time', 'dt', 'iter'])
+        >>> # Solving the stationary system will call dt_solve only once. The
+        >>> # result is the initial object and the solved one.
+        >>> FE.solve_data['solved_objects']
+        [Flow1DFE(Solve for a period of time), Flow1DFE(Solve for a period of time)]
+
+        >>> # Make the system transient
+        >>> FE.add_spatialflux(storage_change)
+        >>> # Change the boundary to drive a change in the currently
+        >>> # stationary solution.
+        >>> FE.add_neumann_BC(-0.4, 'east')
+        >>> FE.solve(verbosity=False, end_time=0.1)
+        >>> # This will now return a sequence of solved objects at specific times.
+        >>> FE.solve_data['solved_objects']
+        [Flow1DFE(Solve for a period of time), Flow1DFE(Solve for a period of time), Flow1DFE(Solve for a period of time), Flow1DFE(Solve for a period of time), Flow1DFE(Solve for a period of time), Flow1DFE(Solve for a period of time), Flow1DFE(Solve for a period of time), Flow1DFE(Solve for a period of time), Flow1DFE(Solve for a period of time), Flow1DFE(Solve for a period of time), Flow1DFE(Solve for a period of time)]
 
         """
-
         solved_objs = [deepcopy(self)]
         time_data = [0]
         dt_data = [None]

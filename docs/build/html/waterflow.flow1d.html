@@ -906,7 +906,7 @@ explicitly.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="k">import</span> <span class="n">initializer</span>
 </pre></div>
 </div>
-<p>Select soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="#strunk1979" id="id1">[SW79]</a>
+<p>Select soil 13, ‘loam’, from De Staringreeks <span class="bibtex" id="id1">[Strunk1979]</span>
 and prepare the conductivity function and theta-h relation with the
 soil parameters. These functions are the arguments to the fluxfunction
 and the storage change function repectively.</p>
@@ -1039,7 +1039,7 @@ when called with default arguments.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="k">import</span> <span class="n">initializer</span>
 </pre></div>
 </div>
-<p>Select soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="#strunk1979" id="id2">[SW79]</a>
+<p>Select soil 13, ‘loam’, from De Staringreeks <span class="bibtex" id="id2">[Strunk1979]</span>
 and prepare the conductivity function with the soil parameters.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">condf</span><span class="o">.</span><span class="n">soilselector</span><span class="p">([</span><span class="mi">13</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">kfun</span> <span class="o">=</span> <span class="n">initializer</span><span class="p">(</span><span class="n">condf</span><span class="o">.</span><span class="n">VG_conductivity</span><span class="p">,</span> <span class="n">ksat</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">ksat</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
@@ -1536,7 +1536,7 @@ the <img class="math" src="_images/math/6fd2860318fa09d7c44f574ad52a40cdf7ba79cf
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="k">import</span> <span class="n">initializer</span>
 </pre></div>
 </div>
-<p>Select soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="#strunk1979" id="id3">[SW79]</a>
+<p>Select soil 13, ‘loam’, from De Staringreeks <span class="bibtex" id="id3">[Strunk1979]</span>
 and prepare the conductivity function and theta-h relation with the
 soil parameters. These functions are the arguments to the fluxfunction
 and the storage change function repectively.</p>
@@ -1608,7 +1608,7 @@ to the dataframe.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="k">import</span> <span class="n">initializer</span>
 </pre></div>
 </div>
-<p>Select soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="#strunk1979" id="id4">[SW79]</a>
+<p>Select soil 13, ‘loam’, from De Staringreeks <span class="bibtex" id="id4">[Strunk1979]</span>
 and prepare the conductivity function and theta-h relation with the
 soil parameters. These functions are the arguments to the fluxfunction
 and the storage change function repectively.</p>
@@ -1653,7 +1653,7 @@ and the storage change function repectively.</p>
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.dt_solve">
 <code class="sig-name descname">dt_solve</code><span class="sig-paren">(</span><em class="sig-param">dt</em>, <em class="sig-param">maxiter=500</em>, <em class="sig-param">threshold=0.001</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/flow1d/flowFE1d.html#Flow1DFE.dt_solve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.dt_solve" title="Permalink to this definition">¶</a></dt>
 <dd><p>Solve the system for one specific time step</p>
-<p>Performs the Newton-Raphson method, <a class="bibtex reference internal" href="#strunk1979" id="id5">[SW79]</a>, for a solution
+<p>Performs the Newton-Raphson method, <a class="bibtex reference internal" href="#newton1964" id="id5">[New64]</a>, for a solution
 to the system of equations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1697,7 +1697,7 @@ function if system is transient (<a class="reference internal" href="#waterflow.
 </ol>
 </li>
 <li><p>Build the jacobian matrix (<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE._CMAT" title="waterflow.flow1d.flowFE1d.Flow1DFE._CMAT"><code class="xref py py-meth docutils literal notranslate"><span class="pre">_CMAT()</span></code></a>).</p></li>
-<li><p>Newton-Raphson iteration <a class="bibtex reference internal" href="#strunk1979" id="id6">[SW79]</a>.</p>
+<li><p>Newton-Raphson iteration <a class="bibtex reference internal" href="#newton1964" id="id6">[New64]</a>.</p>
 <ol class="loweralpha simple">
 <li><p><img class="math" src="_images/math/aaf9d72928602213963e5fbe2b5e2afecf5d0332.png" alt="A * y + F_{forcing} = 0"/> is solved for <img class="math" src="_images/math/1b5e577d6216dca3af7d87aa122a0b9b360d6cb3.png" alt="y"/> (<code class="xref py py-func docutils literal notranslate"><span class="pre">solve()</span></code>).</p></li>
 <li><p><img class="math" src="_images/math/1b5e577d6216dca3af7d87aa122a0b9b360d6cb3.png" alt="y"/> is accumulated to <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.states" title="waterflow.flow1d.flowFE1d.Flow1DFE.states"><code class="xref py py-attr docutils literal notranslate"><span class="pre">states</span></code></a>.</p></li>
@@ -1722,7 +1722,7 @@ next iteration from step 3.</p></li>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="k">import</span> <span class="n">initializer</span>
 </pre></div>
 </div>
-<p>Select soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="#strunk1979" id="id7">[SW79]</a>
+<p>Select soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="#wosten2001" id="id7">[WostenVDS01]</a>
 and prepare the conductivity function and theta-h relation with the
 soil parameters. These functions are the arguments to the fluxfunction
 and the storage change function repectively.</p>
@@ -2030,7 +2030,7 @@ following closed form equation.</p>
 <p><span class="eqno">(43)<a class="headerlink" href="#equation-waterflow-flow1d-42" title="Permalink to this equation">¶</a></span><img src="_images/math/4e3010d8c0c2496f79e1cc6a58332c2d24a634bc.png" alt="w_{\lambda} = \frac{2}{\left(\left(1 - p_{\lambda}^{2}\right) *
 P_{\Lambda}^{'}(p_{\lambda})^{2}\right)}"/></p>
 </div><p>A full description of the theory behind this Gaussain quadrature method
-is documented in <a class="bibtex reference internal" href="#strunk1979" id="id8">[SW79]</a>.</p>
+is documented in <span class="bibtex" id="id8">[Strunk1979]</span>.</p>
 <p class="rubric">Examples</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.flow1d.flowFE1d</span> <span class="k">import</span> <span class="n">Flow1DFE</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span> <span class="o">=</span> <span class="n">Flow1DFE</span><span class="p">(</span><span class="s2">&quot;Gaussian quadrature&quot;</span><span class="p">)</span>
@@ -2107,8 +2107,8 @@ remains the same.</p></li>
 </pre></div>
 </div>
 <p>Implement the Richards equation for unsturated flow, herein the
-Van Genuchten conductivity function is used. <a class="bibtex reference internal" href="#strunk1979" id="id9">[SW79]</a>.
-Soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="#strunk1979" id="id10">[SW79]</a> is selected.
+Van Genuchten conductivity function is used, <span class="bibtex" id="id9">[Strunk1979]</span>.
+Soil 13, ‘loam’, from De Staringreeks <span class="bibtex" id="id10">[Strunk1979]</span> is selected.
 See <a class="reference internal" href="waterflow.utility.html#waterflow.utility.fluxfunctions.richards_equation" title="waterflow.utility.fluxfunctions.richards_equation"><code class="xref py py-func docutils literal notranslate"><span class="pre">richards_equation()</span></code></a> for
 the full definition of the fluxfunction.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">condf</span><span class="o">.</span><span class="n">soilselector</span><span class="p">([</span><span class="mi">13</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
@@ -2119,7 +2119,7 @@ the full definition of the fluxfunction.</p>
 </pre></div>
 </div>
 <p>For saturated flow the Darcy equation with a constant saturated
-conductivity can be used. <a class="bibtex reference internal" href="#strunk1979" id="id11">[SW79]</a>. See
+conductivity can be used. <span class="bibtex" id="id11">[Strunk1979]</span>. See
 <a class="reference internal" href="waterflow.utility.html#waterflow.utility.fluxfunctions.darcy" title="waterflow.utility.fluxfunctions.darcy"><code class="xref py py-func docutils literal notranslate"><span class="pre">darcy()</span></code></a> for the full
 definition of the fluxfunction.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">darcy</span> <span class="o">=</span> <span class="n">fluxf</span><span class="o">.</span><span class="n">darcy</span>
@@ -2134,7 +2134,12 @@ definition of the fluxfunction.</p>
 <code class="sig-name descname">solve</code><span class="sig-paren">(</span><em class="sig-param">dt=0.001</em>, <em class="sig-param">dt_min=1e-05</em>, <em class="sig-param">dt_max=0.5</em>, <em class="sig-param">end_time=1</em>, <em class="sig-param">maxiter=500</em>, <em class="sig-param">dtitlow=1.5</em>, <em class="sig-param">dtithigh=0.5</em>, <em class="sig-param">itermin=5</em>, <em class="sig-param">itermax=10</em>, <em class="sig-param">threshold=0.001</em>, <em class="sig-param">verbosity=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/flow1d/flowFE1d.html#Flow1DFE.solve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.solve" title="Permalink to this definition">¶</a></dt>
 <dd><p>Solve the system for an arbitrary period of time</p>
 <p>The outer loop that progresses the model over time by calling
-<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.dt_solve" title="waterflow.flow1d.flowFE1d.Flow1DFE.dt_solve"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dt_solve()</span></code></a> sequentially until <code class="docutils literal notranslate"><span class="pre">end_time</span></code> is reached.</p>
+<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.dt_solve" title="waterflow.flow1d.flowFE1d.Flow1DFE.dt_solve"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dt_solve()</span></code></a> sequentially until <code class="docutils literal notranslate"><span class="pre">end_time</span></code> is reached.
+Each sequential call to <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.dt_solve" title="waterflow.flow1d.flowFE1d.Flow1DFE.dt_solve"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dt_solve()</span></code></a> will produce a new
+solved object that holds the current model states at the specific time.
+This data will be saved to <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.solve_data" title="waterflow.flow1d.flowFE1d.Flow1DFE.solve_data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">solve_data</span></code></a>. The total time that
+it takes for this method to converge to a solution at <code class="docutils literal notranslate"><span class="pre">end_time</span></code> is
+saved in <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.runtime" title="waterflow.flow1d.flowFE1d.Flow1DFE.runtime"><code class="xref py py-attr docutils literal notranslate"><span class="pre">runtime</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -2154,7 +2159,9 @@ will be multiplied with its decreasing multiplier <code class="docutils literal 
 for the next time step.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p><code class="docutils literal notranslate"><span class="pre">itermin</span></code> &lt; <code class="docutils literal notranslate"><span class="pre">itermin</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">itermin</span></code> &lt; <code class="docutils literal notranslate"><span class="pre">itermin</span></code>. See the notes below for a
+precise description of the variable time step selection
+procedure.</p>
 </div>
 </p></li>
 <li><p><strong>threshold</strong> (<cite>float</cite>, default is 1e-3) – <p>Threshold for conversion, the system has converged when the
@@ -2167,7 +2174,84 @@ definition below is satisfied:</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This method may also be used for stationary systems in which no
+time step value is given. The default value for <code class="docutils literal notranslate"><span class="pre">dt</span></code> can be
+passed because of the method being independent from this argument
+in such a case.</p>
+</div>
+<p><strong>Variable time step selection</strong></p>
+<p>The number of iterations, Niter, returned by <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.dt_solve" title="waterflow.flow1d.flowFE1d.Flow1DFE.dt_solve"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dt_solve()</span></code></a> will
+decide how the time step <code class="docutils literal notranslate"><span class="pre">dt</span></code> will be altered for the next call to
+<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.dt_solve" title="waterflow.flow1d.flowFE1d.Flow1DFE.dt_solve"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dt_solve()</span></code></a>. See the description below:</p>
+<ol class="arabic">
+<li><p>If Niter &gt; <code class="docutils literal notranslate"><span class="pre">maxiter</span></code>, then <code class="docutils literal notranslate"><span class="pre">dt</span></code> * <code class="docutils literal notranslate"><span class="pre">dtithigh</span></code>.</p></li>
+<li><p>If Niter &lt; <code class="docutils literal notranslate"><span class="pre">maxiter</span></code>, then check for the following:</p>
+<blockquote>
+<div><ol class="upperalpha simple">
+<li><p>If Niter &lt;= <code class="docutils literal notranslate"><span class="pre">itermin</span></code>, then <code class="docutils literal notranslate"><span class="pre">dt</span></code> * <code class="docutils literal notranslate"><span class="pre">dtitlow</span></code>.</p></li>
+<li><p>If Niter &gt;= <code class="docutils literal notranslate"><span class="pre">itermax</span></code>, then <code class="docutils literal notranslate"><span class="pre">dt</span></code> * <code class="docutils literal notranslate"><span class="pre">dtithigh</span></code>.</p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">itermin</span></code> &lt; Niter &lt; <code class="docutils literal notranslate"><span class="pre">itermax</span></code>, then <code class="docutils literal notranslate"><span class="pre">dt</span></code>.</p></li>
+</ol>
+</div></blockquote>
+</li>
+</ol>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">dt</span></code> cannot become smaller than <code class="docutils literal notranslate"><span class="pre">dt_min</span></code> or larger
+than <code class="docutils literal notranslate"><span class="pre">dt_max</span></code>.</p>
+<blockquote>
+<div><div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The size of the last time step is not determined by this
+procedure but will be calculated as difference between the
+current time and the <code class="docutils literal notranslate"><span class="pre">end_time</span></code> so the model will
+have its last solution on its <code class="docutils literal notranslate"><span class="pre">end_time</span></code> exactly.</p>
+</div>
+</div></blockquote>
 <p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.flow1d.flowFE1d</span> <span class="k">import</span> <span class="n">Flow1DFE</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility</span> <span class="k">import</span> <span class="n">conductivityfunctions</span> <span class="k">as</span> <span class="n">condf</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility</span> <span class="k">import</span> <span class="n">fluxfunctions</span> <span class="k">as</span> <span class="n">fluxf</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="k">import</span> <span class="n">initializer</span>
+</pre></div>
+</div>
+<p>Select soil 13, ‘loam’, from De Staringreeks <span class="bibtex" id="id12">[Strunk1979]</span>
+and prepare the conductivity function and theta-h relation with the
+soil parameters. These functions are the arguments to the fluxfunction
+and the storage change function repectively.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">condf</span><span class="o">.</span><span class="n">soilselector</span><span class="p">([</span><span class="mi">13</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">theta_h</span> <span class="o">=</span> <span class="n">initializer</span><span class="p">(</span><span class="n">condf</span><span class="o">.</span><span class="n">VG_pressureh</span><span class="p">,</span> <span class="n">theta_r</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">t_res</span><span class="p">,</span>
+<span class="gp">... </span>                      <span class="n">theta_s</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">t_sat</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">kfun</span> <span class="o">=</span> <span class="n">initializer</span><span class="p">(</span><span class="n">condf</span><span class="o">.</span><span class="n">VG_conductivity</span><span class="p">,</span> <span class="n">ksat</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">ksat</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">storage_change</span> <span class="o">=</span> <span class="n">initializer</span><span class="p">(</span><span class="n">fluxf</span><span class="o">.</span><span class="n">storage_change</span><span class="p">,</span> <span class="n">fun</span><span class="o">=</span><span class="n">theta_h</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span> <span class="o">=</span> <span class="n">Flow1DFE</span><span class="p">(</span><span class="s2">&quot;Solve for a period of time&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">set_systemfluxfunction</span><span class="p">(</span><span class="n">fluxf</span><span class="o">.</span><span class="n">richards_equation</span><span class="p">,</span> <span class="n">kfun</span><span class="o">=</span><span class="n">kfun</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">set_field1d</span><span class="p">(</span><span class="n">nodes</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">11</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">add_dirichlet_BC</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;west&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">add_neumann_BC</span><span class="p">(</span><span class="o">-</span><span class="mf">0.3</span><span class="p">,</span> <span class="s1">&#39;east&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">add_spatialflux</span><span class="p">(</span><span class="o">-</span><span class="mf">0.001</span><span class="p">,</span> <span class="s1">&#39;Extraction&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">verbosity</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">solve_data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+<span class="go">dict_keys([&#39;solved_objects&#39;, &#39;time&#39;, &#39;dt&#39;, &#39;iter&#39;])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Solving the stationary system will call dt_solve only once. The</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># result is the initial object and the solved one.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">solve_data</span><span class="p">[</span><span class="s1">&#39;solved_objects&#39;</span><span class="p">]</span>
+<span class="go">[Flow1DFE(Solve for a period of time), Flow1DFE(Solve for a period of time)]</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Make the system transient</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">add_spatialflux</span><span class="p">(</span><span class="n">storage_change</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Change the boundary to drive a change in the currently</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># stationary solution.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">add_neumann_BC</span><span class="p">(</span><span class="o">-</span><span class="mf">0.4</span><span class="p">,</span> <span class="s1">&#39;east&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">verbosity</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">end_time</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># This will now return a sequence of solved objects at specific times.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FE</span><span class="o">.</span><span class="n">solve_data</span><span class="p">[</span><span class="s1">&#39;solved_objects&#39;</span><span class="p">]</span>
+<span class="go">[Flow1DFE(Solve for a period of time), Flow1DFE(Solve for a period of time), Flow1DFE(Solve for a period of time), Flow1DFE(Solve for a period of time), Flow1DFE(Solve for a period of time), Flow1DFE(Solve for a period of time), Flow1DFE(Solve for a period of time), Flow1DFE(Solve for a period of time), Flow1DFE(Solve for a period of time), Flow1DFE(Solve for a period of time), Flow1DFE(Solve for a period of time)]</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="method">
@@ -2242,7 +2326,7 @@ extension. The string version of the description is also available via
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="k">import</span> <span class="n">initializer</span>
 </pre></div>
 </div>
-<p>Select soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="#strunk1979" id="id12">[SW79]</a>
+<p>Select soil 13, ‘loam’, from De Staringreeks <span class="bibtex" id="id13">[Strunk1979]</span>
 and prepare the conductivity function and theta-h relation with the
 soil parameters. These functions are the arguments to the fluxfunction
 and the storage change function repectively.</p>
@@ -2325,7 +2409,7 @@ known object that was solved for in terms of time
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="k">import</span> <span class="n">initializer</span>
 </pre></div>
 </div>
-<p>Select soil 13, ‘loam’, from De Staringreeks <a class="bibtex reference internal" href="#strunk1979" id="id13">[SW79]</a>
+<p>Select soil 13, ‘loam’, from De Staringreeks <span class="bibtex" id="id14">[Strunk1979]</span>
 and prepare the conductivity function and theta-h relation with the
 soil parameters. These functions are the arguments to the fluxfunction
 and the storage change function repectively.</p>
@@ -2428,8 +2512,11 @@ and the storage change function repectively.</p>
 <div class="section" id="references">
 <h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
 <p id="bibtex-bibliography-waterflow.flow1d-0"><dl class="citation">
-<dt class="bibtex label" id="strunk1979"><span class="brackets">SW79</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id2">2</a>,<a href="#id3">3</a>,<a href="#id4">4</a>,<a href="#id5">5</a>,<a href="#id6">6</a>,<a href="#id7">7</a>,<a href="#id8">8</a>,<a href="#id9">9</a>,<a href="#id10">10</a>,<a href="#id11">11</a>,<a href="#id12">12</a>,<a href="#id13">13</a>)</span></dt>
-<dd><p>William Strunk, Jr. and E. B. White. <em>The Elements of Style</em>. Macmillan, third edition, 1979.</p>
+<dt class="bibtex label" id="newton1964"><span class="brackets">New64</span><span class="fn-backref">(<a href="#id5">1</a>,<a href="#id6">2</a>)</span></dt>
+<dd><p>Isaac Newton. Methodus fluxionum et serierum infinitarum. <em>Opuscula mathematica, philosophica et philologica</em>, 1964.</p>
+</dd>
+<dt class="bibtex label" id="wosten2001"><span class="brackets"><a class="fn-backref" href="#id7">WostenVDS01</a></span></dt>
+<dd><p>J. H M Wösten, G.J Veerman, W.J.M DeGroot, and J Stolte. Waterretentie- en doorlatendheidskarakteristieken van boven- en ondergronden in Nederland: de Staringreeks. <em>Alterra Rapport</em>, 153:86, 2001. <a class="reference external" href="https://doi.org/153">doi:153</a>.</p>
 </dd>
 </dl>
 </p>

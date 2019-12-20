@@ -1459,7 +1459,7 @@
 <span class="sd">        &gt;&gt;&gt; from waterflow.utility.helper import initializer</span>
 
 <span class="sd">        Implement the Richards equation for unsturated flow, herein the</span>
-<span class="sd">        Van Genuchten conductivity function is used. :cite:`Strunk1979`.</span>
+<span class="sd">        Van Genuchten conductivity function is used, :cite:`Strunk1979`.</span>
 <span class="sd">        Soil 13, &#39;loam&#39;, from De Staringreeks :cite:`Strunk1979` is selected.</span>
 <span class="sd">        See :py:func:`~waterflow.utility.fluxfunctions.richards_equation` for</span>
 <span class="sd">        the full definition of the fluxfunction.</span>
@@ -2187,7 +2187,7 @@
 <div class="viewcode-block" id="Flow1DFE.dt_solve"><a class="viewcode-back" href="../../../waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE.dt_solve">[docs]</a>    <span class="k">def</span> <span class="nf">dt_solve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Solve the system for one specific time step</span>
 
-<span class="sd">        Performs the Newton-Raphson method, :cite:`Strunk1979`, for a solution</span>
+<span class="sd">        Performs the Newton-Raphson method, :cite:`Newton1964`, for a solution</span>
 <span class="sd">        to the system of equations.</span>
 
 <span class="sd">        Parameters</span>
@@ -2230,7 +2230,7 @@
 <span class="sd">            c.  Calculation of state dependent forcing values (:py:meth:`~_statedep_forcing`).</span>
 
 <span class="sd">        5.  Build the jacobian matrix (:py:meth:`~_CMAT`).</span>
-<span class="sd">        6.  Newton-Raphson iteration :cite:`Strunk1979`.</span>
+<span class="sd">        6.  Newton-Raphson iteration :cite:`Newton1964`.</span>
 
 <span class="sd">            a.  :math:`A * y + F_{forcing} = 0` is solved for :math:`y` (:py:func:`~numpy.linalg.solve`).</span>
 <span class="sd">            b.  :math:`y` is accumulated to :py:attr:`~states`.</span>
@@ -2251,7 +2251,7 @@
 <span class="sd">        &gt;&gt;&gt; from waterflow.utility import fluxfunctions as fluxf</span>
 <span class="sd">        &gt;&gt;&gt; from waterflow.utility.helper import initializer</span>
 
-<span class="sd">        Select soil 13, &#39;loam&#39;, from De Staringreeks :cite:`Strunk1979`</span>
+<span class="sd">        Select soil 13, &#39;loam&#39;, from De Staringreeks :cite:`Wosten2001`</span>
 <span class="sd">        and prepare the conductivity function and theta-h relation with the</span>
 <span class="sd">        soil parameters. These functions are the arguments to the fluxfunction</span>
 <span class="sd">        and the storage change function repectively.</span>
@@ -2337,6 +2337,11 @@
 
 <span class="sd">        The outer loop that progresses the model over time by calling</span>
 <span class="sd">        :py:meth:`~dt_solve` sequentially until ``end_time`` is reached.</span>
+<span class="sd">        Each sequential call to :py:meth:`~dt_solve` will produce a new</span>
+<span class="sd">        solved object that holds the current model states at the specific time.</span>
+<span class="sd">        This data will be saved to :py:attr:`~solve_data`. The total time that</span>
+<span class="sd">        it takes for this method to converge to a solution at ``end_time`` is</span>
+<span class="sd">        saved in :py:attr:`~runtime`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -2365,7 +2370,9 @@
 <span class="sd">            for the next time step.</span>
 
 <span class="sd">            .. warning::</span>
-<span class="sd">                ``itermin`` &lt; ``itermin``.</span>
+<span class="sd">                ``itermin`` &lt; ``itermin``. See the notes below for a</span>
+<span class="sd">                precise description of the variable time step selection</span>
+<span class="sd">                procedure.</span>
 
 <span class="sd">        threshold : `float`, default is 1e-3</span>
 <span class="sd">            Threshold for conversion, the system has converged when the</span>
@@ -2380,11 +2387,77 @@
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 
+<span class="sd">        .. note::</span>
+<span class="sd">            This method may also be used for stationary systems in which no</span>
+<span class="sd">            time step value is given. The default value for ``dt`` can be</span>
+<span class="sd">            passed because of the method being independent from this argument</span>
+<span class="sd">            in such a case.</span>
+
+<span class="sd">        **Variable time step selection**</span>
+
+<span class="sd">        The number of iterations, Niter, returned by :py:meth:`~dt_solve` will</span>
+<span class="sd">        decide how the time step ``dt`` will be altered for the next call to</span>
+<span class="sd">        :py:meth:`~dt_solve`. See the description below:</span>
+
+<span class="sd">        1.  If Niter &gt; ``maxiter``, then ``dt`` * ``dtithigh``.</span>
+<span class="sd">        2.  If Niter &lt; ``maxiter``, then check for the following:</span>
+
+<span class="sd">                A.  If Niter &lt;= ``itermin``, then ``dt`` * ``dtitlow``.</span>
+<span class="sd">                B.  If Niter &gt;= ``itermax``, then ``dt`` * ``dtithigh``.</span>
+<span class="sd">                C.  If ``itermin`` &lt; Niter &lt; ``itermax``, then ``dt``.</span>
+
+<span class="sd">        Note that ``dt`` cannot become smaller than ``dt_min`` or larger</span>
+<span class="sd">        than ``dt_max``.</span>
+
+<span class="sd">            .. warning::</span>
+<span class="sd">                The size of the last time step is not determined by this</span>
+<span class="sd">                procedure but will be calculated as difference between the</span>
+<span class="sd">                current time and the ``end_time`` so the model will</span>
+<span class="sd">                have its last solution on its ``end_time`` exactly.</span>
+
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; from waterflow.flow1d.flowFE1d import Flow1DFE</span>
+<span class="sd">        &gt;&gt;&gt; from waterflow.utility import conductivityfunctions as condf</span>
+<span class="sd">        &gt;&gt;&gt; from waterflow.utility import fluxfunctions as fluxf</span>
+<span class="sd">        &gt;&gt;&gt; from waterflow.utility.helper import initializer</span>
+
+<span class="sd">        Select soil 13, &#39;loam&#39;, from De Staringreeks :cite:`Strunk1979`</span>
+<span class="sd">        and prepare the conductivity function and theta-h relation with the</span>
+<span class="sd">        soil parameters. These functions are the arguments to the fluxfunction</span>
+<span class="sd">        and the storage change function repectively.</span>
+
+<span class="sd">        &gt;&gt;&gt; s, *_ = condf.soilselector([13])[0]</span>
+<span class="sd">        &gt;&gt;&gt; theta_h = initializer(condf.VG_pressureh, theta_r=s.t_res,</span>
+<span class="sd">        ...                       theta_s=s.t_sat, a=s.alpha, n=s.n)</span>
+<span class="sd">        &gt;&gt;&gt; kfun = initializer(condf.VG_conductivity, ksat=s.ksat, a=s.alpha, n=s.n)</span>
+<span class="sd">        &gt;&gt;&gt; storage_change = initializer(fluxf.storage_change, fun=theta_h)</span>
+
+<span class="sd">        &gt;&gt;&gt; FE = Flow1DFE(&quot;Solve for a period of time&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; FE.set_systemfluxfunction(fluxf.richards_equation, kfun=kfun)</span>
+<span class="sd">        &gt;&gt;&gt; FE.set_field1d(nodes=(-10, 0, 11))</span>
+<span class="sd">        &gt;&gt;&gt; FE.add_dirichlet_BC(0.0, &#39;west&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; FE.add_neumann_BC(-0.3, &#39;east&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; FE.add_spatialflux(-0.001, &#39;Extraction&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; FE.solve(verbosity=False)</span>
+<span class="sd">        &gt;&gt;&gt; FE.solve_data.keys()</span>
+<span class="sd">        dict_keys([&#39;solved_objects&#39;, &#39;time&#39;, &#39;dt&#39;, &#39;iter&#39;])</span>
+<span class="sd">        &gt;&gt;&gt; # Solving the stationary system will call dt_solve only once. The</span>
+<span class="sd">        &gt;&gt;&gt; # result is the initial object and the solved one.</span>
+<span class="sd">        &gt;&gt;&gt; FE.solve_data[&#39;solved_objects&#39;]</span>
+<span class="sd">        [Flow1DFE(Solve for a period of time), Flow1DFE(Solve for a period of time)]</span>
+
+<span class="sd">        &gt;&gt;&gt; # Make the system transient</span>
+<span class="sd">        &gt;&gt;&gt; FE.add_spatialflux(storage_change)</span>
+<span class="sd">        &gt;&gt;&gt; # Change the boundary to drive a change in the currently</span>
+<span class="sd">        &gt;&gt;&gt; # stationary solution.</span>
+<span class="sd">        &gt;&gt;&gt; FE.add_neumann_BC(-0.4, &#39;east&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; FE.solve(verbosity=False, end_time=0.1)</span>
+<span class="sd">        &gt;&gt;&gt; # This will now return a sequence of solved objects at specific times.</span>
+<span class="sd">        &gt;&gt;&gt; FE.solve_data[&#39;solved_objects&#39;]</span>
+<span class="sd">        [Flow1DFE(Solve for a period of time), Flow1DFE(Solve for a period of time), Flow1DFE(Solve for a period of time), Flow1DFE(Solve for a period of time), Flow1DFE(Solve for a period of time), Flow1DFE(Solve for a period of time), Flow1DFE(Solve for a period of time), Flow1DFE(Solve for a period of time), Flow1DFE(Solve for a period of time), Flow1DFE(Solve for a period of time), Flow1DFE(Solve for a period of time)]</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="n">solved_objs</span> <span class="o">=</span> <span class="p">[</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)]</span>
         <span class="n">time_data</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">dt_data</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span>
