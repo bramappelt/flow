@@ -9,7 +9,6 @@ import os
 
 import numpy as np
 import pandas as pd
-from scipy.integrate import quad
 from scipy.special import legendre
 
 from waterflow import OUTPUT_DIR
@@ -32,25 +31,27 @@ class Flow1DFE:
     id_ : `str`
         Name of the model object.
 
-    savepath : `str`, optional
-        Directory to which model data will be saved.
+    savepath : `str`, default is :py:data:`~waterflow.OUTPUT_DIR`
+        Directory to which model runs will be saved.
 
     Attributes
     ----------
     id_ : `str`
         Name of the model object.
 
-    savepath: `str`
-        Model's save directory.
+    savepath: `str`, default is :py:data:`~waterflow.OUTPUT_DIR`
+        Directory to which model runs will be saved.
 
     systemfluxfunc : `function`
         Holds the selected flux function.
 
     nodes : `numpy.ndarray`
-        Nodal positions at which the system will be solved.
+        Nodal positions at which the system will be solved. Matrix of dimension
+        :math:`[1 \\times N]`.
 
     states : `numpy.ndarray`
         State solutions at the nodal positions as defined in :py:attr:`~nodes`.
+        Matrix of dimension :math:`[1 \\times N]`.
 
     seg_lengths : `numpy.ndarray`
         Lengths of segments between the nodes in the shape
@@ -83,7 +84,7 @@ class Flow1DFE:
         Contains state dependent point flux functions on the model domain. The
         key : value pairs in the dictionary have the following format:
 
-            'Flux name' : [(:math:`P`, (:math:`node_{l}`, :math:`node_{r}`, :math:`lfac`, :math:`rfac`)), :math:`F_{local}` of shape :math:`[1 \\times N]`]
+            'Flux name' : [(:math:`P`, (:math:`x_{l}`, :math:`x_{r}`, :math:`lfac`, :math:`rfac`)), :math:`F_{local}` of shape :math:`[1 \\times N]`]
 
     spatflux : `dict`
         Contains the spatial fluxes on the model domain. Both the scalar and
@@ -100,8 +101,8 @@ class Flow1DFE:
 
     internal_forcing : `dict`
         The internal forcing of the system as calculated with
-        :py:attr:`~systemfluxfunc`, using the selected Gaussian quadrature
-        :py:attr:`~degree`.
+        :py:attr:`~_internal_forcing`, using the selected Gaussian quadrature
+        :py:attr:`~gauss_degree`.
 
     forcing : `numpy.ndarray`
         All the forcing fluxes applied to the system including the storage
@@ -112,15 +113,18 @@ class Flow1DFE:
     conductivities : `numpy.ndarray`
         Hydraulic conductivities at the nodal positions, :py:attr:`~nodes`.
         These values are calculated with the conductivity function as
-        given in the :py:attr:`~systemfluxfunc`.
+        given in :py:attr:`~systemfluxfunc`. Matrix of dimension
+        :math:`[1 \\times N]`.
 
     moisture : `numpy.ndarray`
         Moisture contents at the nodal positions, :py:attr:`~nodes`. These
-        values are calculated with the explicitly assigned :py:attr:`~tfun`.
+        values are calculated with a function that should be assigned to the
+        model explicitly, having :py:attr:`~tfun` as attribute name. Matrix of
+        dimension :math:`[1 \\times N]`.
 
     fluxes : `numpy.ndarray`
         Fluxes through the :py:attr:`~nodes`, defined to be positive to the
-        right.
+        right. Matrix of dimension :math:`[1 \\times N]`.
 
     isinitial : `bool`, default is True
         First object that contains initial input which has not been solved for
@@ -144,7 +148,7 @@ class Flow1DFE:
           | consecutive model solutions to converge.
 
     runtime : `float`
-        The total time it takes for :py:meth:`~solve` to find a solution.
+        The total time (s) it takes for :py:meth:`~solve` to find a solution.
 
     df_states : `pandas.core.frame.DataFrame`
         Current information about the static model solution.
@@ -153,34 +157,37 @@ class Flow1DFE:
         Current static information about the water balance.
 
     df_balance_summary : `pandas.core.frame.DataFrame`
-        Sum of the columns as saved in :py:attr:`~df_balance`.
+        Sum of the (relevant) columns as saved in :py:attr:`~df_balance`.
 
     dft_solved_times : `pandas.core.frame.DataFrame`
         Dataframe version of :py:attr:`~solve_data`.
 
     dft_print_times : `pandas.core.frame.DataFrame`
-        Objects that contain a solution to the model at specific times,
-        calculated with :py:meth:`~transient_dataframeify`.
+        A version of :py:attr:`~dft_solved_times` but at specifically
+        chosen print times. This attribute is calculated with
+        :py:meth:`~transient_dataframeify` giving it a
+        value for ``print_times``, otherwise the default
+        :py:attr:`~dft_solved_times` will be used.
 
     dft_states : `dict`
         Collection of all :py:attr:`~df_states` dataframes for the times in
-        :py:attr:`~dft_solved_times` or at :py:attr:`~print_times` if not
-        `None`.
+        :py:attr:`~dft_solved_times` or at :py:attr:`~dft_print_times` if
+        specific print times were given.
 
     dft_nodes : `dict`
         Nodes that are selected in :py:meth:`~transient_dataframeify` are
-        saved at :py:attr:`~dft_solved_times` or at :py:attr:`~print_times`
-        if not `None`.
+        saved at :py:attr:`~dft_solved_times` or at :py:attr:`~dft_print_times`
+        if specific print times were given.
 
     dft_balance : `dict`
         Collection of all :py:attr:`~df_balance` dataframes at
-        :py:attr:`~dft_solved_times` or at :py:attr:`~print_times` if not
-        `None`.
+        :py:attr:`~dft_solved_times` or at :py:attr:`~dft_print_times` if
+        specific print times were given.
 
     dft_balance_summary : `pandas.core.frame.DataFrame`
         Collection of all :py:attr:`~df_balance_summary` dataframes at
-        :py:attr:`~dft_solved_times` or at :py:attr:`~print_times` if not
-        `None`.
+        :py:attr:`~dft_solved_times` or at :py:attr:`~dft_print_times` if
+        specific print times were given.
 
     _west : `int`
         Internal value that differentiates between a Dirichlet or Neumann
@@ -200,11 +207,11 @@ class Flow1DFE:
         for integral approximation.
 
     _xgauss : `tuple`
-        Roots of Legendre polynomial on the interval [0, 1] for the selected
-        :py:attr:`~gauss_degree`.
+        Roots of Legendre polynomial on the interval :math:`[0, 1]` for the
+        selected :py:attr:`~gauss_degree`.
 
     _wgauss : `tuple`
-        Weights that correspond to :py:attr:`~_xgauss`.
+        Weights that correspond to the positions in :py:attr:`~_xgauss`.
 
     gaussquad : `list`
         Combination of corresponding values of :py:attr:`~_xgauss` and
@@ -238,7 +245,6 @@ class Flow1DFE:
         self.conductivities = []
         self.moisture = []
         self.fluxes = []
-        self.stats = {"rmse": [], "mae": []}  # ## ??
         self.isinitial = True
         self.isconverged = False
         self.solve_data = None
@@ -258,7 +264,7 @@ class Flow1DFE:
         self._west = None
         self._east = None
         self._delta = 1e-5
-        # specific
+        # Gauss specific
         self.gauss_degree = 1
         self._xgauss = None
         self._wgauss = None
@@ -299,10 +305,10 @@ class Flow1DFE:
         >>> from waterflow.utility import fluxfunctions as fluxf
         >>> from waterflow.utility.helper import initializer
 
-        Select soil 13, 'loam', from De Staringreeks :cite:`Strunk1979`
+        Select soil 13, 'loam', from De Staringreeks :cite:`Wosten2001`
         and prepare the conductivity function and theta-h relation with the
         soil parameters. These functions are the arguments to the fluxfunction
-        and the storage change function repectively.
+        and the storage change function respectively.
 
         >>> s, *_ = condf.soilselector([13])[0]
         >>> theta_h = initializer(condf.VG_pressureh, theta_r=s.t_res,
@@ -434,7 +440,7 @@ class Flow1DFE:
             P_{\\Lambda}^{'}(p_{\\lambda})^{2}\\right)}
 
         A full description of the theory behind this Gaussain quadrature method
-        is documented in :cite:`Strunk1979`.
+        is documented in :cite:`Abramowitz1972`.
 
         Examples
         --------
@@ -552,7 +558,7 @@ class Flow1DFE:
         Argument :math:`X_{i, \\lambda}` represents the absolute position
         of the Gaussian quadrature point as saved in :py:attr:`~xintegration`.
         The state argument :math:`s_{i,\\lambda}` at this specific Gaussian
-        quadrature point is calculated as follows:        
+        quadrature point is calculated as follows:
 
         .. math::
             s_{i,\\lambda} = s_{i} * (1-p_{\\lambda}) + s_{i+1} * p_{\\lambda}
@@ -573,7 +579,7 @@ class Flow1DFE:
                                 F_{i+1} - F_{i+2}  \\\\
                                 \\vdots            \\\\
                                 F_{N-1} - F_{N}    \\\\
-                                -F_{N}
+                                F_{N}
                            \\end{bmatrix}
 
         .. note::
@@ -590,7 +596,7 @@ class Flow1DFE:
         >>> from waterflow.utility.fluxfunctions import richards_equation
         >>> from waterflow.utility.helper import initializer
 
-        Select soil 13, 'loam', from De Staringreeks :cite:`Strunk1979`
+        Select soil 13, 'loam', from De Staringreeks :cite:`Wosten2001`
         and prepare the conductivity function with the soil parameters.
 
         >>> s, *_ = condf.soilselector([13])[0]
@@ -641,13 +647,13 @@ class Flow1DFE:
     def _statedep_forcing(self):
         """ Calculation of state dependent forcing values
 
-        State dependent forcing values saved in :py:attr:`~Sspatflux` and
-        :py:attr:`~Spointflux` are calculated. The local forcing matrices
-        :math:`F_{local}` are populated and the total of both is accumulated
-        to the global forcing matrix :math:`F_{forcing}`. Forcing values at
-        the position of a Dirichlet boundary condition are set to zero. This
-        method is called internally by :py:meth:`~dt_solve` to prepare for
-        the next iteration.
+        Values for the state dependent forcing functions saved in
+        :py:attr:`~Sspatflux` and :py:attr:`~Spointflux` are calculated.
+        The local forcing matrices :math:`F_{local}` are populated and the
+        total of both is accumulated to the global forcing matrix
+        :math:`F_{forcing}`. Forcing values at the position of a Dirichlet
+        boundary condition are set to zero. This method is called internally
+        by :py:meth:`~dt_solve` to prepare for the next iteration.
 
         Notes
         -----
@@ -695,7 +701,7 @@ class Flow1DFE:
                           F_{r_{i}} + F_{l_{i+1}}    \\\\
                           F_{r_{i+1}} + F_{l_{i+2}}  \\\\
                           \\vdots                    \\\\
-                          F_{r_{N-1}} + F_{l_{N-1}}  \\\\
+                          F_{r_{N-1}} + F_{l_{N}}  \\\\
                           F_{r_{N}}
                         \\end{bmatrix}
 
@@ -850,7 +856,7 @@ class Flow1DFE:
         -----
         The conductivity function is part of the :py:attr:`~systemfluxfunc`.
         The moisture content function should be assigned to the model
-        explicitly.
+        explicitly. See the example below.
 
         Examples
         --------
@@ -860,7 +866,7 @@ class Flow1DFE:
         >>> from waterflow.utility import fluxfunctions as fluxf
         >>> from waterflow.utility.helper import initializer
 
-        Select soil 13, 'loam', from De Staringreeks :cite:`Strunk1979`
+        Select soil 13, 'loam', from De Staringreeks :cite:`Wosten2001`
         and prepare the conductivity function and theta-h relation with the
         soil parameters. These functions are the arguments to the fluxfunction
         and the storage change function repectively.
@@ -883,7 +889,7 @@ class Flow1DFE:
         []
         >>> # Create an equilibrium situation
         >>> FE.set_initial_states([-i for i in range(10)])
-        >>> # Now add the moisture content function
+        >>> # Now add the moisture content function explicitly
         >>> FE.tfun = theta_h
         >>> # Calculate again
         >>> FE._calc_theta_k()
@@ -926,12 +932,14 @@ class Flow1DFE:
         :py:attr:`~Sspatflux`. The calling signature may look as follows:
 
         ..  math::
-            storage\_change(x, s, prevstate, dt, fun=lambda\\text{ }x: 1, S=1)
+            storage\\textunderscore change(x, s, prevstate, dt, fun=lambda\\text{ }x: 1, S=1)
 
-        The :math:`prevstate` and :math:`dt` argument needs to be updated at
-        every iteration and are set as default values so the storage
+        The :math:`prevstate` and :math:`dt` argument need to be updated for
+        every new time step and are set as default values so the storage
         change function can be called with the signature demanded by
-        :py:meth:`~add_spatialflux`.
+        :py:meth:`~add_spatialflux`. See
+        :py:func:`~waterflow.utility.fluxfunctions.storage_change` for the
+        complete definition of the storage change function.
 
         """
         storagechange = self.Sspatflux.get('storage_change', None)
@@ -943,7 +951,7 @@ class Flow1DFE:
     def _solve_initial_object(self):
         """ Calculation on first model input
 
-        Basic calculations on the input data for the first object, used as
+        Calculations on the input data for the first object, used as
         first entry in any of the model's dataframes.
 
         Notes
@@ -972,9 +980,9 @@ class Flow1DFE:
 
         Notes
         -----
-        The lengths of the segments between the nodes are calculated a follows.
-        The number of segments is always one less than the number of nodes in
-        the system.
+        The lengths of the segments between the nodes are calculated as
+        follows. The number of segments is always one less than the number of
+        nodes in the system.
 
         .. math::
             L_{i} = x_{i+1} - x_{i} \\text{ for } i=1,2,\\dotsc,N-1
@@ -993,9 +1001,9 @@ class Flow1DFE:
                 \\end{cases}
 
         Multiplication of :math:`nL_{i}` with scalar or sequence like
-        spatial fluxes results in a forcing array that has the shape
+        spatial fluxes result in a forcing array that has the shape
         :math:`[1 \\times N]` which is convenient for direct addition to the
-        global :math:`F_{forcing}` matrix.
+        global :py:attr:`~forcing` matrix.
 
         Examples
         --------
@@ -1050,9 +1058,9 @@ class Flow1DFE:
         .. math::
             A = A_{sys} + A_{spat} + A_{point}
 
-        * :math:`A_{sys}`, derivatives of the :py:attr:`~systemfluxfunc`.
-        * :math:`A_{spat}`, derivatives of functions in :py:attr:`~Sspatflux`.
-        * :math:`A_{point}`, derivatives of functions in :py:attr:`~Spointflux`.
+        * :math:`A_{sys}`, derivatives of the :py:attr:`~systemfluxfunc`, :math:`Q`.
+        * :math:`A_{spat}`, derivatives of functions in :py:attr:`~Sspatflux`, :math:`S`.
+        * :math:`A_{point}`, derivatives of functions in :py:attr:`~Spointflux`, :math:`P`.
 
         **System's flow equation jacobian**
 
@@ -1077,7 +1085,7 @@ class Flow1DFE:
         shown below:
 
         .. math::
-            grad_{i} = \\frac{s_{i+1} - s{i}}{L_{i}}
+            grad_{i} = \\frac{s_{i+1} - s_{i}}{L_{i}}
 
         :math:`A_{sys}` presents the structure of the sparse jacobian matrix
         in which the derivatives of the systemflux function :math:`Q` are
@@ -1116,7 +1124,8 @@ class Flow1DFE:
             s_{i,\\lambda} = s_{i} * (1-p_{\\lambda}) + s_{i+1} * p_{\\lambda}
 
         The structure of the sparse jacobian matrix, :math:`A_{spat}`, of the
-        sum of all state dependent spatialflux functions is shown below:
+        sum of all state dependent spatialflux function derivatives is shown
+        below:
 
         .. math::
             A_{spat} = \\begin{bmatrix}
@@ -1130,7 +1139,7 @@ class Flow1DFE:
 
         **Point state dependent jacobian**
 
-        The derivatives of the state dependend point fluxes, :math:`P`, if
+        The derivatives of the state dependent point fluxes, :math:`P`, if
         present, are collected in :math:`A_{point}`. The derivates are
         calculated for the specific functions, distributed to the two nearest
         nodes and summed to a total at this specific position. This is
@@ -1149,7 +1158,7 @@ class Flow1DFE:
             s_{i,k} = s_{i} + rfac_{k} * (s_{i+1} - s_{i})
 
         The structure of the jacobian matrix, :math:`A_{point}`, of the sum of
-        all state dependent pointflux functions is shown below:
+        all state dependent pointflux function derivatives is shown below:
 
         .. math::
             A_{point} = \\begin{bmatrix}
@@ -1242,7 +1251,7 @@ class Flow1DFE:
         -----
 
         .. warning::
-            Make sure that the positions of the nodes increase towards the
+            Make sure that the positions of the ``nodes`` increase towards the
             right of the domain.
 
         Examples
@@ -1290,8 +1299,8 @@ class Flow1DFE:
         Parameters
         ----------
         function : `func`
-            Flow equation that takes position, state and gradient as its
-            arguments respectively.
+            Flow equation that takes position, state and gradient of state as
+            its arguments respectively.
         **kwargs : `keyword arguments`
             Extra arguments for the flow equation which are implemented
             as defaults so that the calling signature of the flow equation
@@ -1306,8 +1315,8 @@ class Flow1DFE:
         >>> from waterflow.utility.helper import initializer
 
         Implement the Richards equation for unsturated flow, herein the
-        Van Genuchten conductivity function is used, :cite:`Strunk1979`.
-        Soil 13, 'loam', from De Staringreeks :cite:`Strunk1979` is selected.
+        Van Genuchten conductivity function is used, :cite:`VanGenuchten1980`.
+        Soil 13, 'loam', from De Staringreeks :cite:`Wosten2001` is selected.
         See :py:func:`~waterflow.utility.fluxfunctions.richards_equation` for
         the full definition of the fluxfunction.
 
@@ -1318,7 +1327,7 @@ class Flow1DFE:
         >>> FErichard.set_systemfluxfunction(richards, kfun=kfun)
 
         For saturated flow the Darcy equation with a constant saturated
-        conductivity can be used. :cite:`Strunk1979`. See
+        conductivity can be used :cite:`Darcy1856`. See
         :py:func:`~waterflow.utility.fluxfunctions.darcy` for the full
         definition of the fluxfunction.
 
@@ -1393,6 +1402,7 @@ class Flow1DFE:
         Notes
         -----
         Describe how the boundary condition is implemented. !!!!!!!!!!!!!
+        In which attrs ?
 
         Examples
         --------
@@ -1489,7 +1499,7 @@ class Flow1DFE:
 
         Parameters
         ----------
-        *args : `str`, optional.
+        *args : `str`, optional
             The positional arguments should contain the name of the boundary
             conditions as saved in :py:attr:`~BCs`. This can be "west" or
             "east".
@@ -1498,7 +1508,7 @@ class Flow1DFE:
         -----
         KeyError
             This exception is raised when ``*args`` contains an invalid
-            boundary condition name.
+            boundary condition name which does not occur in the system.
 
         Notes
         -----
@@ -1559,13 +1569,13 @@ class Flow1DFE:
         ----------
         rate : `float`, `int`, `list` or `func`
             *   Scalar pointflux value(s).
-            *   Pointflux function(s) of the form :math:`P(s)`.
+            *   Pointflux function of the form :math:`P(s)`.
         pos : `float`, `int` or `list`
-            Position(s) of the pointflux value(s)/function(s).
+            Position(s) of the pointflux value(s)/function.
         name : `str`, default is None
             Name of the pointflux. If omitted, a unique key is
-            generated or rate.__name__ is used in case of a
-            function argument.
+            generated for a scalar pointflux or the string version
+            of the pointflux function is used.
 
         Notes
         -----
@@ -1676,15 +1686,16 @@ class Flow1DFE:
 
         Parameters
         ----------
-        q : `int`, `float, `list` or `func`
+        q : `int`, `float`, `list` or `func`
             * Scalar spatial flux value applied over the complete domain.
             * Sequence of different spatial flux values for every nodal
               position.
             * Positional and/or state dependent spatial flux function.
             * Storage change function for a transient simulation.
         name : `str`, default is None
-            Name of the pointflux. If omitted, a unique key is generated or
-            q.__name__ is used in case of a function argument.
+            Name of the spatialflux. If omitted, a unique key is
+            generated for a scalar/sequence like spatialflux or the string
+            version of the spatialflux function is used.
 
         Notes
         -----
@@ -1707,8 +1718,8 @@ class Flow1DFE:
             F_{r_{i}} = \\sum_{\\lambda =1}^{\\Lambda} S(X_{i, \\lambda}) * p_{\\lambda} * w_{\\lambda} * L_{i}
 
         After the calculation of the distribution towards the nearest nodes the
-        local forcing matrix :math:`F_{local}` is populated and the will be
-        saved in :py:attr:`~spatflux`.
+        local forcing matrix :math:`F_{local}` is populated and will be saved
+        in :py:attr:`~spatflux`.
 
         .. math::
             F_{local} = \\begin{bmatrix}
@@ -1727,7 +1738,7 @@ class Flow1DFE:
         ``q`` can have four arguments, :math:`S(x, s, prevstate, dt)`. This is
         a special case reserved for the storage change function.
         The function signature may have keyword arguments but they need to
-        be optional having a default argument. See a possible definition of
+        be optional having a default value. See a possible definition of
         a storage change function,
         :py:func:`~waterflow.utility.fluxfunctions.storage_change`, that can
         be used for both saturated and unsaturated conditions depending on its
@@ -1737,7 +1748,7 @@ class Flow1DFE:
 
         .. note::
             For spatial state dependent flux functions the function signature
-            will always look like this :math:`S(x, s)` whether there is a
+            will always look like :math:`S(x, s)` whether there is a
             positional dependency or not. This is needed to distinguish between
             the :math:`x` and :math:`s` arguments.
 
@@ -1989,13 +2000,6 @@ class Flow1DFE:
         `functools.partial`
             Function that calculates the system's states for a given position.
 
-        Notes
-        -----
-        The main purpose of this method is to allow for Gaussian quadrature
-        calculations which require state values at specific positions between
-        the system's :py:attr:`~nodes`. This method also provides a tool for
-        plotting at arbitrary positions within the domain.
-
         Examples
         --------
 
@@ -2034,8 +2038,8 @@ class Flow1DFE:
     def dt_solve(self, dt, maxiter=500, threshold=1e-3):
         """ Solve the system for one specific time step
 
-        Performs the Newton-Raphson method, :cite:`Newton1964`, for a solution
-        to the system of equations.
+        Performs the Newton-Raphson method, :cite:`Newton1964`, to find a
+        solution to the system of equations.
 
         Parameters
         ----------
@@ -2082,14 +2086,14 @@ class Flow1DFE:
             a.  :math:`A * y + F_{forcing} = 0` is solved for :math:`y` (:py:func:`~numpy.linalg.solve`).
             b.  :math:`y` is accumulated to :py:attr:`~states`.
 
-        7. Repeat step 3.
-        8. Check for convergence ``threshold``, if not satisfied proceed with
+        7. Check for convergence ``threshold``, if not satisfied proceed with
            next iteration from step 3.
 
         Returns
         -------
         `int`
-            Number of iterations until system convergence or ``maxiter``.
+            Number of iterations until system convergence or ``maxiter`` if
+            the system has not been converged.
 
         Examples
         --------
@@ -2269,7 +2273,7 @@ class Flow1DFE:
         >>> from waterflow.utility import fluxfunctions as fluxf
         >>> from waterflow.utility.helper import initializer
 
-        Select soil 13, 'loam', from De Staringreeks :cite:`Strunk1979`
+        Select soil 13, 'loam', from De Staringreeks :cite:`Wosten2001`
         and prepare the conductivity function and theta-h relation with the
         soil parameters. These functions are the arguments to the fluxfunction
         and the storage change function repectively.
@@ -2469,7 +2473,7 @@ class Flow1DFE:
         >>> from waterflow.utility import fluxfunctions as fluxf
         >>> from waterflow.utility.helper import initializer
 
-        Select soil 13, 'loam', from De Staringreeks :cite:`Strunk1979`
+        Select soil 13, 'loam', from De Staringreeks :cite:`Wosten2001`
         and prepare the conductivity function and theta-h relation with the
         soil parameters. These functions are the arguments to the fluxfunction
         and the storage change function repectively.
@@ -2615,9 +2619,9 @@ class Flow1DFE:
             print(self.df_balance_summary)
 
     def dataframeify(self, invert):
-        """ Write current static model to dataframe
+        """ Write internal model values to a dataframe
 
-        Save the current model results to :py:attr:`~df_states`.
+        Save the static model results to :py:attr:`~df_states`.
 
         Parameters
         ----------
@@ -2637,10 +2641,11 @@ class Flow1DFE:
         >>> from waterflow.utility import fluxfunctions as fluxf
         >>> from waterflow.utility.helper import initializer
 
-        Select soil 13, 'loam', from De Staringreeks :cite:`Strunk1979`
+        Select soil 13, 'loam', from De Staringreeks :cite:`Wosten2001`
         and prepare the conductivity function and theta-h relation with the
         soil parameters. These functions are the arguments to the fluxfunction
-        and the storage change function repectively.
+        and the storage change function repectively. Note that the theta-h
+        relation needs to be added to the model explicitly.
 
         >>> s, *_ = condf.soilselector([13])[0]
         >>> theta_h = initializer(condf.VG_pressureh, theta_r=s.t_res,
@@ -2712,14 +2717,14 @@ class Flow1DFE:
 
         Parameters
         ----------
-        print_times : `int`, `list` or `numpy.ndarray`
+        print_times : `int`, `list` or `numpy.ndarray`, default is None
             Number of linearly spaced print times, or sequence of specific
             print times.
-        include_maxima : `bool`
+        include_maxima : `bool`, default is ``True``
             Include both endpoints in the dataframe.
-        nodes : `list` or `numpy.ndarray`
+        nodes : `list` or `numpy.ndarray`, default is None
             Positional values of the nodes that will be tracked over time.
-        invert : `bool`
+        invert : `bool`, default is ``True``
             Mirror the built dataframes w.r.t. the x-axis.
 
         Notes
@@ -2742,7 +2747,7 @@ class Flow1DFE:
         >>> from waterflow.utility import fluxfunctions as fluxf
         >>> from waterflow.utility.helper import initializer
 
-        Select soil 13, 'loam', from De Staringreeks :cite:`Strunk1979`
+        Select soil 13, 'loam', from De Staringreeks :cite:`Wosten2001`
         and prepare the conductivity function and theta-h relation with the
         soil parameters. These functions are the arguments to the fluxfunction
         and the storage change function repectively.
@@ -2933,10 +2938,11 @@ class Flow1DFE:
 
         Parameters
         ----------
-        savepath: :obj:`str`, default is ``OUTPUT_DIR``
+        savepath: `str`, default is :py:attr:`~savepath`
             A base path to which runs will be saved.
-        dirname : :obj:`str`, default is a chronological name
-            Name of save directory that is appended to savepath.
+        dirname : `str`, default is a chronological name
+            Name of save directory that is appended to savepath where
+            the data of the current model run will be stored.
 
         Notes
         -----

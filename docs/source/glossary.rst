@@ -60,7 +60,7 @@ Symbol Glossary
 
     :math:`F_{external}`
         Accumulation of all point and spatial fluxes. The calculation is perfomed
-        by:py:meth:`~waterflow.flow1d.flowFE1d.Flow1DFE.calcbalance`. Matrix of
+        by :py:meth:`~waterflow.flow1d.flowFE1d.Flow1DFE.calcbalance`. Matrix of
         dimension :math:`[1 \times N]`.
 
     :math:`F_{internal}`

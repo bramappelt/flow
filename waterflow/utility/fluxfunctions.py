@@ -88,7 +88,7 @@ def storage_change(x, s, prevstate, dt, fun=lambda x: 1, S=1):
 
     .. math::
 
-        q(x, s, dt) = - S * \\frac{fun(s) - fun(pressure(x))}{dt}
+        q(x, s, prevstate, dt, fun, S) = - S * \\frac{fun(s) - fun(pressure(x))}{dt}
 
     """
     return - S * (fun(s) - fun(prevstate(x))) / dt

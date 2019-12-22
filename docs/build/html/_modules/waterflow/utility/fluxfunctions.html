@@ -241,7 +241,7 @@
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        q(x, s, dt) = - S * \\frac{fun(s) - fun(pressure(x))}{dt}</span>
+<span class="sd">        q(x, s, prevstate, dt, fun, S) = - S * \\frac{fun(s) - fun(pressure(x))}{dt}</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="o">-</span> <span class="n">S</span> <span class="o">*</span> <span class="p">(</span><span class="n">fun</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">-</span> <span class="n">fun</span><span class="p">(</span><span class="n">prevstate</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span> <span class="o">/</span> <span class="n">dt</span></div>
