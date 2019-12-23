@@ -1,3 +1,5 @@
+""" Ready to use plot functions """
+
 import os
 from functools import partial
 

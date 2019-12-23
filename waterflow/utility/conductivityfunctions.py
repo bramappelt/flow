@@ -1,5 +1,4 @@
-""" This package contains several conductivity functions
-and a soil selector function """
+""" Conductivity functions and a soil selector function """
 
 import os
 from collections import namedtuple

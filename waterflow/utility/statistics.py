@@ -1,5 +1,5 @@
-""" This module contains some functions which allow for the calculation of
-certain statistical measures. """
+""" Functions for statistical measures (Root Mean Square &
+Mean Absolute Error) """
 
 import pandas as pd
 import numpy as np

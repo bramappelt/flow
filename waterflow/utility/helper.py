@@ -1,4 +1,4 @@
-""" Module with helper functions """
+""" Miscellaneous helper functions """
 
 import os
 from functools import partial, update_wrapper

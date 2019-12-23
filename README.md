@@ -23,6 +23,6 @@ pip3 install -r requirements.txt
 
 **Note:** Remember to add the installation directory to your PYTHONPATH environment variable.
 
-### PypI
+### PyPI
 
 *Will be updated when available on PyPI*

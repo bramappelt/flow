@@ -1554,8 +1554,35 @@
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        Describe how the boundary condition is implemented. !!!!!!!!!!!!!</span>
-<span class="sd">        In which attrs ?</span>
+<span class="sd">        Implementation of a Dirichlet boundary condition is done by setting</span>
+<span class="sd">        the :py:attr:`~states` value at any (or both) of the sides to a fixed</span>
+<span class="sd">        ``value``. The specific row in the Newton-Raphson method</span>
+<span class="sd">        :cite:`Newton1964` is disabled, this is reflected by setting any</span>
+<span class="sd">        (or both) of the :py:attr:`~_east` or :py:attr:`~_west` to specific</span>
+<span class="sd">        indices (1, -1). See the schematisation of the implementation below.</span>
+<span class="sd">        :math:`y` should be solved for as described in :py:meth:`~dt_solve`.</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            0 = \\begin{bmatrix}</span>
+<span class="sd">                    A_{2,1} &amp; \\cdots &amp; A_{2,N} \\\\</span>
+<span class="sd">                    \\vdots &amp; \\ddots &amp; \\vdots \\\\</span>
+<span class="sd">                    A_{N,1} &amp; \\cdots &amp; A_{N,N}</span>
+<span class="sd">                \\end{bmatrix} \\times</span>
+<span class="sd">                \\begin{bmatrix}</span>
+<span class="sd">                    y_{2}       \\\\</span>
+<span class="sd">                    \\vdots     \\\\</span>
+<span class="sd">                    y_{N}</span>
+<span class="sd">                \\end{bmatrix} +</span>
+<span class="sd">                \\begin{bmatrix}</span>
+<span class="sd">                    F_{2}              \\\\</span>
+<span class="sd">                    \\vdots            \\\\</span>
+<span class="sd">                    F_{N}</span>
+<span class="sd">                \\end{bmatrix}</span>
+
+<span class="sd">        .. note::</span>
+<span class="sd">            :py:attr:`~_east` can carry either the index -1 or :math:`N`,</span>
+<span class="sd">            :py:attr:`~_west` can be 1 or 0. The values are determined by</span>
+<span class="sd">            boundary condition type (Dirichlet or Neumann, respectively).</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
@@ -1569,7 +1596,7 @@
 <span class="sd">        &gt;&gt;&gt; FE.BCs</span>
 <span class="sd">        {&#39;east&#39;: (-100, &#39;Dirichlet&#39;, -1), &#39;west&#39;: (0, &#39;Dirichlet&#39;, 0)}</span>
 
-<span class="sd">        .. note::</span>
+<span class="sd">        .. warning::</span>
 <span class="sd">            Note that a new boundary condition will overwrite an existing</span>
 <span class="sd">            one without a warning.</span>
 
@@ -1603,8 +1630,36 @@
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        Describe how the boundary condition is implemented. !!!!!!!!!!!!!</span>
-<span class="sd">        also note that FE.set_field1d needs to be called for the _east attr</span>
+<span class="sd">        The implementation of a Neumann boundary conditions is straightforward.</span>
+<span class="sd">        Like any other forcing, the ``value`` is added to the</span>
+<span class="sd">        :py:attr:`~forcing` matrix at either the left or the right edge of the</span>
+<span class="sd">        domain. Depending on position, :py:attr:`~_east` or :py:attr:`~_west`</span>
+<span class="sd">        will be assigned indices (0 or :math:`N`) to indicate that the</span>
+<span class="sd">        complete domain contributes to the state calculations. See the</span>
+<span class="sd">        schematisation of the implementation below. :math:`y` should be solved</span>
+<span class="sd">        for as described in :py:meth:`~dt_solve` and :cite:`Newton1964`.</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            0 = \\begin{bmatrix}</span>
+<span class="sd">                    A_{1,1} &amp; \\cdots &amp; A_{1,N} \\\\</span>
+<span class="sd">                    \\vdots &amp; \\ddots &amp; \\vdots \\\\</span>
+<span class="sd">                    A_{N,1} &amp; \\cdots &amp; A_{N,N}</span>
+<span class="sd">                \\end{bmatrix} \\times</span>
+<span class="sd">                \\begin{bmatrix}</span>
+<span class="sd">                    y_{1}       \\\\</span>
+<span class="sd">                    \\vdots     \\\\</span>
+<span class="sd">                    y_{N}</span>
+<span class="sd">                \\end{bmatrix} +</span>
+<span class="sd">                \\begin{bmatrix}</span>
+<span class="sd">                    F_{1} + value       \\\\</span>
+<span class="sd">                    \\vdots             \\\\</span>
+<span class="sd">                    F_{N}</span>
+<span class="sd">                \\end{bmatrix}</span>
+
+<span class="sd">        .. note::</span>
+<span class="sd">            :py:attr:`~_east` can carry either the index -1 or :math:`N`,</span>
+<span class="sd">            :py:attr:`~_west` can be 1 or 0. The values are determined by</span>
+<span class="sd">            boundary condition type (Dirichlet or Neumann, respectively).</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
@@ -1624,7 +1679,7 @@
 <span class="sd">        &gt;&gt;&gt; FE.BCs</span>
 <span class="sd">        {&#39;east&#39;: (-0.5, &#39;Neumann&#39;, -1), &#39;west&#39;: (-0.8, &#39;Neumann&#39;, 0)}</span>
 
-<span class="sd">        .. note::</span>
+<span class="sd">        .. warning::</span>
 <span class="sd">            Note that a new boundary condition will overwrite an existing</span>
 <span class="sd">            one without a warning. This method will allow both boundaries</span>
 <span class="sd">            to be of type Neumann but remember that this won&#39;t be useful</span>
@@ -2185,8 +2240,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_east</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
             <span class="n">states</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">BCs</span><span class="p">[</span><span class="s2">&quot;east&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
         <span class="c1"># linearly interpolate between states including assigned boundaries</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">partial</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">,</span> <span class="n">xp</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">,</span> <span class="n">fp</span><span class="o">=</span><span class="n">states</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">partial</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">,</span> <span class="n">xp</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">,</span> <span class="n">fp</span><span class="o">=</span><span class="n">states</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Flow1DFE.dt_solve"><a class="viewcode-back" href="../../../waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE.dt_solve">[docs]</a>    <span class="k">def</span> <span class="nf">dt_solve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Solve the system for one specific time step</span>

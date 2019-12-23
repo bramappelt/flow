@@ -155,6 +155,14 @@
             
   <div class="section" id="welcome-to-flow-s-documentation">
 <h1>Welcome to Flow’s documentation!<a class="headerlink" href="#welcome-to-flow-s-documentation" title="Permalink to this headline">¶</a></h1>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
 <div class="toctree-wrapper compound">
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
@@ -169,14 +177,93 @@
 </dd>
 <dt>how</dt><dd><p>This is a module that is built for the python programming language.</p>
 </dd>
-<dt>what not</dt><dd><p>This is not a complete fully dimensional flow simulator.</p>
+<dt>what not</dt><dd><p>This is not a complete full dimensional flow simulator.</p>
 </dd>
-<dt>Which</dt><dd><p>Which calculation techniques are used in this software package.</p>
+<dt>Which</dt><dd><p>Calculation techniques are used in this software package.</p>
 </dd>
 </dl>
+<div class="section" id="unsaturated-flow-example">
+<h3>Unsaturated flow example<a class="headerlink" href="#unsaturated-flow-example" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Necessary imports</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.flow1d.flowFE1d</span> <span class="k">import</span> <span class="n">Flow1DFE</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility</span> <span class="k">import</span> <span class="n">conductivityfunctions</span> <span class="k">as</span> <span class="n">condf</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility</span> <span class="k">import</span> <span class="n">fluxfunctions</span> <span class="k">as</span> <span class="n">fluxf</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="k">import</span> <span class="n">initializer</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.spacing</span> <span class="k">import</span> <span class="n">biasedspacing</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.plotting</span> <span class="k">import</span> <span class="n">solverplot</span>
+</pre></div>
 </div>
-<div class="section" id="second-order-heading">
-<h2>Second order heading<a class="headerlink" href="#second-order-heading" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Select soil 13 from The Staringreeks</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">soil</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">condf</span><span class="o">.</span><span class="n">soilselector</span><span class="p">([</span><span class="mi">13</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">theta_r</span><span class="p">,</span> <span class="n">theta_s</span><span class="p">,</span> <span class="n">ksat</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="p">(</span><span class="n">soil</span><span class="o">.</span><span class="n">t_res</span><span class="p">,</span> <span class="n">soil</span><span class="o">.</span><span class="n">t_sat</span><span class="p">,</span> <span class="n">soil</span><span class="o">.</span><span class="n">ksat</span><span class="p">,</span> <span class="n">soil</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="n">soil</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Field&#39;s discretization</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">L</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nx</span> <span class="o">=</span> <span class="mi">51</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">xsp</span> <span class="o">=</span> <span class="n">biasedspacing</span><span class="p">(</span><span class="n">nx</span><span class="p">,</span> <span class="n">power</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">rb</span><span class="o">=-</span><span class="n">L</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">initial_states</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nx</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Prepare functions with soil specific values</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">theta_h</span> <span class="o">=</span> <span class="n">initializer</span><span class="p">(</span><span class="n">condf</span><span class="o">.</span><span class="n">VG_pressureh</span><span class="p">,</span> <span class="n">theta_r</span><span class="o">=</span><span class="n">theta_r</span><span class="p">,</span> <span class="n">theta_s</span><span class="o">=</span><span class="n">theta_s</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conductivity_func</span> <span class="o">=</span> <span class="n">initializer</span><span class="p">(</span><span class="n">condf</span><span class="o">.</span><span class="n">VG_conductivity</span><span class="p">,</span> <span class="n">ksat</span><span class="o">=</span><span class="n">ksat</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">storage_change</span> <span class="o">=</span> <span class="n">initializer</span><span class="p">(</span><span class="n">fluxf</span><span class="o">.</span><span class="n">storage_change</span><span class="p">,</span> <span class="n">fun</span><span class="o">=</span><span class="n">theta_h</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Define and solve the model</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">M</span> <span class="o">=</span> <span class="n">Flow1DFE</span><span class="p">(</span><span class="s1">&#39;Unsaturated transient model&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">M</span><span class="o">.</span><span class="n">set_field1d</span><span class="p">(</span><span class="n">nodes</span><span class="o">=</span><span class="n">xsp</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">M</span><span class="o">.</span><span class="n">set_gaussian_quadrature</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">M</span><span class="o">.</span><span class="n">set_initial_states</span><span class="p">(</span><span class="n">initial_states</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">M</span><span class="o">.</span><span class="n">set_systemfluxfunction</span><span class="p">(</span><span class="n">fluxf</span><span class="o">.</span><span class="n">richards_equation</span><span class="p">,</span> <span class="n">kfun</span><span class="o">=</span><span class="n">conductivity_func</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">M</span><span class="o">.</span><span class="n">add_dirichlet_BC</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;west&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">M</span><span class="o">.</span><span class="n">add_neumann_BC</span><span class="p">(</span><span class="o">-</span><span class="mf">0.3</span><span class="p">,</span> <span class="s1">&#39;east&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">M</span><span class="o">.</span><span class="n">add_spatialflux</span><span class="p">(</span><span class="o">-</span><span class="mf">0.01</span><span class="p">,</span> <span class="s1">&#39;extraction&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">M</span><span class="o">.</span><span class="n">add_pointflux</span><span class="p">(</span><span class="o">-</span><span class="mf">0.03</span><span class="p">,</span> <span class="o">-</span><span class="mf">5.5</span><span class="p">,</span> <span class="s1">&#39;pflux&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">M</span><span class="o">.</span><span class="n">add_spatialflux</span><span class="p">(</span><span class="n">storage_change</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">M</span><span class="o">.</span><span class="n">tfun</span> <span class="o">=</span> <span class="n">theta_h</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">M</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">end_time</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">M</span><span class="o">.</span><span class="n">transient_dataframeify</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Plot summary information</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">M</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span>
+<span class="go">Id: Unsaturated transient model</span>
+<span class="go">System length: 100.0</span>
+<span class="go">Number of nodes: 51</span>
+<span class="go">Gauss degree: 2</span>
+<span class="go">kfun: VG_conductivity</span>
+<span class="go">tfun: VG_pressureh</span>
+<span class="go">BCs: west value: 0.0 and of type Dirichlet, east value: -0.3 and of type Neumann</span>
+<span class="go">Pointflux: pflux</span>
+<span class="go">Spatflux: extraction, storage_change</span>
+<span class="go">Runtime (s): 2.1232735999999477</span>
+<span class="go"># Balance</span>
+<span class="go">pnt-pflux         -0.030000</span>
+<span class="go">spat-extraction   -1.000000</span>
+<span class="go">storage_change     0.004666</span>
+<span class="go">internal          -0.006175</span>
+<span class="go">all-spatial       -1.000000</span>
+<span class="go">all-points        -0.030000</span>
+<span class="go">all-external      -1.030000</span>
+<span class="go">net               -0.001508</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create plots</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">solverplot</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>(<a class="reference external" href=".//index-1.py">Source code</a>, <a class="reference external" href=".//index-1.png">png</a>, <a class="reference external" href=".//index-1.hires.png">hires.png</a>, <a class="reference external" href=".//index-1.pdf">pdf</a>)</p>
+<div class="figure align-default">
+<img alt="_images/index-1.png" src="_images/index-1.png" />
+</div>
+</div>
+<div class="section" id="saturated-flow-example">
+<h3>Saturated flow example<a class="headerlink" href="#saturated-flow-example" title="Permalink to this headline">¶</a></h3>
+<p><em>Under construction</em></p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Be aware of the system’s orientation change between saturated and
@@ -184,29 +271,8 @@ unsaturated flow problems. The orientation rotates counter clockwise
 for 90 degrees which means that western and eastern boundaries become
 lower and upper boundaries respectively.</p>
 </div>
-<div class="admonition tip">
-<p class="admonition-title">Tip</p>
-<p>This is a tip text!</p>
 </div>
 </div>
-<div class="section" id="flow-example-for-a-saturated-situation">
-<h2>Flow example for a saturated situation<a class="headerlink" href="#flow-example-for-a-saturated-situation" title="Permalink to this headline">¶</a></h2>
-<img alt="_images/Figure1_sat.png" src="_images/Figure1_sat.png" />
-<p>In this example a saturated flow situation is presented.</p>
-</div>
-<div class="section" id="flow-example-for-an-unsatured-situation">
-<h2>Flow example for an unsatured situation<a class="headerlink" href="#flow-example-for-an-unsatured-situation" title="Permalink to this headline">¶</a></h2>
-<img alt="_images/Figure2_unsat.png" src="_images/Figure2_unsat.png" />
-<p>In this example an unsaturated flow situation is presented.</p>
-</div>
-</div>
-<div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
-<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
-<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
-</ul>
 </div>
 
 

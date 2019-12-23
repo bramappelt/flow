@@ -1401,8 +1401,35 @@ class Flow1DFE:
 
         Notes
         -----
-        Describe how the boundary condition is implemented. !!!!!!!!!!!!!
-        In which attrs ?
+        Implementation of a Dirichlet boundary condition is done by setting
+        the :py:attr:`~states` value at any (or both) of the sides to a fixed
+        ``value``. The specific row in the Newton-Raphson method
+        :cite:`Newton1964` is disabled, this is reflected by setting any
+        (or both) of the :py:attr:`~_east` or :py:attr:`~_west` to specific
+        indices (1, -1). See the schematisation of the implementation below.
+        :math:`y` should be solved for as described in :py:meth:`~dt_solve`.
+
+        .. math::
+            0 = \\begin{bmatrix}
+                    A_{2,1} & \\cdots & A_{2,N} \\\\
+                    \\vdots & \\ddots & \\vdots \\\\
+                    A_{N,1} & \\cdots & A_{N,N}
+                \\end{bmatrix} \\times
+                \\begin{bmatrix}
+                    y_{2}       \\\\
+                    \\vdots     \\\\
+                    y_{N}
+                \\end{bmatrix} +
+                \\begin{bmatrix}
+                    F_{2}              \\\\
+                    \\vdots            \\\\
+                    F_{N}
+                \\end{bmatrix}
+
+        .. note::
+            :py:attr:`~_east` can carry either the index -1 or :math:`N`,
+            :py:attr:`~_west` can be 1 or 0. The values are determined by
+            boundary condition type (Dirichlet or Neumann, respectively).
 
         Examples
         --------
@@ -1416,7 +1443,7 @@ class Flow1DFE:
         >>> FE.BCs
         {'east': (-100, 'Dirichlet', -1), 'west': (0, 'Dirichlet', 0)}
 
-        .. note::
+        .. warning::
             Note that a new boundary condition will overwrite an existing
             one without a warning.
 
@@ -1450,8 +1477,36 @@ class Flow1DFE:
 
         Notes
         -----
-        Describe how the boundary condition is implemented. !!!!!!!!!!!!!
-        also note that FE.set_field1d needs to be called for the _east attr
+        The implementation of a Neumann boundary conditions is straightforward.
+        Like any other forcing, the ``value`` is added to the
+        :py:attr:`~forcing` matrix at either the left or the right edge of the
+        domain. Depending on position, :py:attr:`~_east` or :py:attr:`~_west`
+        will be assigned indices (0 or :math:`N`) to indicate that the
+        complete domain contributes to the state calculations. See the
+        schematisation of the implementation below. :math:`y` should be solved
+        for as described in :py:meth:`~dt_solve` and :cite:`Newton1964`.
+
+        .. math::
+            0 = \\begin{bmatrix}
+                    A_{1,1} & \\cdots & A_{1,N} \\\\
+                    \\vdots & \\ddots & \\vdots \\\\
+                    A_{N,1} & \\cdots & A_{N,N}
+                \\end{bmatrix} \\times
+                \\begin{bmatrix}
+                    y_{1}       \\\\
+                    \\vdots     \\\\
+                    y_{N}
+                \\end{bmatrix} +
+                \\begin{bmatrix}
+                    F_{1} + value       \\\\
+                    \\vdots             \\\\
+                    F_{N}
+                \\end{bmatrix}
+
+        .. note::
+            :py:attr:`~_east` can carry either the index -1 or :math:`N`,
+            :py:attr:`~_west` can be 1 or 0. The values are determined by
+            boundary condition type (Dirichlet or Neumann, respectively).
 
         Examples
         --------
@@ -1471,7 +1526,7 @@ class Flow1DFE:
         >>> FE.BCs
         {'east': (-0.5, 'Neumann', -1), 'west': (-0.8, 'Neumann', 0)}
 
-        .. note::
+        .. warning::
             Note that a new boundary condition will overwrite an existing
             one without a warning. This method will allow both boundaries
             to be of type Neumann but remember that this won't be useful
@@ -2032,8 +2087,7 @@ class Flow1DFE:
         if self._east == -1:
             states[-1] = self.BCs["east"][0]
         # linearly interpolate between states including assigned boundaries
-        else:
-            return partial(np.interp, xp=self.nodes, fp=states)
+        return partial(np.interp, xp=self.nodes, fp=states)
 
     def dt_solve(self, dt, maxiter=500, threshold=1e-3):
         """ Solve the system for one specific time step

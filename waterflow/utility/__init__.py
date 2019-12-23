@@ -1,7 +1,10 @@
-""" This module contains helper functions for the flow problems. Below some examples are given.
+""" This module contains additional functions for the flow problems.
 
-* Forcing functions (External input for the flow models)
-* Grid spacing functions (create different discretizations)
-* Some statistical measures (Root Mean Square & Mean Absolute Error)
+* Conductivity functions and a soil selector function
+* Several flow equations for (un)saturated flow problems and a storage change function
+* Grid spacing functions
+* Miscellaneous helper functions
+* Ready to use plot functions
+* Functions for statistical measures (Root Mean Square & Mean Absolute Error)
 
 """

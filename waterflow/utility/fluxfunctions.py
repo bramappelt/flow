@@ -1,5 +1,5 @@
-""" This package contains several one dimensional flux functions
-and a storage change function """
+""" Several flow equations for (un)saturated flow problems and a
+storage change function """
 
 
 def darcy(x, s, gradient, ksat=1):
@@ -61,7 +61,7 @@ def darcy_k_s(x, s, gradient, kfun=lambda x: 1):
         -kfun(x) * s * \\frac{\\delta s}{\\delta x}
 
     """
-    return - kfun(x) * s * gradient
+    return - kfun(x, s) * s * gradient
 
 
 def richards_equation(x, s, gradient, kfun):

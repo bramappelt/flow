@@ -1,5 +1,4 @@
-''' This package contains functions for the generation of nodal
-distributions '''
+""" Grid spacing functions """
 
 import numpy as np
 

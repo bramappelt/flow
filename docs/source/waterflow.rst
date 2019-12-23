@@ -1,6 +1,14 @@
 waterflow package
 =================
 
+Module contents
+---------------
+
+.. automodule:: waterflow
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Subpackages
 -----------
 
@@ -9,15 +17,4 @@ Subpackages
    waterflow.flow1d
    waterflow.utility
 
-Submodules
-----------
-
-
-Module contents
----------------
-
-.. automodule:: waterflow
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
