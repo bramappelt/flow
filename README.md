@@ -5,7 +5,7 @@ The documentation can be found [here](https://bramappelt.github.io/flow/).
 
 ## Installation
 
-The software can be installed from source or via [PyPi]("https://pypi.org").
+The software can be installed from source or via [PyPi]("https://test.pypi.org").
 
 ### Source
 
@@ -25,4 +25,8 @@ pip3 install -r requirements.txt
 
 ### PyPI
 
-*Will be updated when available on PyPI*
+This will automatically install the dependencies and appends the module name to your PYTHONPATH.
+
+```cl
+pip install -i https://test.pypi.org/simple/ Flow-BramAppelt
+```
