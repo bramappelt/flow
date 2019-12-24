@@ -86,6 +86,7 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index_examples.html">What is this <em>Flow</em> software package for?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../modules.html">flow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../glossary.html">Symbol Glossary</a></li>
 </ul>
@@ -1789,7 +1790,7 @@
 <span class="sd">        -----</span>
 <span class="sd">        :math:`node_{r}` is the index of the right node that is nearest</span>
 <span class="sd">        the position of the pointflux and is calculated by</span>
-<span class="sd">        :py:meth:`~numpy.searchsorted`. :math:`node_{l} = node_{r} - 1`,</span>
+<span class="sd">        :func:`numpy.searchsorted`. :math:`node_{l} = node_{r} - 1`,</span>
 <span class="sd">        which is the left node that is most near the position of the pointflux.</span>
 
 <span class="sd">        :math:`lfac` and :math:`rfac` represent the fractions of the pointflux</span>
@@ -2290,7 +2291,7 @@
 <span class="sd">        5.  Build the jacobian matrix (:py:meth:`~_CMAT`).</span>
 <span class="sd">        6.  Newton-Raphson iteration :cite:`Newton1964`.</span>
 
-<span class="sd">            a.  :math:`A * y + F_{forcing} = 0` is solved for :math:`y` (:py:func:`~numpy.linalg.solve`).</span>
+<span class="sd">            a.  :math:`A * y + F_{forcing} = 0` is solved for :math:`y` (:func:`~numpy.linalg.solve`).</span>
 <span class="sd">            b.  :math:`y` is accumulated to :py:attr:`~states`.</span>
 
 <span class="sd">        7. Check for convergence ``threshold``, if not satisfied proceed with</span>

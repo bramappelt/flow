@@ -184,7 +184,7 @@
 <dl class="class">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE">
 <em class="property">class </em><code class="sig-prename descclassname">waterflow.flow1d.flowFE1d.</code><code class="sig-name descname">Flow1DFE</code><span class="sig-paren">(</span><em class="sig-param">id_</em>, <em class="sig-param">savepath='C:\Users\bramb\Documents/flowoutput/'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/flow1d/flowFE1d.html#Flow1DFE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Class for solving flow problems numerically</p>
 <p>This class represents an object that can be used to solve
 (un)saturated 1-dimensional flow problems using finite elements.
@@ -964,7 +964,7 @@ is not explicitly set, a natural boundary condition (no flow) is
 set as default.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><strong>numpy.linalg.LinAlgError</strong> – This error is raised if the system has infinitely many solutions
+<dd class="field-odd"><p><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.linalg.LinAlgError.html#numpy.linalg.LinAlgError" title="(in NumPy v1.17)"><strong>numpy.linalg.LinAlgError</strong></a> – This error is raised if the system has infinitely many solutions
     as a consequence of two Neumann boundary conditions or when none
     are entered.</p>
 </dd>
@@ -1374,7 +1374,7 @@ of the pointflux function is used.</p></li>
 <p class="rubric">Notes</p>
 <p><img class="math" src="_images/math/2373bbe3b79c85cbb454720d66cd1c1e6e42263d.png" alt="node_{r}"/> is the index of the right node that is nearest
 the position of the pointflux and is calculated by
-<code class="xref py py-meth docutils literal notranslate"><span class="pre">searchsorted()</span></code>. <img class="math" src="_images/math/c37f7d30844f9dc0e4d9992e40e0caf1a70319f0.png" alt="node_{l} = node_{r} - 1"/>,
+<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.searchsorted.html#numpy.searchsorted" title="(in NumPy v1.17)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.searchsorted()</span></code></a>. <img class="math" src="_images/math/c37f7d30844f9dc0e4d9992e40e0caf1a70319f0.png" alt="node_{l} = node_{r} - 1"/>,
 which is the left node that is most near the position of the pointflux.</p>
 <p><img class="math" src="_images/math/05f849c308f3b3287a5b63a095df2e3247025c1f.png" alt="lfac"/> and <img class="math" src="_images/math/0ac002b95bdf53f34b0324be11dda0527b39cda1.png" alt="rfac"/> represent the fractions of the pointflux
 that contribute to the nearest left and right node repectively.</p>
@@ -1771,7 +1771,7 @@ function if system is transient (<a class="reference internal" href="#waterflow.
 <li><p>Build the jacobian matrix (<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE._CMAT" title="waterflow.flow1d.flowFE1d.Flow1DFE._CMAT"><code class="xref py py-meth docutils literal notranslate"><span class="pre">_CMAT()</span></code></a>).</p></li>
 <li><p>Newton-Raphson iteration <a class="bibtex reference internal" href="#newton1964" id="id8">[New64]</a>.</p>
 <ol class="loweralpha simple">
-<li><p><img class="math" src="_images/math/aaf9d72928602213963e5fbe2b5e2afecf5d0332.png" alt="A * y + F_{forcing} = 0"/> is solved for <img class="math" src="_images/math/1b5e577d6216dca3af7d87aa122a0b9b360d6cb3.png" alt="y"/> (<code class="xref py py-func docutils literal notranslate"><span class="pre">solve()</span></code>).</p></li>
+<li><p><img class="math" src="_images/math/aaf9d72928602213963e5fbe2b5e2afecf5d0332.png" alt="A * y + F_{forcing} = 0"/> is solved for <img class="math" src="_images/math/1b5e577d6216dca3af7d87aa122a0b9b360d6cb3.png" alt="y"/> (<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.linalg.solve.html#numpy.linalg.solve" title="(in NumPy v1.17)"><code class="xref py py-func docutils literal notranslate"><span class="pre">solve()</span></code></a>).</p></li>
 <li><p><img class="math" src="_images/math/1b5e577d6216dca3af7d87aa122a0b9b360d6cb3.png" alt="y"/> is accumulated to <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.states" title="waterflow.flow1d.flowFE1d.Flow1DFE.states"><code class="xref py py-attr docutils literal notranslate"><span class="pre">states</span></code></a>.</p></li>
 </ol>
 </li>
@@ -1851,7 +1851,7 @@ conditions as saved in <a class="reference internal" href="#waterflow.flow1d.flo
 “east”.</p>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>KeyError</strong> – This exception is raised when <code class="docutils literal notranslate"><span class="pre">*args</span></code> contains an invalid
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.8)"><strong>KeyError</strong></a> – This exception is raised when <code class="docutils literal notranslate"><span class="pre">*args</span></code> contains an invalid
     boundary condition name which does not occur in the system.</p>
 </dd>
 </dl>
@@ -1897,7 +1897,7 @@ with default arguments all point fluxes will be removed from both
 <dd class="field-odd"><p><strong>*args</strong> (<cite>str</cite>, optional) – Name(s) of specific point fluxes.</p>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>KeyError</strong> – Will be raised when the name of the pointflux does not exists.</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.8)"><strong>KeyError</strong></a> – Will be raised when the name of the pointflux does not exists.</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -1953,7 +1953,7 @@ with default arguments all spatial fluxes will be removed from both
 <dd class="field-odd"><p><strong>*args</strong> (<cite>str</cite>, optional) – Name(s) of specific spatial fluxes.</p>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>KeyError</strong> – Will be raised when the name of the spatialflux does not exists.</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.8)"><strong>KeyError</strong></a> – Will be raised when the name of the spatialflux does not exists.</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>

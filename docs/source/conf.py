@@ -46,7 +46,9 @@ extensions = ['sphinx.ext.autodoc',
               'IPython.sphinxext.ipython_console_highlighting',
               'sphinx.ext.inheritance_diagram',
               'sphinxcontrib.bibtex',
-              'sphinx.ext.viewcode']
+              'sphinx.ext.viewcode',
+              'sphinx.ext.intersphinx'
+              ]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -90,3 +92,6 @@ autodoc_default_flags = ['members',
                          'private-members',
                          'inherited-members',
                          'show-inheritance']
+
+# intersphinx settings
+intersphinx_mapping = {'numpy': ('http://docs.scipy.org/doc/numpy', None)}

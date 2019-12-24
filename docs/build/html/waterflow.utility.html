@@ -358,20 +358,20 @@ which distances increase from left to right.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>numnodes</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>) – Total number of nodes that is used for the nodal spacing.</p></li>
-<li><p><strong>power</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>) – Degree of nodal shifting to the left of the domain.</p></li>
-<li><p><strong>lb</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, default is 0) – Left bound of the domain.</p></li>
-<li><p><strong>rb</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, default = 1) – Right bound of the domain.</p></li>
-<li><p><strong>maxdist</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, default is None) – Maximum distance allowed between two nodes. The value of
+<li><p><strong>numnodes</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a>) – Total number of nodes that is used for the nodal spacing.</p></li>
+<li><p><strong>power</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – Degree of nodal shifting to the left of the domain.</p></li>
+<li><p><strong>lb</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>, default is 0) – Left bound of the domain.</p></li>
+<li><p><strong>rb</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>, default = 1) – Right bound of the domain.</p></li>
+<li><p><strong>maxdist</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>, default is None) – Maximum distance allowed between two nodes. The value of
 the <cite>length</cite> argument should be accounted for if given.</p></li>
-<li><p><strong>length</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, default is 1) – Multiplier to scale the nodal positions.</p></li>
+<li><p><strong>length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>, default is 1) – Multiplier to scale the nodal positions.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>x-dim</strong> – Positions of the nodes.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>numpy.ndarray</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)">numpy.ndarray</a></p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -426,16 +426,16 @@ selected locations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>nx</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>) – Number of nodes in the x-direction.</p></li>
-<li><p><strong>Lx</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>) – Total length in the x-direction.</p></li>
-<li><p><strong>ny</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>) – Number of nodes in the y-direction.</p></li>
-<li><p><strong>Ly</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>) – Total length in the y-direction.</p></li>
-<li><p><strong>linear</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code>, default is True) – Distinguish between linear and non-linear nodal distributions.</p></li>
-<li><p><strong>loc</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code>, default is None) – A list of nodes or coördinate tuples on which to concentrate nodal
+<li><p><strong>nx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a>) – Number of nodes in the x-direction.</p></li>
+<li><p><strong>Lx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a> of <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – Total length in the x-direction.</p></li>
+<li><p><strong>ny</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a>) – Number of nodes in the y-direction.</p></li>
+<li><p><strong>Ly</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a> of <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – Total length in the y-direction.</p></li>
+<li><p><strong>linear</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a>, default is True) – Distinguish between linear and non-linear nodal distributions.</p></li>
+<li><p><strong>loc</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a>, default is None) – A list of nodes or coördinate tuples on which to concentrate nodal
 discretization.</p></li>
-<li><p><strong>power</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>, default is None) – The number of nodes that are influenced by the nodal concentrations
+<li><p><strong>power</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a>, default is None) – The number of nodes that are influenced by the nodal concentrations
 given at the <cite>loc</cite> parameter.</p></li>
-<li><p><strong>weight</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>) – The degree of nodal concentration around a given <cite>loc</cite>.</p></li>
+<li><p><strong>weight</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a> of <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – The degree of nodal concentration around a given <cite>loc</cite>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>

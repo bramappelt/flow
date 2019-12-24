@@ -1636,7 +1636,7 @@ class Flow1DFE:
         -----
         :math:`node_{r}` is the index of the right node that is nearest
         the position of the pointflux and is calculated by
-        :py:meth:`~numpy.searchsorted`. :math:`node_{l} = node_{r} - 1`,
+        :func:`numpy.searchsorted`. :math:`node_{l} = node_{r} - 1`,
         which is the left node that is most near the position of the pointflux.
 
         :math:`lfac` and :math:`rfac` represent the fractions of the pointflux
@@ -2137,7 +2137,7 @@ class Flow1DFE:
         5.  Build the jacobian matrix (:py:meth:`~_CMAT`).
         6.  Newton-Raphson iteration :cite:`Newton1964`.
 
-            a.  :math:`A * y + F_{forcing} = 0` is solved for :math:`y` (:py:func:`~numpy.linalg.solve`).
+            a.  :math:`A * y + F_{forcing} = 0` is solved for :math:`y` (:func:`~numpy.linalg.solve`).
             b.  :math:`y` is accumulated to :py:attr:`~states`.
 
         7. Check for convergence ``threshold``, if not satisfied proceed with
