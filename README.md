@@ -9,23 +9,17 @@ The software can be installed from source or via [PyPi]("https://test.pypi.org")
 
 ### Source
 
-Clone repository
+Clone repository and install the package
 
 ```cl
 git clone "https://github.com/bramappelt/flow.git"
+cd flow
+python setup.py install
 ```
-
-Install dependencies, can be done in a virtual environment.
-
-```cl
-pip3 install -r requirements.txt
-```
-
-**Note:** Remember to add the installation directory to your PYTHONPATH environment variable.
 
 ### PyPI
 
-This will automatically install the dependencies and appends the module name to your PYTHONPATH.
+This will automatically install the package and its dependencies.
 
 ```cl
 pip install -i https://test.pypi.org/simple/ Flow-BramAppelt
