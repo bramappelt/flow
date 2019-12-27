@@ -94,4 +94,5 @@ autodoc_default_flags = ['members',
                          'show-inheritance']
 
 # intersphinx settings
-intersphinx_mapping = {'numpy': ('http://docs.scipy.org/doc/numpy', None)}
+intersphinx_mapping = {'numpy': ('https://docs.scipy.org/doc/numpy', None),
+                       'functools': ('https://docs.python.org/3.7/library/functools.html', None)}

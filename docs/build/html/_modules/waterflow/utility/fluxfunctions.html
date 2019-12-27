@@ -156,100 +156,220 @@
 <span class="sd">storage change function &quot;&quot;&quot;</span>
 
 
-<div class="viewcode-block" id="darcy"><a class="viewcode-back" href="../../../waterflow.utility.html#waterflow.utility.fluxfunctions.darcy">[docs]</a><span class="k">def</span> <span class="nf">darcy</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">gradient</span><span class="p">,</span> <span class="n">ksat</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<div class="viewcode-block" id="darcy"><a class="viewcode-back" href="../../../waterflow.utility.html#waterflow.utility.fluxfunctions.darcy">[docs]</a><span class="k">def</span> <span class="nf">darcy</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">gradient</span><span class="p">,</span> <span class="n">kfun</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="mi">1</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Flux function for saturated flow</span>
+
+<span class="sd">    Flow equation as first described by :cite:`Darcy1856`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : `float`</span>
+<span class="sd">        Positional argument :math:`\\left(length\\right)`.</span>
+<span class="sd">    s : `float`</span>
+<span class="sd">        State of the system :math:`\\left(length\\right)`.</span>
+<span class="sd">    gradient : `float`</span>
+<span class="sd">        Gradient :math:\\frac{\\delta s}{\\delta x}.</span>
+<span class="sd">    kfun : `func`, default is :math:`kfun(x,s) = 1`</span>
+<span class="sd">        Hydraulic conductivity function with signature :math:`kfun(x, s)`</span>
+<span class="sd">        :math:`\\left(\\frac{length}{time}\\right)`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    `float`</span>
+<span class="sd">        Flux value :math:`\\left(\\frac{length}{time}\\right)`.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-
-<span class="sd">    .. math ::</span>
-
-<span class="sd">        q(x, s, \\frac{\\delta s}{\\delta x}) =</span>
-<span class="sd">        -\\frac{\\delta s}{\\delta x} * ksat</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="o">-</span> <span class="n">gradient</span> <span class="o">*</span> <span class="n">ksat</span></div>
-
-
-<div class="viewcode-block" id="darcy_s"><a class="viewcode-back" href="../../../waterflow.utility.html#waterflow.utility.fluxfunctions.darcy_s">[docs]</a><span class="k">def</span> <span class="nf">darcy_s</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">gradient</span><span class="p">,</span> <span class="n">ksat</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Flux function for saturated flow</span>
-
-<span class="sd">    Notes</span>
-<span class="sd">    -----</span>
-
-<span class="sd">    .. math ::</span>
-
-<span class="sd">        q(x, s, \\frac{\\delta s}{\\delta x}) =</span>
-<span class="sd">        -s * \\frac{\\delta s}{\\delta x} * ksat</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">return</span> <span class="o">-</span> <span class="n">gradient</span> <span class="o">*</span> <span class="n">ksat</span> <span class="o">*</span> <span class="n">s</span></div>
-
-
-<div class="viewcode-block" id="darcy_k"><a class="viewcode-back" href="../../../waterflow.utility.html#waterflow.utility.fluxfunctions.darcy_k">[docs]</a><span class="k">def</span> <span class="nf">darcy_k</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">gradient</span><span class="p">,</span> <span class="n">kfun</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">1</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Flux function for saturated flow</span>
-
-<span class="sd">    Notes</span>
-<span class="sd">    -----</span>
+<span class="sd">    See the exact implemention of the :cite:`Darcy1856` function below:</span>
 
 <span class="sd">    .. math::</span>
-
 <span class="sd">        q(x, s, \\frac{\\delta s}{\\delta x}) =</span>
-<span class="sd">        -kfun(x) * \\frac{\\delta s}{\\delta x}</span>
+<span class="sd">        -kfun(x, s) * \\frac{\\delta s}{\\delta x}</span>
+
+<span class="sd">    .. tip::</span>
+<span class="sd">        The function :math:`kfun` can return a fixed value if the saturated</span>
+<span class="sd">        conductivity is needed instead of a hydraulic conductivity function.</span>
+<span class="sd">        The ``kfun`` argument may look like the following:</span>
+
+<span class="sd">            .. math::</span>
+<span class="sd">                kfun(x, s) = ksat</span>
+
+<span class="sd">        Which can be implemented in Python with a lambda function</span>
+<span class="sd">        (lambda x, s: ksat) or just with a common function.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    &gt;&gt;&gt; from waterflow.utility.fluxfunctions import darcy</span>
+<span class="sd">    &gt;&gt;&gt; from waterflow.utility.helper import initializer</span>
+<span class="sd">    &gt;&gt;&gt; # In this case ksat is 1, negative gradient is returned</span>
+<span class="sd">    &gt;&gt;&gt; darcy(10, 5, 0.01)</span>
+<span class="sd">    -0.01</span>
+<span class="sd">    &gt;&gt;&gt; # Prepare the fluxfunction with a different default argument</span>
+<span class="sd">    &gt;&gt;&gt; def kfun(x, s):</span>
+<span class="sd">    ...     return -0.001 * x + s**1.2</span>
+<span class="sd">    &gt;&gt;&gt; darcy = initializer(darcy, kfun=kfun)</span>
+<span class="sd">    &gt;&gt;&gt; round(darcy(10, 5, 0.01), 4)</span>
+<span class="sd">    -0.0689</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="o">-</span> <span class="n">kfun</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="o">*</span> <span class="n">gradient</span></div>
 
-    <span class="k">return</span> <span class="o">-</span> <span class="n">kfun</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">gradient</span></div>
 
-
-<div class="viewcode-block" id="darcy_k_s"><a class="viewcode-back" href="../../../waterflow.utility.html#waterflow.utility.fluxfunctions.darcy_k_s">[docs]</a><span class="k">def</span> <span class="nf">darcy_k_s</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">gradient</span><span class="p">,</span> <span class="n">kfun</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">1</span><span class="p">):</span>
+<div class="viewcode-block" id="darcy_s"><a class="viewcode-back" href="../../../waterflow.utility.html#waterflow.utility.fluxfunctions.darcy_s">[docs]</a><span class="k">def</span> <span class="nf">darcy_s</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">gradient</span><span class="p">,</span> <span class="n">kfun</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="mi">1</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Flux function for saturated flow</span>
+
+<span class="sd">    Flow equation as first described by :cite:`Darcy1856` which</span>
+<span class="sd">    is altered to include a state dependency.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : `float`</span>
+<span class="sd">        Positional argument :math:`\\left(length\\right)`.</span>
+<span class="sd">    s : `float`</span>
+<span class="sd">        State of the system :math:`\\left(length\\right)`.</span>
+<span class="sd">    gradient : `float`</span>
+<span class="sd">        Gradient :math:\\frac{\\delta s}{\\delta x}.</span>
+<span class="sd">    kfun : `func`, default is :math:`kfun(x,s) = 1`</span>
+<span class="sd">        Hydraulic conductivity function with signature :math:`kfun(x, s)`</span>
+<span class="sd">        :math:`\\left(\\frac{length}{time}\\right)`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    `float`</span>
+<span class="sd">        Flux value :math:`\\left(\\frac{length}{time}\\right)`.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
+<span class="sd">    See the exact implemention of the adapted function below:</span>
 
 <span class="sd">    .. math::</span>
-
 <span class="sd">        q(x, s, \\frac{\\delta s}{\\delta x}) =</span>
-<span class="sd">        -kfun(x) * s * \\frac{\\delta s}{\\delta x}</span>
+<span class="sd">        -kfun(x, s) * s * \\frac{\\delta s}{\\delta x}</span>
+
+<span class="sd">    .. tip::</span>
+<span class="sd">        The function :math:`kfun` can return a fixed value if the saturated</span>
+<span class="sd">        conductivity is needed instead of a hydraulic conductivity function.</span>
+<span class="sd">        The ``kfun`` argument may look like the following:</span>
+
+<span class="sd">            .. math::</span>
+<span class="sd">                kfun(x, s) = ksat</span>
+
+<span class="sd">        Which can be implemented in Python with a lambda function</span>
+<span class="sd">        (lambda x, s: ksat) or just with a common function.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    &gt;&gt;&gt; from waterflow.utility.fluxfunctions import darcy_s</span>
+<span class="sd">    &gt;&gt;&gt; from waterflow.utility.helper import initializer</span>
+<span class="sd">    &gt;&gt;&gt; # In this case ksat is 1, negative gradient is returned</span>
+<span class="sd">    &gt;&gt;&gt; darcy_s(10, 5, 0.01)</span>
+<span class="sd">    -0.05</span>
+<span class="sd">    &gt;&gt;&gt; # Prepare the fluxfunction with a different default argument</span>
+<span class="sd">    &gt;&gt;&gt; def kfun(x, s):</span>
+<span class="sd">    ...     return -0.001 * x + s**1.2</span>
+<span class="sd">    &gt;&gt;&gt; darcy_s = initializer(darcy_s, kfun=kfun)</span>
+<span class="sd">    &gt;&gt;&gt; round(darcy_s(10, 5, 0.01), 4)</span>
+<span class="sd">    -0.3444</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="o">-</span> <span class="n">kfun</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="o">*</span> <span class="n">s</span> <span class="o">*</span> <span class="n">gradient</span></div>
 
 
 <div class="viewcode-block" id="richards_equation"><a class="viewcode-back" href="../../../waterflow.utility.html#waterflow.utility.fluxfunctions.richards_equation">[docs]</a><span class="k">def</span> <span class="nf">richards_equation</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">gradient</span><span class="p">,</span> <span class="n">kfun</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Richards equation, for unsaturated flow</span>
+    <span class="sd">&quot;&quot;&quot; Flux function for unsaturated flow</span>
+
+<span class="sd">    Flux function for unsaturated flow as described by :cite:`Richards1970`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : `float`</span>
+<span class="sd">        Positional argument :math:`\\left(length\\right)`.</span>
+<span class="sd">    s : `float`</span>
+<span class="sd">        State of the system :math:`\\left(length\\right)`.</span>
+<span class="sd">    gradient : `float`</span>
+<span class="sd">        Gradient :math:`\\frac{\\delta s}{\\delta x}`.</span>
+<span class="sd">    kfun : `func`</span>
+<span class="sd">        Unsaturated hydraulic conductivity function with signature</span>
+<span class="sd">        :math:`kfun(x, s)` :math:`\\left(\\frac{length}{time}\\right)`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    `float`</span>
+<span class="sd">        Flux value :math:`\\left(\\frac{length}{time}\\right)`.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
+<span class="sd">    See the exact implementation of the richards equation :cite:`Richards1970`</span>
+<span class="sd">    below:</span>
 
 <span class="sd">    .. math::</span>
-
 <span class="sd">        q(x, s, \\frac{\\delta s}{\\delta x}) =</span>
 <span class="sd">        -kfun(x, s) * \\left(\\frac{\\delta s}{\\delta x} + 1\\right)</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        For usage in the flow model,</span>
+<span class="sd">        :py:class:`~waterflow.flow1d.flowFE1d.Flow1DFE`, the calling signature</span>
+<span class="sd">        needs to be reduced to 3 positional arguments. ``kfun`` should be given</span>
+<span class="sd">        a default value, see the examples section.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from waterflow.utility.fluxfunctions import richards_equation</span>
+<span class="sd">    &gt;&gt;&gt; from waterflow.utility.conductivityfunctions import VG_pressureh</span>
+<span class="sd">    &gt;&gt;&gt; from waterflow.utility.helper import initializer</span>
+<span class="sd">    &gt;&gt;&gt; # kfun itself needs to be initialized too</span>
+<span class="sd">    &gt;&gt;&gt; VG_pressureh = initializer(VG_pressureh, theta_s=0.42, a=0.0748, n=1.44)</span>
+<span class="sd">    &gt;&gt;&gt; # Prepare the unsaturated hydraulic conductivity function</span>
+<span class="sd">    &gt;&gt;&gt; richards_equation = initializer(richards_equation, kfun=VG_pressureh)</span>
+<span class="sd">    &gt;&gt;&gt; richards_equation(0, -10**4.2, 0.1)</span>
+<span class="sd">    -0.462</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="o">-</span><span class="n">kfun</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">gradient</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="storage_change"><a class="viewcode-back" href="../../../waterflow.utility.html#waterflow.utility.fluxfunctions.storage_change">[docs]</a><span class="k">def</span> <span class="nf">storage_change</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">prevstate</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">fun</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">S</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; General storage change function for both saturated and</span>
+<div class="viewcode-block" id="storage_change"><a class="viewcode-back" href="../../../waterflow.utility.html#waterflow.utility.fluxfunctions.storage_change">[docs]</a><span class="k">def</span> <span class="nf">storage_change</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">prevstate</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">fun</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="n">S</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Storage change function</span>
+
+<span class="sd">    General storage change function for both saturated and</span>
 <span class="sd">    unsaturated flow simulations</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : `float`</span>
+<span class="sd">        Positional argument :math:`\\left(length\\right)`.</span>
+<span class="sd">    s : `float`</span>
+<span class="sd">        State of the system :math:`\\left(length\\right)`.</span>
+<span class="sd">    prevstate : `func`</span>
+<span class="sd">        Converts a position, :math:`x`, to a state value :math:`s`.</span>
+<span class="sd">    dt : `float`</span>
+<span class="sd">        Time step `\\left(time\\right)`.</span>
+<span class="sd">    fun : `func`, default is :math:`fun(x) = x`</span>
+<span class="sd">        Convert a state value, :math:`s`, to a moisture content, :math:`\\theta`,</span>
+<span class="sd">        in case of unsaturated flow.</span>
+<span class="sd">    S : `float`, default is 1.0</span>
+<span class="sd">        Sorptivity as a fraction.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
 
 <span class="sd">    .. math::</span>
+<span class="sd">        q(x, s, prevstate, dt) = - S * \\frac{fun(s) - fun(prevstate(x))}{dt}</span>
 
-<span class="sd">        q(x, s, prevstate, dt, fun, S) = - S * \\frac{fun(s) - fun(pressure(x))}{dt}</span>
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
 
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">return</span> <span class="o">-</span> <span class="n">S</span> <span class="o">*</span> <span class="p">(</span><span class="n">fun</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">-</span> <span class="n">fun</span><span class="p">(</span><span class="n">prevstate</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span> <span class="o">/</span> <span class="n">dt</span></div>
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="k">pass</span>
+    <span class="kn">import</span> <span class="nn">doctest</span>
+    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
 </pre></div>
 
            </div>

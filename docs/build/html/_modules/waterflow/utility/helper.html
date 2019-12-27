@@ -159,7 +159,44 @@
 
 
 <div class="viewcode-block" id="initializer"><a class="viewcode-back" href="../../../waterflow.utility.html#waterflow.utility.helper.initializer">[docs]</a><span class="k">def</span> <span class="nf">initializer</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; prepare a function with specific default arguments &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot; Prepare or reduce a function with default arguments</span>
+
+<span class="sd">    Reduce the number of positional arguments in ``func`` or change</span>
+<span class="sd">    the default values of already set keyword arguments.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    *args</span>
+<span class="sd">        Positional arguments in ``func``.</span>
+<span class="sd">    **kwargs</span>
+<span class="sd">        Keyword arguments in ``func``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    `functools.partial`</span>
+<span class="sd">        Initialized function.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This function is implemented as a combination of :func:`functools.partial`</span>
+<span class="sd">    to adapt the function signature and :func:`functools.update_wrapper` to</span>
+<span class="sd">    copy the metadata from ``func``.</span>
+
+<span class="sd">    Examples</span>
+
+<span class="sd">    &gt;&gt;&gt; from waterflow.utility.helper import initializer</span>
+<span class="sd">    &gt;&gt;&gt; def f(a, b, c=3):</span>
+<span class="sd">    ...     return a, b, c</span>
+<span class="sd">    &gt;&gt;&gt; f(1, 2)</span>
+<span class="sd">    (1, 2, 3)</span>
+<span class="sd">    &gt;&gt;&gt; f = initializer(f, c=10)</span>
+<span class="sd">    &gt;&gt;&gt; f(1, 2)</span>
+<span class="sd">    (1, 2, 10)</span>
+<span class="sd">    &gt;&gt;&gt; f = initializer(f, 11)</span>
+<span class="sd">    &gt;&gt;&gt; f(b=2)</span>
+<span class="sd">    (11, 2, 10)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">pfunc</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="c1"># update initialized function with function&#39;s original attributes</span>
     <span class="n">update_wrapper</span><span class="p">(</span><span class="n">pfunc</span><span class="p">,</span> <span class="n">func</span><span class="p">)</span>
@@ -167,11 +204,32 @@
 
 
 <div class="viewcode-block" id="newdir"><a class="viewcode-back" href="../../../waterflow.utility.html#waterflow.utility.helper.newdir">[docs]</a><span class="k">def</span> <span class="nf">newdir</span><span class="p">(</span><span class="n">basepath</span><span class="p">,</span> <span class="n">dirname</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; checks and/or creates new directory &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot; Creates new directory</span>
+
+<span class="sd">    Creates a new directory if it does not exist.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    basepath : `str`</span>
+<span class="sd">        Path to the location of the new directory.</span>
+<span class="sd">    dirname : `str`</span>
+<span class="sd">        Name of the new directory</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    `str`</span>
+<span class="sd">        Absolute path including the new directory.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">newpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">basepath</span><span class="p">,</span> <span class="n">dirname</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">newpath</span><span class="p">):</span>
         <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">newpath</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">newpath</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">doctest</span>
+    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
 </pre></div>
 
            </div>

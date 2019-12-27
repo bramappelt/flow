@@ -51,11 +51,3 @@ waterflow.utility.spacing module
    :members:
    :undoc-members:
    :show-inheritance:
-
-waterflow.utility.statistics module
------------------------------------
-
-.. automodule:: waterflow.utility.statistics
-   :members:
-   :undoc-members:
-   :show-inheritance:

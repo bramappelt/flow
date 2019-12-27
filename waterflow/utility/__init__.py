@@ -5,6 +5,5 @@
 * Grid spacing functions
 * Miscellaneous helper functions
 * Ready to use plot functions
-* Functions for statistical measures (Root Mean Square & Mean Absolute Error)
 
 """

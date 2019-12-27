@@ -88,6 +88,7 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index_examples.html">What is this <em>Flow</em> software package for?</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">flow</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="waterflow.html">waterflow package</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="waterflow.html#module-waterflow">Module contents</a></li>
@@ -180,7 +181,6 @@
 <li><p>Grid spacing functions</p></li>
 <li><p>Miscellaneous helper functions</p></li>
 <li><p>Ready to use plot functions</p></li>
-<li><p>Functions for statistical measures (Root Mean Square &amp; Mean Absolute Error)</p></li>
 </ul>
 </div>
 <div class="section" id="submodules">
@@ -192,52 +192,226 @@
 <dl class="function">
 <dt id="waterflow.utility.conductivityfunctions.VG_conductivity">
 <code class="sig-prename descclassname">waterflow.utility.conductivityfunctions.</code><code class="sig-name descname">VG_conductivity</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">h</em>, <em class="sig-param">ksat</em>, <em class="sig-param">a</em>, <em class="sig-param">n</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/conductivityfunctions.html#VG_conductivity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.conductivityfunctions.VG_conductivity" title="Permalink to this definition">¶</a></dt>
-<dd><p>k-h relation as described by Van Genuchten</p>
+<dd><p>Hydraulic conductivity function</p>
+<p>Unsaturated hydraulic conductivity function as described by
+<a class="bibtex reference internal" href="waterflow.flow1d.html#vangenuchten1980" id="id1">[genclo80vGgenclo80vG80]</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<cite>float</cite>) – Positional argument <img class="math" src="_images/math/6e5e038a450b3e1c936ae16c60b8efca897f5066.png" alt="\left(length\right)"/>.</p></li>
+<li><p><strong>h</strong> (<cite>float</cite>) – Soil water potential <img class="math" src="_images/math/6e5e038a450b3e1c936ae16c60b8efca897f5066.png" alt="\left(length\right)"/>.</p></li>
+<li><p><strong>ksat</strong> (<cite>float</cite>) – Saturated hydraulic conductivity <img class="math" src="_images/math/3f1267f19649eb284eeeb7b701977c8962d4a141.png" alt="\left(\frac{length}{time}\right)"/>.</p></li>
+<li><p><strong>a</strong> (<cite>float</cite>) – Empirical soil parameter <img class="math" src="_images/math/d843d026298aee4a664568f88f261bc7cc511454.png" alt="\left(\frac{1}{length}\right)"/>.</p></li>
+<li><p><strong>n</strong> (<cite>float</cite>) – Empirical soil parameter <img class="math" src="_images/math/8d108ef71184c3f5bb1a1dd119435b4523b0e244.png" alt="\left(-\right)"/>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Hydraulic conductivity <img class="math" src="_images/math/3f1267f19649eb284eeeb7b701977c8962d4a141.png" alt="\left(\frac{length}{time}\right)"/>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><cite>float</cite></p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
+<p>This is the hydraulic conductivity function with the Mualem approach which
+means that parameter <img class="math" src="_images/math/e9bc7da808d33a16a8347f27a519bd067186aa66.png" alt="m"/> is fixed as described by <a class="bibtex reference internal" href="waterflow.flow1d.html#mualem1976" id="id2">[Mua76]</a>
+and <a class="bibtex reference internal" href="waterflow.flow1d.html#vangenuchten1980" id="id3">[genclo80vGgenclo80vG80]</a>.</p>
 <div class="math" id="equation-waterflow-utility-0">
 <p><span class="eqno">(1)<a class="headerlink" href="#equation-waterflow-utility-0" title="Permalink to this equation">¶</a></span><img src="_images/math/80d85a7fe4220d0ff9539dfadeb2c7131527744b.png" alt="m = 1 - \frac{1}{n}"/></p>
 </div><div class="math" id="equation-waterflow-utility-1">
-<p><span class="eqno">(2)<a class="headerlink" href="#equation-waterflow-utility-1" title="Permalink to this equation">¶</a></span><img src="_images/math/df60b02239b9f5de777d1d5f091fd0e9780b1c94.png" alt="k(h) =
-\begin{cases}
-    \frac{\left(1 - (a*-h)^{n-1}*(1+(a*-h)^{n})^{-m}\right)^{2}}
-    {(1 + (a*-h)^{n})^{\frac{m}{2}}} * ksat, &amp; \text{if } h&lt;0\\
-    ksat, &amp; \text{otherwise}
-\end{cases}"/></p>
-</div></dd></dl>
+<p><span class="eqno">(2)<a class="headerlink" href="#equation-waterflow-utility-1" title="Permalink to this equation">¶</a></span><img src="_images/math/9fc787ac8c3e784404c4c597155576191e653818.png" alt="k(h) = \begin{cases}
+            \frac{\left(1 - (a*-h)^{n-1}*(1+(a*-h)^{n})^{-m}\right)^{2}}
+            {(1 + (a*-h)^{n})^{\frac{m}{2}}} * ksat, &amp; \text{if } h&lt;0 \\
+            ksat, &amp; \text{otherwise}
+       \end{cases}"/></p>
+</div><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For usage in the flow model,
+<a class="reference internal" href="waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE" title="waterflow.flow1d.flowFE1d.Flow1DFE"><code class="xref py py-class docutils literal notranslate"><span class="pre">Flow1DFE</span></code></a>, the number of
+positional arguments needs to be reduced to two (<code class="docutils literal notranslate"><span class="pre">x</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">h</span></code>).
+Despite independence of argument <code class="docutils literal notranslate"><span class="pre">x</span></code> in this function is needs to
+be included in the function signature. The other arguments need to be
+assigned a default value. See the examples section.</p>
+</div>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.conductivityfunctions</span> <span class="k">import</span> <span class="n">soilselector</span><span class="p">,</span> <span class="n">VG_conductivity</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="k">import</span> <span class="n">initializer</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">soil</span> <span class="o">=</span> <span class="n">soilselector</span><span class="p">([</span><span class="mi">3</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">soil</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Without preparation</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">VG_conductivity</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">ksat</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">n</span><span class="p">),</span> <span class="mi">4</span><span class="p">)</span>
+<span class="go">0.2742</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># With preparation</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">VG_conductivity</span> <span class="o">=</span> <span class="n">initializer</span><span class="p">(</span><span class="n">VG_conductivity</span><span class="p">,</span> <span class="n">ksat</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">ksat</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">VG_conductivity</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span> <span class="mi">4</span><span class="p">)</span>
+<span class="go">0.2742</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="function">
 <dt id="waterflow.utility.conductivityfunctions.VG_pressureh">
 <code class="sig-prename descclassname">waterflow.utility.conductivityfunctions.</code><code class="sig-name descname">VG_pressureh</code><span class="sig-paren">(</span><em class="sig-param">h</em>, <em class="sig-param">theta_r</em>, <em class="sig-param">theta_s</em>, <em class="sig-param">a</em>, <em class="sig-param">n</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/conductivityfunctions.html#VG_pressureh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.conductivityfunctions.VG_pressureh" title="Permalink to this definition">¶</a></dt>
-<dd><p>theta-h relation as described by Van Genuchten</p>
+<dd><p>Water retention function <img class="math" src="_images/math/ec87273788470ab7a90e7f1d54038e09890dd462.png" alt="theta(h)"/></p>
+<p>Soil water retention function as described by
+<a class="bibtex reference internal" href="waterflow.flow1d.html#vangenuchten1980" id="id4">[genclo80vGgenclo80vG80]</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>h</strong> (<cite>float</cite>) – Soil water potential <img class="math" src="_images/math/6e5e038a450b3e1c936ae16c60b8efca897f5066.png" alt="\left(length\right)"/>.</p></li>
+<li><p><strong>theta_r</strong> (<cite>float</cite>) – Residual water content as a fraction.</p></li>
+<li><p><strong>theta_s</strong> (<cite>float</cite>) – Saturated water content as a fraction.</p></li>
+<li><p><strong>a</strong> (<cite>float</cite>) – Empirical soil parameter <img class="math" src="_images/math/d843d026298aee4a664568f88f261bc7cc511454.png" alt="\left(\frac{1}{length}\right)"/>.</p></li>
+<li><p><strong>n</strong> (<cite>float</cite>) – Empirical soil parameter <img class="math" src="_images/math/8d108ef71184c3f5bb1a1dd119435b4523b0e244.png" alt="\left(-\right)"/>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Moisture content as a fraction.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><cite>float</cite></p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
+<p>This version of the water retention function is based on the
+Mualem approach with is described by <a class="bibtex reference internal" href="waterflow.flow1d.html#mualem1976" id="id5">[Mua76]</a> and
+<a class="bibtex reference internal" href="waterflow.flow1d.html#vangenuchten1980" id="id6">[genclo80vGgenclo80vG80]</a>. Under this approach the parameter
+<img class="math" src="_images/math/e9bc7da808d33a16a8347f27a519bd067186aa66.png" alt="m"/> is fixed.</p>
 <div class="math" id="equation-waterflow-utility-2">
 <p><span class="eqno">(3)<a class="headerlink" href="#equation-waterflow-utility-2" title="Permalink to this equation">¶</a></span><img src="_images/math/451d3219f32f5925cec6a346a0f6c1ceeb6879c1.png" alt="m = 1-\frac{1}{n}"/></p>
 </div><div class="math" id="equation-waterflow-utility-3">
-<p><span class="eqno">(4)<a class="headerlink" href="#equation-waterflow-utility-3" title="Permalink to this equation">¶</a></span><img src="_images/math/ce25f8fc48552822caf53cfaed4e474ce3ecee9d.png" alt="\theta(h) =
-\begin{cases}
-    \theta_{r} + \frac{\theta_{s} - \theta_{r}}{(1+(a*-h)^{n})^m},
-    &amp; \text{if } h &lt; 0\\
-    \theta_s, &amp; \text{otherwise}
-\end{cases}"/></p>
-</div></dd></dl>
+<p><span class="eqno">(4)<a class="headerlink" href="#equation-waterflow-utility-3" title="Permalink to this equation">¶</a></span><img src="_images/math/63a93733911d31fea6dfa78f6b77ae68a55eead7.png" alt="\theta(h) = \begin{cases}
+                \theta_{r} + \frac{\theta_{s} - \theta_{r}}{(1+(a*-h)^{n})^m},
+                &amp; \text{if } h &lt; 0\\
+                \theta_s, &amp; \text{otherwise}
+             \end{cases}"/></p>
+</div><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For usage in the flow model,
+<a class="reference internal" href="waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE" title="waterflow.flow1d.flowFE1d.Flow1DFE"><code class="xref py py-class docutils literal notranslate"><span class="pre">Flow1DFE</span></code></a>, the number of
+positional arguments needs to be reduced to one (<code class="docutils literal notranslate"><span class="pre">h</span></code>)
+and the remaining should be assigned a default value. See the
+examples section.</p>
+</div>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.conductivityfunctions</span> <span class="k">import</span> <span class="n">soilselector</span><span class="p">,</span> <span class="n">VG_pressureh</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="k">import</span> <span class="n">initializer</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">soil</span> <span class="o">=</span> <span class="n">soilselector</span><span class="p">([</span><span class="mi">8</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">soil</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Without preparation</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">VG_pressureh</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="o">**</span><span class="mf">4.2</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">t_res</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">t_sat</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">n</span><span class="p">),</span> <span class="mi">4</span><span class="p">)</span>
+<span class="go">0.1079</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># With preparation</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">VG_pressureh</span> <span class="o">=</span> <span class="n">initializer</span><span class="p">(</span><span class="n">VG_pressureh</span><span class="p">,</span> <span class="n">theta_r</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">t_res</span><span class="p">,</span>
+<span class="gp">... </span>                           <span class="n">theta_s</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">t_sat</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">VG_pressureh</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="o">**</span><span class="mf">4.2</span><span class="p">),</span> <span class="mi">4</span><span class="p">)</span>
+<span class="go">0.1079</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="function">
 <dt id="waterflow.utility.conductivityfunctions.VG_theta">
 <code class="sig-prename descclassname">waterflow.utility.conductivityfunctions.</code><code class="sig-name descname">VG_theta</code><span class="sig-paren">(</span><em class="sig-param">theta</em>, <em class="sig-param">theta_r</em>, <em class="sig-param">theta_s</em>, <em class="sig-param">a</em>, <em class="sig-param">n</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/conductivityfunctions.html#VG_theta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.conductivityfunctions.VG_theta" title="Permalink to this definition">¶</a></dt>
-<dd><p>h-theta relation as described by Van Genuchten</p>
+<dd><p>Water retention function, :math:h(theta)</p>
+<p>Soil water retention function as described by
+<a class="bibtex reference internal" href="waterflow.flow1d.html#vangenuchten1980" id="id7">[genclo80vGgenclo80vG80]</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>theta</strong> (<cite>float</cite>) – Water content as a fraction.</p></li>
+<li><p><strong>theta_r</strong> (<cite>float</cite>) – Residual water content as a fraction.</p></li>
+<li><p><strong>theta_s</strong> (<cite>float</cite>) – Saturated water content as a fraction.</p></li>
+<li><p><strong>a</strong> (<cite>float</cite>) – Empirical soil parameter <img class="math" src="_images/math/d843d026298aee4a664568f88f261bc7cc511454.png" alt="\left(\frac{1}{length}\right)"/>.</p></li>
+<li><p><strong>n</strong> (<cite>float</cite>) – Empirical soil parameter <img class="math" src="_images/math/8d108ef71184c3f5bb1a1dd119435b4523b0e244.png" alt="\left(-\right)"/>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Soil water potential <img class="math" src="_images/math/6e5e038a450b3e1c936ae16c60b8efca897f5066.png" alt="\left(length\right)"/>. Note that the sign
+of the value is switched.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><cite>float</cite></p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
+<p>This version of the water retention function is based on the
+Mualem approach with is described by <a class="bibtex reference internal" href="waterflow.flow1d.html#mualem1976" id="id8">[Mua76]</a> and
+<a class="bibtex reference internal" href="waterflow.flow1d.html#vangenuchten1980" id="id9">[genclo80vGgenclo80vG80]</a>. Under this approach the parameter
+<img class="math" src="_images/math/e9bc7da808d33a16a8347f27a519bd067186aa66.png" alt="m"/> is fixed.</p>
 <div class="math" id="equation-waterflow-utility-4">
 <p><span class="eqno">(5)<a class="headerlink" href="#equation-waterflow-utility-4" title="Permalink to this equation">¶</a></span><img src="_images/math/80d85a7fe4220d0ff9539dfadeb2c7131527744b.png" alt="m = 1 - \frac{1}{n}"/></p>
 </div><div class="math" id="equation-waterflow-utility-5">
-<p><span class="eqno">(6)<a class="headerlink" href="#equation-waterflow-utility-5" title="Permalink to this equation">¶</a></span><img src="_images/math/4ccd789f9b7f1ab3e7c241bd84bc27d11e22df0f.png" alt="h(\theta) = \left(\frac{(\theta_{s} - \theta_r) /
-(\theta - \theta_{r})^{\frac{1}{m}} - 1}
-{a^{n}}\right)^{\frac{1}{n}}"/></p>
-</div></dd></dl>
+<p><span class="eqno">(6)<a class="headerlink" href="#equation-waterflow-utility-5" title="Permalink to this equation">¶</a></span><img src="_images/math/209f7ce680abe8d70221bf824631a99660f61961.png" alt="h(\theta) = \left(\frac{(\theta_{s} - \theta_r) /
+             (\theta - \theta_{r})^{\frac{1}{m}} - 1}
+             {a^{n}}\right)^{\frac{1}{n}}"/></p>
+</div><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For usage in the flow model,
+<a class="reference internal" href="waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE" title="waterflow.flow1d.flowFE1d.Flow1DFE"><code class="xref py py-class docutils literal notranslate"><span class="pre">Flow1DFE</span></code></a>, the number of
+positional arguments needs to be reduced to one (<code class="docutils literal notranslate"><span class="pre">theta</span></code>)
+and the remaining should be assigned a default value. See the
+examples section.</p>
+</div>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.conductivityfunctions</span> <span class="k">import</span> <span class="n">soilselector</span><span class="p">,</span> <span class="n">VG_theta</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="k">import</span> <span class="n">initializer</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">soil</span> <span class="o">=</span> <span class="n">soilselector</span><span class="p">([</span><span class="mi">2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">soil</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Without preparation</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">VG_theta</span><span class="p">(</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">t_res</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">t_sat</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">n</span><span class="p">),</span> <span class="mi">4</span><span class="p">)</span>
+<span class="go">97.3908</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># With preparation</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">VG_theta</span> <span class="o">=</span> <span class="n">initializer</span><span class="p">(</span><span class="n">VG_theta</span><span class="p">,</span> <span class="n">theta_r</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">t_res</span><span class="p">,</span> <span class="n">theta_s</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">t_sat</span><span class="p">,</span>
+<span class="gp">... </span>                       <span class="n">a</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">VG_theta</span><span class="p">(</span><span class="mf">0.25</span><span class="p">),</span> <span class="mi">4</span><span class="p">)</span>
+<span class="go">97.3908</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="function">
 <dt id="waterflow.utility.conductivityfunctions.soilselector">
 <code class="sig-prename descclassname">waterflow.utility.conductivityfunctions.</code><code class="sig-name descname">soilselector</code><span class="sig-paren">(</span><em class="sig-param">soils</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/conductivityfunctions.html#soilselector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.conductivityfunctions.soilselector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Select soil(s) from the Staringreeks</p>
+<p>Select soil parameters from one or multiple soils as described in
+The Staringreeks <a class="bibtex reference internal" href="waterflow.flow1d.html#wosten2001" id="id10">[WostenVDS01]</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>soils</strong> (<cite>list</cite>) – Number(s) that correspond(s) to a soil in The Staringreeks.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><cite>list</cite> with <cite>collections.namedtuple</cite> objects – Parameters of the selected soils in the same order as the input.</p></li>
+<li><p><cite>pandas.core.frame.DataFrame</cite> – Slice of the complete dataframe with the selected soils.</p></li>
+<li><p><cite>tuple</cite> with <cite>collections.namedtuple</cite> objects – Holds the parameter extrema of the selected soils.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The source file from which the soil data is read can be found in
+<a class="reference internal" href="waterflow.html#waterflow.DATA_DIR" title="waterflow.DATA_DIR"><code class="xref py py-data docutils literal notranslate"><span class="pre">DATA_DIR</span></code></a>.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.conductivityfunctions</span> <span class="k">import</span> <span class="n">soilselector</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">params</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">extrema</span> <span class="o">=</span> <span class="n">soilselector</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">13</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span><span class="p">,</span> <span class="n">s10</span><span class="p">,</span> <span class="n">s13</span> <span class="o">=</span> <span class="n">params</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Print some parameters of the selected soils</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span><span class="o">.</span><span class="n">soiltype</span><span class="p">,</span> <span class="n">s1</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">s1</span><span class="o">.</span><span class="n">ksat</span>
+<span class="go">(&#39;B1&#39;, &#39;Non-loamy sand&#39;, 23.41)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s10</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">s10</span><span class="o">.</span><span class="n">t_sat</span><span class="p">,</span> <span class="n">s10</span><span class="o">.</span><span class="n">alpha</span>
+<span class="go">(&#39;Light clay&#39;, 0.43, 0.0064)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s13</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">s13</span><span class="o">.</span><span class="n">Lambda</span><span class="p">,</span> <span class="n">s13</span><span class="o">.</span><span class="n">n</span>
+<span class="go">(&#39;Loam&#39;, -1.4969999999999999, 1.4409999999999998)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span>
+<span class="go">   soiltype  t_res  t_sat   ksat   alpha  Lambda      n            name category</span>
+<span class="go">0        B1   0.02   0.43  23.41  0.0234   0.000  1.801  Non-loamy sand        s</span>
+<span class="go">9       B10   0.01   0.43   0.70  0.0064  -3.884  1.210      Light clay        c</span>
+<span class="go">12      B13   0.01   0.42  12.98  0.0084  -1.497  1.441            Loam        l</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">extrema</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">ksat</span>
+<span class="go">0.7</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </div>
@@ -247,63 +421,188 @@
 storage change function</p>
 <dl class="function">
 <dt id="waterflow.utility.fluxfunctions.darcy">
-<code class="sig-prename descclassname">waterflow.utility.fluxfunctions.</code><code class="sig-name descname">darcy</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">s</em>, <em class="sig-param">gradient</em>, <em class="sig-param">ksat=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/fluxfunctions.html#darcy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.fluxfunctions.darcy" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">waterflow.utility.fluxfunctions.</code><code class="sig-name descname">darcy</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">s</em>, <em class="sig-param">gradient</em>, <em class="sig-param">kfun=&lt;function &lt;lambda&gt;&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/fluxfunctions.html#darcy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.fluxfunctions.darcy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flux function for saturated flow</p>
+<p>Flow equation as first described by <a class="bibtex reference internal" href="waterflow.flow1d.html#darcy1856" id="id11">[Dar56]</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<cite>float</cite>) – Positional argument <img class="math" src="_images/math/6e5e038a450b3e1c936ae16c60b8efca897f5066.png" alt="\left(length\right)"/>.</p></li>
+<li><p><strong>s</strong> (<cite>float</cite>) – State of the system <img class="math" src="_images/math/6e5e038a450b3e1c936ae16c60b8efca897f5066.png" alt="\left(length\right)"/>.</p></li>
+<li><p><strong>gradient</strong> (<cite>float</cite>) – Gradient :math:frac{delta s}{delta x}.</p></li>
+<li><p><strong>kfun</strong> (<cite>func</cite>, default is <img class="math" src="_images/math/7ecccf989b50268704e2a70ede68865970912ff4.png" alt="kfun(x,s) = 1"/>) – Hydraulic conductivity function with signature <img class="math" src="_images/math/84a4d2c3db6584d748373534ff7c91b73a524077.png" alt="kfun(x, s)"/>
+<img class="math" src="_images/math/3f1267f19649eb284eeeb7b701977c8962d4a141.png" alt="\left(\frac{length}{time}\right)"/>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Flux value <img class="math" src="_images/math/3f1267f19649eb284eeeb7b701977c8962d4a141.png" alt="\left(\frac{length}{time}\right)"/>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><cite>float</cite></p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
+<p>See the exact implemention of the <a class="bibtex reference internal" href="waterflow.flow1d.html#darcy1856" id="id12">[Dar56]</a> function below:</p>
 <div class="math" id="equation-waterflow-utility-6">
-<p><span class="eqno">(7)<a class="headerlink" href="#equation-waterflow-utility-6" title="Permalink to this equation">¶</a></span><img src="_images/math/b8de8819e4a2c7606cf864ef2f0cfd36bfb2c6b9.png" alt="q(x, s, \frac{\delta s}{\delta x}) =
--\frac{\delta s}{\delta x} * ksat"/></p>
-</div></dd></dl>
-
-<dl class="function">
-<dt id="waterflow.utility.fluxfunctions.darcy_k">
-<code class="sig-prename descclassname">waterflow.utility.fluxfunctions.</code><code class="sig-name descname">darcy_k</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">s</em>, <em class="sig-param">gradient</em>, <em class="sig-param">kfun=&lt;function &lt;lambda&gt;&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/fluxfunctions.html#darcy_k"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.fluxfunctions.darcy_k" title="Permalink to this definition">¶</a></dt>
-<dd><p>Flux function for saturated flow</p>
-<p class="rubric">Notes</p>
-<div class="math" id="equation-waterflow-utility-7">
-<p><span class="eqno">(8)<a class="headerlink" href="#equation-waterflow-utility-7" title="Permalink to this equation">¶</a></span><img src="_images/math/9284fa7eec4e25c1aa4c52d23470376a6307440b.png" alt="q(x, s, \frac{\delta s}{\delta x}) =
--kfun(x) * \frac{\delta s}{\delta x}"/></p>
-</div></dd></dl>
-
-<dl class="function">
-<dt id="waterflow.utility.fluxfunctions.darcy_k_s">
-<code class="sig-prename descclassname">waterflow.utility.fluxfunctions.</code><code class="sig-name descname">darcy_k_s</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">s</em>, <em class="sig-param">gradient</em>, <em class="sig-param">kfun=&lt;function &lt;lambda&gt;&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/fluxfunctions.html#darcy_k_s"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.fluxfunctions.darcy_k_s" title="Permalink to this definition">¶</a></dt>
-<dd><p>Flux function for saturated flow</p>
-<p class="rubric">Notes</p>
-<div class="math" id="equation-waterflow-utility-8">
-<p><span class="eqno">(9)<a class="headerlink" href="#equation-waterflow-utility-8" title="Permalink to this equation">¶</a></span><img src="_images/math/5d83ab92dbb9ef8c97ed4f78c9af81e4468f6998.png" alt="q(x, s, \frac{\delta s}{\delta x}) =
--kfun(x) * s * \frac{\delta s}{\delta x}"/></p>
-</div></dd></dl>
+<p><span class="eqno">(7)<a class="headerlink" href="#equation-waterflow-utility-6" title="Permalink to this equation">¶</a></span><img src="_images/math/bfc01c381b9578c267846a39ce48b44ddeafc496.png" alt="q(x, s, \frac{\delta s}{\delta x}) =
+-kfun(x, s) * \frac{\delta s}{\delta x}"/></p>
+</div><div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The function <img class="math" src="_images/math/cef01e3aa4980ccd8ddd8587761968bd45d32716.png" alt="kfun"/> can return a fixed value if the saturated
+conductivity is needed instead of a hydraulic conductivity function.
+The <code class="docutils literal notranslate"><span class="pre">kfun</span></code> argument may look like the following:</p>
+<blockquote>
+<div><div class="math" id="equation-waterflow-utility-7">
+<p><span class="eqno">(8)<a class="headerlink" href="#equation-waterflow-utility-7" title="Permalink to this equation">¶</a></span><img src="_images/math/661aac12aa5de7977228d685bdd07a6eb8b02126.png" alt="kfun(x, s) = ksat"/></p>
+</div></div></blockquote>
+<p>Which can be implemented in Python with a lambda function
+(lambda x, s: ksat) or just with a common function.</p>
+</div>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.fluxfunctions</span> <span class="k">import</span> <span class="n">darcy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="k">import</span> <span class="n">initializer</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># In this case ksat is 1, negative gradient is returned</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">darcy</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
+<span class="go">-0.01</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Prepare the fluxfunction with a different default argument</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">kfun</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="o">-</span><span class="mf">0.001</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">s</span><span class="o">**</span><span class="mf">1.2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">darcy</span> <span class="o">=</span> <span class="n">initializer</span><span class="p">(</span><span class="n">darcy</span><span class="p">,</span> <span class="n">kfun</span><span class="o">=</span><span class="n">kfun</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">darcy</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">),</span> <span class="mi">4</span><span class="p">)</span>
+<span class="go">-0.0689</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="function">
 <dt id="waterflow.utility.fluxfunctions.darcy_s">
-<code class="sig-prename descclassname">waterflow.utility.fluxfunctions.</code><code class="sig-name descname">darcy_s</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">s</em>, <em class="sig-param">gradient</em>, <em class="sig-param">ksat=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/fluxfunctions.html#darcy_s"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.fluxfunctions.darcy_s" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">waterflow.utility.fluxfunctions.</code><code class="sig-name descname">darcy_s</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">s</em>, <em class="sig-param">gradient</em>, <em class="sig-param">kfun=&lt;function &lt;lambda&gt;&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/fluxfunctions.html#darcy_s"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.fluxfunctions.darcy_s" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flux function for saturated flow</p>
+<p>Flow equation as first described by <a class="bibtex reference internal" href="waterflow.flow1d.html#darcy1856" id="id13">[Dar56]</a> which
+is altered to include a state dependency.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<cite>float</cite>) – Positional argument <img class="math" src="_images/math/6e5e038a450b3e1c936ae16c60b8efca897f5066.png" alt="\left(length\right)"/>.</p></li>
+<li><p><strong>s</strong> (<cite>float</cite>) – State of the system <img class="math" src="_images/math/6e5e038a450b3e1c936ae16c60b8efca897f5066.png" alt="\left(length\right)"/>.</p></li>
+<li><p><strong>gradient</strong> (<cite>float</cite>) – Gradient :math:frac{delta s}{delta x}.</p></li>
+<li><p><strong>kfun</strong> (<cite>func</cite>, default is <img class="math" src="_images/math/7ecccf989b50268704e2a70ede68865970912ff4.png" alt="kfun(x,s) = 1"/>) – Hydraulic conductivity function with signature <img class="math" src="_images/math/84a4d2c3db6584d748373534ff7c91b73a524077.png" alt="kfun(x, s)"/>
+<img class="math" src="_images/math/3f1267f19649eb284eeeb7b701977c8962d4a141.png" alt="\left(\frac{length}{time}\right)"/>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Flux value <img class="math" src="_images/math/3f1267f19649eb284eeeb7b701977c8962d4a141.png" alt="\left(\frac{length}{time}\right)"/>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><cite>float</cite></p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
-<div class="math" id="equation-waterflow-utility-9">
-<p><span class="eqno">(10)<a class="headerlink" href="#equation-waterflow-utility-9" title="Permalink to this equation">¶</a></span><img src="_images/math/74dd68fd1baaa9901e3e8412272e9b70791c7b52.png" alt="q(x, s, \frac{\delta s}{\delta x}) =
--s * \frac{\delta s}{\delta x} * ksat"/></p>
-</div></dd></dl>
+<p>See the exact implemention of the adapted function below:</p>
+<div class="math" id="equation-waterflow-utility-8">
+<p><span class="eqno">(9)<a class="headerlink" href="#equation-waterflow-utility-8" title="Permalink to this equation">¶</a></span><img src="_images/math/fc2195b3e4c07457bcd97c843583be1e06e46d92.png" alt="q(x, s, \frac{\delta s}{\delta x}) =
+-kfun(x, s) * s * \frac{\delta s}{\delta x}"/></p>
+</div><div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The function <img class="math" src="_images/math/cef01e3aa4980ccd8ddd8587761968bd45d32716.png" alt="kfun"/> can return a fixed value if the saturated
+conductivity is needed instead of a hydraulic conductivity function.
+The <code class="docutils literal notranslate"><span class="pre">kfun</span></code> argument may look like the following:</p>
+<blockquote>
+<div><div class="math" id="equation-waterflow-utility-9">
+<p><span class="eqno">(10)<a class="headerlink" href="#equation-waterflow-utility-9" title="Permalink to this equation">¶</a></span><img src="_images/math/661aac12aa5de7977228d685bdd07a6eb8b02126.png" alt="kfun(x, s) = ksat"/></p>
+</div></div></blockquote>
+<p>Which can be implemented in Python with a lambda function
+(lambda x, s: ksat) or just with a common function.</p>
+</div>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.fluxfunctions</span> <span class="k">import</span> <span class="n">darcy_s</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="k">import</span> <span class="n">initializer</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># In this case ksat is 1, negative gradient is returned</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">darcy_s</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
+<span class="go">-0.05</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Prepare the fluxfunction with a different default argument</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">kfun</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="o">-</span><span class="mf">0.001</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">s</span><span class="o">**</span><span class="mf">1.2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">darcy_s</span> <span class="o">=</span> <span class="n">initializer</span><span class="p">(</span><span class="n">darcy_s</span><span class="p">,</span> <span class="n">kfun</span><span class="o">=</span><span class="n">kfun</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">darcy_s</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">),</span> <span class="mi">4</span><span class="p">)</span>
+<span class="go">-0.3444</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="function">
 <dt id="waterflow.utility.fluxfunctions.richards_equation">
 <code class="sig-prename descclassname">waterflow.utility.fluxfunctions.</code><code class="sig-name descname">richards_equation</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">s</em>, <em class="sig-param">gradient</em>, <em class="sig-param">kfun</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/fluxfunctions.html#richards_equation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.fluxfunctions.richards_equation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Richards equation, for unsaturated flow</p>
+<dd><p>Flux function for unsaturated flow</p>
+<p>Flux function for unsaturated flow as described by <a class="bibtex reference internal" href="waterflow.flow1d.html#richards1970" id="id14">[Ric70]</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<cite>float</cite>) – Positional argument <img class="math" src="_images/math/6e5e038a450b3e1c936ae16c60b8efca897f5066.png" alt="\left(length\right)"/>.</p></li>
+<li><p><strong>s</strong> (<cite>float</cite>) – State of the system <img class="math" src="_images/math/6e5e038a450b3e1c936ae16c60b8efca897f5066.png" alt="\left(length\right)"/>.</p></li>
+<li><p><strong>gradient</strong> (<cite>float</cite>) – Gradient <img class="math" src="_images/math/4454191ffa1101270dd6b73b88861d9d362f7418.png" alt="\frac{\delta s}{\delta x}"/>.</p></li>
+<li><p><strong>kfun</strong> (<cite>func</cite>) – Unsaturated hydraulic conductivity function with signature
+<img class="math" src="_images/math/84a4d2c3db6584d748373534ff7c91b73a524077.png" alt="kfun(x, s)"/> <img class="math" src="_images/math/3f1267f19649eb284eeeb7b701977c8962d4a141.png" alt="\left(\frac{length}{time}\right)"/>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Flux value <img class="math" src="_images/math/3f1267f19649eb284eeeb7b701977c8962d4a141.png" alt="\left(\frac{length}{time}\right)"/>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><cite>float</cite></p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
+<p>See the exact implementation of the richards equation <a class="bibtex reference internal" href="waterflow.flow1d.html#richards1970" id="id15">[Ric70]</a>
+below:</p>
 <div class="math" id="equation-waterflow-utility-10">
 <p><span class="eqno">(11)<a class="headerlink" href="#equation-waterflow-utility-10" title="Permalink to this equation">¶</a></span><img src="_images/math/cbb60b6daf15337fdeb7bbe042f21150c96ea14e.png" alt="q(x, s, \frac{\delta s}{\delta x}) =
 -kfun(x, s) * \left(\frac{\delta s}{\delta x} + 1\right)"/></p>
-</div></dd></dl>
+</div><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For usage in the flow model,
+<a class="reference internal" href="waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE" title="waterflow.flow1d.flowFE1d.Flow1DFE"><code class="xref py py-class docutils literal notranslate"><span class="pre">Flow1DFE</span></code></a>, the calling signature
+needs to be reduced to 3 positional arguments. <code class="docutils literal notranslate"><span class="pre">kfun</span></code> should be given
+a default value, see the examples section.</p>
+</div>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.fluxfunctions</span> <span class="k">import</span> <span class="n">richards_equation</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.conductivityfunctions</span> <span class="k">import</span> <span class="n">VG_pressureh</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="k">import</span> <span class="n">initializer</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># kfun itself needs to be initialized too</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">VG_pressureh</span> <span class="o">=</span> <span class="n">initializer</span><span class="p">(</span><span class="n">VG_pressureh</span><span class="p">,</span> <span class="n">theta_s</span><span class="o">=</span><span class="mf">0.42</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mf">0.0748</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mf">1.44</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Prepare the unsaturated hydraulic conductivity function</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">richards_equation</span> <span class="o">=</span> <span class="n">initializer</span><span class="p">(</span><span class="n">richards_equation</span><span class="p">,</span> <span class="n">kfun</span><span class="o">=</span><span class="n">VG_pressureh</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">richards_equation</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="o">**</span><span class="mf">4.2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+<span class="go">-0.462</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="function">
 <dt id="waterflow.utility.fluxfunctions.storage_change">
-<code class="sig-prename descclassname">waterflow.utility.fluxfunctions.</code><code class="sig-name descname">storage_change</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">s</em>, <em class="sig-param">prevstate</em>, <em class="sig-param">dt</em>, <em class="sig-param">fun=&lt;function &lt;lambda&gt;&gt;</em>, <em class="sig-param">S=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/fluxfunctions.html#storage_change"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.fluxfunctions.storage_change" title="Permalink to this definition">¶</a></dt>
-<dd><p>General storage change function for both saturated and
+<code class="sig-prename descclassname">waterflow.utility.fluxfunctions.</code><code class="sig-name descname">storage_change</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">s</em>, <em class="sig-param">prevstate</em>, <em class="sig-param">dt</em>, <em class="sig-param">fun=&lt;function &lt;lambda&gt;&gt;</em>, <em class="sig-param">S=1.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/fluxfunctions.html#storage_change"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.fluxfunctions.storage_change" title="Permalink to this definition">¶</a></dt>
+<dd><p>Storage change function</p>
+<p>General storage change function for both saturated and
 unsaturated flow simulations</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<cite>float</cite>) – Positional argument <img class="math" src="_images/math/6e5e038a450b3e1c936ae16c60b8efca897f5066.png" alt="\left(length\right)"/>.</p></li>
+<li><p><strong>s</strong> (<cite>float</cite>) – State of the system <img class="math" src="_images/math/6e5e038a450b3e1c936ae16c60b8efca897f5066.png" alt="\left(length\right)"/>.</p></li>
+<li><p><strong>prevstate</strong> (<cite>func</cite>) – Converts a position, <img class="math" src="_images/math/888f7c323ac0341871e867220ae2d76467d74d6e.png" alt="x"/>, to a state value <img class="math" src="_images/math/106b04b320e75010b1d8029e59244f234f75e6f9.png" alt="s"/>.</p></li>
+<li><p><strong>dt</strong> (<cite>float</cite>) – Time step <cite>left(timeright)</cite>.</p></li>
+<li><p><strong>fun</strong> (<cite>func</cite>, default is <img class="math" src="_images/math/c1f506d42dbd3108598f7c0c2a06a59c4e4e0ce8.png" alt="fun(x) = x"/>) – Convert a state value, <img class="math" src="_images/math/106b04b320e75010b1d8029e59244f234f75e6f9.png" alt="s"/>, to a moisture content, <img class="math" src="_images/math/8a87f04e7d7cca18343c084cceca5237fae62491.png" alt="\theta"/>,
+in case of unsaturated flow.</p></li>
+<li><p><strong>S</strong> (<cite>float</cite>, default is 1.0) – Sorptivity as a fraction.</p></li>
+</ul>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <div class="math" id="equation-waterflow-utility-11">
-<p><span class="eqno">(12)<a class="headerlink" href="#equation-waterflow-utility-11" title="Permalink to this equation">¶</a></span><img src="_images/math/884eae4aa26c9c984d5a02c72f303775f1d813d5.png" alt="q(x, s, prevstate, dt, fun, S) = - S * \frac{fun(s) - fun(pressure(x))}{dt}"/></p>
-</div></dd></dl>
+<p><span class="eqno">(12)<a class="headerlink" href="#equation-waterflow-utility-11" title="Permalink to this equation">¶</a></span><img src="_images/math/d286d3d90b954fc41d6d98bbff26859dfe9dcb4f.png" alt="q(x, s, prevstate, dt) = - S * \frac{fun(s) - fun(prevstate(x))}{dt}"/></p>
+</div><p class="rubric">Examples</p>
+</dd></dl>
 
 </div>
 <div class="section" id="module-waterflow.utility.helper">
@@ -312,13 +611,62 @@ unsaturated flow simulations</p>
 <dl class="function">
 <dt id="waterflow.utility.helper.initializer">
 <code class="sig-prename descclassname">waterflow.utility.helper.</code><code class="sig-name descname">initializer</code><span class="sig-paren">(</span><em class="sig-param">func</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/helper.html#initializer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.helper.initializer" title="Permalink to this definition">¶</a></dt>
-<dd><p>prepare a function with specific default arguments</p>
+<dd><p>Prepare or reduce a function with default arguments</p>
+<p>Reduce the number of positional arguments in <code class="docutils literal notranslate"><span class="pre">func</span></code> or change
+the default values of already set keyword arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>*args</strong> – Positional arguments in <code class="docutils literal notranslate"><span class="pre">func</span></code>.</p></li>
+<li><p><strong>**kwargs</strong> – Keyword arguments in <code class="docutils literal notranslate"><span class="pre">func</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Initialized function.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><cite>functools.partial</cite></p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function is implemented as a combination of <a class="reference external" href="https://docs.python.org/3/library/functools.html#functools.partial" title="(in Python v3.8)"><code class="xref py py-func docutils literal notranslate"><span class="pre">functools.partial()</span></code></a>
+to adapt the function signature and <a class="reference external" href="https://docs.python.org/3/library/functools.html#functools.update_wrapper" title="(in Python v3.8)"><code class="xref py py-func docutils literal notranslate"><span class="pre">functools.update_wrapper()</span></code></a> to
+copy the metadata from <code class="docutils literal notranslate"><span class="pre">func</span></code>.</p>
+<p>Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="k">import</span> <span class="n">initializer</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="go">(1, 2, 3)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">initializer</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="go">(1, 2, 10)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">initializer</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="p">(</span><span class="n">b</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="go">(11, 2, 10)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="function">
 <dt id="waterflow.utility.helper.newdir">
 <code class="sig-prename descclassname">waterflow.utility.helper.</code><code class="sig-name descname">newdir</code><span class="sig-paren">(</span><em class="sig-param">basepath</em>, <em class="sig-param">dirname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/helper.html#newdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.helper.newdir" title="Permalink to this definition">¶</a></dt>
-<dd><p>checks and/or creates new directory</p>
+<dd><p>Creates new directory</p>
+<p>Creates a new directory if it does not exist.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>basepath</strong> (<cite>str</cite>) – Path to the location of the new directory.</p></li>
+<li><p><strong>dirname</strong> (<cite>str</cite>) – Name of the new directory</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Absolute path including the new directory.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><cite>str</cite></p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -358,20 +706,20 @@ which distances increase from left to right.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>numnodes</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a>) – Total number of nodes that is used for the nodal spacing.</p></li>
-<li><p><strong>power</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – Degree of nodal shifting to the left of the domain.</p></li>
-<li><p><strong>lb</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>, default is 0) – Left bound of the domain.</p></li>
-<li><p><strong>rb</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>, default = 1) – Right bound of the domain.</p></li>
-<li><p><strong>maxdist</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>, default is None) – Maximum distance allowed between two nodes. The value of
+<li><p><strong>numnodes</strong> (<cite>int</cite>) – Total number of nodes that is used for the nodal spacing.</p></li>
+<li><p><strong>power</strong> (<cite>int</cite> or <cite>float</cite>) – Degree of nodal shifting to the left of the domain.</p></li>
+<li><p><strong>lb</strong> (<cite>int</cite> or <cite>float</cite>, default is 0) – Left bound of the domain.</p></li>
+<li><p><strong>rb</strong> (<cite>int</cite> or <cite>float</cite>, default = 1) – Right bound of the domain.</p></li>
+<li><p><strong>maxdist</strong> (<cite>int</cite> or <cite>float</cite>, default is None) – Maximum distance allowed between two nodes. The value of
 the <cite>length</cite> argument should be accounted for if given.</p></li>
-<li><p><strong>length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>, default is 1) – Multiplier to scale the nodal positions.</p></li>
+<li><p><strong>length</strong> (<cite>int</cite> or <cite>float</cite>, default is 1) – Multiplier to scale the nodal positions.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>x-dim</strong> – Positions of the nodes.</p>
+<dd class="field-even"><p>Nodal positions in the x-direction.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)">numpy.ndarray</a></p>
+<dd class="field-odd"><p><cite>numpy.ndarray</cite></p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -426,22 +774,22 @@ selected locations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>nx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a>) – Number of nodes in the x-direction.</p></li>
-<li><p><strong>Lx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a> of <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – Total length in the x-direction.</p></li>
-<li><p><strong>ny</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a>) – Number of nodes in the y-direction.</p></li>
-<li><p><strong>Ly</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a> of <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – Total length in the y-direction.</p></li>
-<li><p><strong>linear</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a>, default is True) – Distinguish between linear and non-linear nodal distributions.</p></li>
-<li><p><strong>loc</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a>, default is None) – A list of nodes or coördinate tuples on which to concentrate nodal
+<li><p><strong>nx</strong> (<cite>int</cite>) – Number of nodes in the x-direction.</p></li>
+<li><p><strong>Lx</strong> (<cite>int</cite> or <cite>float</cite>) – Total length in the x-direction.</p></li>
+<li><p><strong>ny</strong> (<cite>int</cite>) – Number of nodes in the y-direction.</p></li>
+<li><p><strong>Ly</strong> (<cite>int</cite> or <cite>float</cite>) – Total length in the y-direction.</p></li>
+<li><p><strong>linear</strong> (<cite>bool</cite>, default is True) – Distinguish between linear and non-linear nodal distributions.</p></li>
+<li><p><strong>loc</strong> (<cite>list</cite>, default is None) – A list of nodes or coördinate tuples on which to concentrate nodal
 discretization.</p></li>
-<li><p><strong>power</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a>, default is None) – The number of nodes that are influenced by the nodal concentrations
+<li><p><strong>power</strong> (<cite>int</cite>, default is None) – The number of nodes that are influenced by the nodal concentrations
 given at the <cite>loc</cite> parameter.</p></li>
-<li><p><strong>weight</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a> of <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>) – The degree of nodal concentration around a given <cite>loc</cite>.</p></li>
+<li><p><strong>weight</strong> (<cite>int</cite> of <cite>float</cite>) – The degree of nodal concentration around a given <cite>loc</cite>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
-<li><p><strong>x-dim</strong> (<em>numpy.ndarray</em>) – Numpy Array that contains nodal positions in the x-direction.</p></li>
-<li><p><strong>y-dim</strong> (<em>numpy.ndarray</em>) – Numpy Array that contains nodal positions in the y-direction.</p></li>
+<li><p><cite>numpy.ndarray</cite> – Nodal positions in the x-direction.</p></li>
+<li><p><cite>numpy.ndarray</cite> – Nodal positions in the y-direction.</p></li>
 </ul>
 </p>
 </dd>
@@ -486,95 +834,6 @@ are influenced by a factor weight.</p>
 <p>(<a class="reference external" href=".//waterflow-utility-3.py">Source code</a>, <a class="reference external" href=".//waterflow-utility-3.png">png</a>, <a class="reference external" href=".//waterflow-utility-3.hires.png">hires.png</a>, <a class="reference external" href=".//waterflow-utility-3.pdf">pdf</a>)</p>
 <div class="figure align-default">
 <img alt="_images/waterflow-utility-3.png" src="_images/waterflow-utility-3.png" />
-</div>
-</dd></dl>
-
-</div>
-<div class="section" id="module-waterflow.utility.statistics">
-<span id="waterflow-utility-statistics-module"></span><h2>waterflow.utility.statistics module<a class="headerlink" href="#module-waterflow.utility.statistics" title="Permalink to this headline">¶</a></h2>
-<p>Functions for statistical measures (Root Mean Square &amp;
-Mean Absolute Error)</p>
-<dl class="function">
-<dt id="waterflow.utility.statistics.MAE">
-<code class="sig-prename descclassname">waterflow.utility.statistics.</code><code class="sig-name descname">MAE</code><span class="sig-paren">(</span><em class="sig-param">*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/statistics.html#MAE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.statistics.MAE" title="Permalink to this definition">¶</a></dt>
-<dd><p>The Mean Absolute Error.</p>
-<p>Returns the Mean Absolute Error based on two individual arrays or the
-last two entries of a dataframe.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>df</strong> (<em>pandas.core.frame.DataFrame</em>) – A dataframe with 2 columns and at least 2 rows. The columns in the
-daraframe should be of equal length.</p></li>
-<li><p><strong>arr1</strong> (<em>list/numpy.ndarray</em>) – An 1-dimensional array.</p></li>
-<li><p><strong>arr2</strong> (<em>list/numpy.ndarray</em>) – An 1-dimensional array.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>MAE</strong> – Floating point value of the Mean Absolute Error.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>numpy.float64</p>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
-<p>Notes about the implementad algorithm.</p>
-<p>The formula implemented:</p>
-<div class="math" id="equation-waterflow-utility-13">
-<p><span class="eqno">(14)<a class="headerlink" href="#equation-waterflow-utility-13" title="Permalink to this equation">¶</a></span><img src="_images/math/b852db473a10f76a1c2a25b58a79441f1eeeea90.png" alt="MAE=\sqrt{\frac{\lvert X_i -X_j\rvert}{N}}"/></p>
-</div><p class="rubric">Examples</p>
-<p>Create a dataframe and populate with random values. Note: The data
-arrays can also be passed to the function as separate arguments.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">dataframe</span><span class="p">[</span><span class="s2">&quot;col1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">3</span><span class="p">]))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">dataframe</span><span class="p">[</span><span class="s2">&quot;col2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">]))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">mae</span> <span class="o">=</span> <span class="n">MAE</span><span class="p">(</span><span class="n">dataframe</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">mae</span><span class="p">)</span>
-<span class="go">2.0</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="function">
-<dt id="waterflow.utility.statistics.RMSE">
-<code class="sig-prename descclassname">waterflow.utility.statistics.</code><code class="sig-name descname">RMSE</code><span class="sig-paren">(</span><em class="sig-param">*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/statistics.html#RMSE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.statistics.RMSE" title="Permalink to this definition">¶</a></dt>
-<dd><p>The Root Mean Square Error.</p>
-<p>Returns the Root Mean Square Error based on two individual arrays or the
-last two entries of a dataframe.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>df</strong> (<em>pandas.core.frame.DataFrame</em>) – A dataframe with 2 columns and at least 2 rows. The columns in the
-dataframe should be of equal length.</p></li>
-<li><p><strong>arr1</strong> (<em>list/numpy.ndarray</em>) – An 1-dimensional array.</p></li>
-<li><p><strong>arr2</strong> (<em>list/numpy.ndarray</em>) – An 1-dimensional array.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Floating point value of the Root Mean Square Error.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>numpy.float64</p>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
-<p>Notes about the implementation algorithm.</p>
-<p>The formula implemented:</p>
-<div class="math" id="equation-waterflow-utility-14">
-<p><span class="eqno">(15)<a class="headerlink" href="#equation-waterflow-utility-14" title="Permalink to this equation">¶</a></span><img src="_images/math/87a3120f86f280590f296fa215e1387c8cddfea0.png" alt="RMSE=\sqrt{\frac{\sum{(X_i -X_j)^2}}{N}}"/></p>
-</div><p class="rubric">Examples</p>
-<p>Create a dataframe and populate it with random values. Note: The data
-arrays can also be passed to the function as separate arguments.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">dataframe</span><span class="p">[</span><span class="s2">&quot;col1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">3</span><span class="p">]))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">dataframe</span><span class="p">[</span><span class="s2">&quot;col2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">]))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">rmse</span> <span class="o">=</span> <span class="n">RMSE</span><span class="p">(</span><span class="n">dataframe</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">rmse</span><span class="p">)</span>
-<span class="go">2.23606797749979</span>
-</pre></div>
 </div>
 </dd></dl>
 

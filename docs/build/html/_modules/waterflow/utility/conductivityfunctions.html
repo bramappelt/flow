@@ -163,7 +163,52 @@
 
 
 <div class="viewcode-block" id="soilselector"><a class="viewcode-back" href="../../../waterflow.utility.html#waterflow.utility.conductivityfunctions.soilselector">[docs]</a><span class="k">def</span> <span class="nf">soilselector</span><span class="p">(</span><span class="n">soils</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Select soil(s) from the Staringreeks &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot; Select soil(s) from the Staringreeks</span>
+
+<span class="sd">    Select soil parameters from one or multiple soils as described in</span>
+<span class="sd">    The Staringreeks :cite:`Wosten2001`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    soils : `list`</span>
+<span class="sd">        Number(s) that correspond(s) to a soil in The Staringreeks.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    `list` with `collections.namedtuple` objects</span>
+<span class="sd">        Parameters of the selected soils in the same order as the input.</span>
+<span class="sd">    `pandas.core.frame.DataFrame`</span>
+<span class="sd">        Slice of the complete dataframe with the selected soils.</span>
+<span class="sd">    `tuple` with `collections.namedtuple` objects</span>
+<span class="sd">        Holds the parameter extrema of the selected soils.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The source file from which the soil data is read can be found in</span>
+<span class="sd">    :py:data:`~waterflow.DATA_DIR`.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    &gt;&gt;&gt; from waterflow.utility.conductivityfunctions import soilselector</span>
+<span class="sd">    &gt;&gt;&gt; params, df, extrema = soilselector([1, 10, 13])</span>
+<span class="sd">    &gt;&gt;&gt; s1, s10, s13 = params</span>
+<span class="sd">    &gt;&gt;&gt; # Print some parameters of the selected soils</span>
+<span class="sd">    &gt;&gt;&gt; s1.soiltype, s1.name, s1.ksat</span>
+<span class="sd">    (&#39;B1&#39;, &#39;Non-loamy sand&#39;, 23.41)</span>
+<span class="sd">    &gt;&gt;&gt; s10.name, s10.t_sat, s10.alpha</span>
+<span class="sd">    (&#39;Light clay&#39;, 0.43, 0.0064)</span>
+<span class="sd">    &gt;&gt;&gt; s13.name, s13.Lambda, s13.n</span>
+<span class="sd">    (&#39;Loam&#39;, -1.4969999999999999, 1.4409999999999998)</span>
+<span class="sd">    &gt;&gt;&gt; df</span>
+<span class="sd">       soiltype  t_res  t_sat   ksat   alpha  Lambda      n            name category</span>
+<span class="sd">    0        B1   0.02   0.43  23.41  0.0234   0.000  1.801  Non-loamy sand        s</span>
+<span class="sd">    9       B10   0.01   0.43   0.70  0.0064  -3.884  1.210      Light clay        c</span>
+<span class="sd">    12      B13   0.01   0.42  12.98  0.0084  -1.497  1.441            Loam        l</span>
+<span class="sd">    &gt;&gt;&gt; extrema[0].ksat</span>
+<span class="sd">    0.7</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">staringreeks</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_table</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DATA_DIR</span><span class="p">,</span> <span class="s2">&quot;StaringReeks.txt&quot;</span><span class="p">),</span>
                                  <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="n">soildata</span> <span class="o">=</span> <span class="n">staringreeks</span><span class="o">.</span><span class="n">iloc</span><span class="p">[[</span><span class="n">s</span><span class="o">-</span><span class="mi">1</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">soils</span><span class="p">]]</span>
@@ -178,22 +223,67 @@
     <span class="k">return</span> <span class="n">rows</span><span class="p">,</span> <span class="n">soildata</span><span class="p">,</span> <span class="n">extrema</span></div>
 
 
-<span class="c1"># Van Genuchten (theta)</span>
 <div class="viewcode-block" id="VG_theta"><a class="viewcode-back" href="../../../waterflow.utility.html#waterflow.utility.conductivityfunctions.VG_theta">[docs]</a><span class="k">def</span> <span class="nf">VG_theta</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">theta_r</span><span class="p">,</span> <span class="n">theta_s</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; h-theta relation as described by Van Genuchten</span>
+    <span class="sd">&quot;&quot;&quot; Water retention function, :math:h(theta)</span>
+
+<span class="sd">    Soil water retention function as described by</span>
+<span class="sd">    :cite:`VanGenuchten1980`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    theta : `float`</span>
+<span class="sd">        Water content as a fraction.</span>
+<span class="sd">    theta_r : `float`</span>
+<span class="sd">        Residual water content as a fraction.</span>
+<span class="sd">    theta_s : `float`</span>
+<span class="sd">        Saturated water content as a fraction.</span>
+<span class="sd">    a : `float`</span>
+<span class="sd">        Empirical soil parameter :math:`\\left(\\frac{1}{length}\\right)`.</span>
+<span class="sd">    n : `float`</span>
+<span class="sd">        Empirical soil parameter :math:`\\left(-\\right)`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    `float`</span>
+<span class="sd">        Soil water potential :math:`\\left(length\\right)`. Note that the sign</span>
+<span class="sd">        of the value is switched.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
+<span class="sd">    This version of the water retention function is based on the</span>
+<span class="sd">    Mualem approach with is described by :cite:`Mualem1976` and</span>
+<span class="sd">    :cite:`VanGenuchten1980`. Under this approach the parameter</span>
+<span class="sd">    :math:`m` is fixed.</span>
 
 <span class="sd">    .. math::</span>
-
 <span class="sd">        m = 1 - \\frac{1}{n}</span>
 
 <span class="sd">    .. math::</span>
-
 <span class="sd">        h(\\theta) = \\left(\\frac{(\\theta_{s} - \\theta_r) /</span>
-<span class="sd">        (\\theta - \\theta_{r})^{\\frac{1}{m}} - 1}</span>
-<span class="sd">        {a^{n}}\\right)^{\\frac{1}{n}}</span>
+<span class="sd">                     (\\theta - \\theta_{r})^{\\frac{1}{m}} - 1}</span>
+<span class="sd">                     {a^{n}}\\right)^{\\frac{1}{n}}</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        For usage in the flow model,</span>
+<span class="sd">        :py:class:`~waterflow.flow1d.flowFE1d.Flow1DFE`, the number of</span>
+<span class="sd">        positional arguments needs to be reduced to one (``theta``)</span>
+<span class="sd">        and the remaining should be assigned a default value. See the</span>
+<span class="sd">        examples section.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from waterflow.utility.conductivityfunctions import soilselector, VG_theta</span>
+<span class="sd">    &gt;&gt;&gt; from waterflow.utility.helper import initializer</span>
+<span class="sd">    &gt;&gt;&gt; soil = soilselector([2])</span>
+<span class="sd">    &gt;&gt;&gt; p = soil[0][0]</span>
+<span class="sd">    &gt;&gt;&gt; # Without preparation</span>
+<span class="sd">    &gt;&gt;&gt; round(VG_theta(0.25, p.t_res, p.t_sat, p.alpha, p.n), 4)</span>
+<span class="sd">    97.3908</span>
+<span class="sd">    &gt;&gt;&gt; # With preparation</span>
+<span class="sd">    &gt;&gt;&gt; VG_theta = initializer(VG_theta, theta_r=p.t_res, theta_s=p.t_sat,</span>
+<span class="sd">    ...                        a=p.alpha, n=p.n)</span>
+<span class="sd">    &gt;&gt;&gt; round(VG_theta(0.25), 4)</span>
+<span class="sd">    97.3908</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">m</span> <span class="o">=</span> <span class="mi">1</span><span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="n">n</span>
@@ -201,28 +291,70 @@
     <span class="k">return</span> <span class="p">((</span><span class="n">THETA</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">m</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">a</span><span class="o">**</span><span class="n">n</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">n</span><span class="p">)</span></div>
 
 
-<span class="c1"># Van Genuchten (h)</span>
 <div class="viewcode-block" id="VG_pressureh"><a class="viewcode-back" href="../../../waterflow.utility.html#waterflow.utility.conductivityfunctions.VG_pressureh">[docs]</a><span class="k">def</span> <span class="nf">VG_pressureh</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">theta_r</span><span class="p">,</span> <span class="n">theta_s</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; theta-h relation as described by Van Genuchten</span>
+    <span class="sd">&quot;&quot;&quot; Water retention function :math:`theta(h)`</span>
+
+<span class="sd">    Soil water retention function as described by</span>
+<span class="sd">    :cite:`VanGenuchten1980`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    h : `float`</span>
+<span class="sd">        Soil water potential :math:`\\left(length\\right)`.</span>
+<span class="sd">    theta_r : `float`</span>
+<span class="sd">        Residual water content as a fraction.</span>
+<span class="sd">    theta_s : `float`</span>
+<span class="sd">        Saturated water content as a fraction.</span>
+<span class="sd">    a : `float`</span>
+<span class="sd">        Empirical soil parameter :math:`\\left(\\frac{1}{length}\\right)`.</span>
+<span class="sd">    n : `float`</span>
+<span class="sd">        Empirical soil parameter :math:`\\left(-\\right)`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    `float`</span>
+<span class="sd">        Moisture content as a fraction.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
+<span class="sd">    This version of the water retention function is based on the</span>
+<span class="sd">    Mualem approach with is described by :cite:`Mualem1976` and</span>
+<span class="sd">    :cite:`VanGenuchten1980`. Under this approach the parameter</span>
+<span class="sd">    :math:`m` is fixed.</span>
 
 <span class="sd">    .. math ::</span>
-
 <span class="sd">        m = 1-\\frac{1}{n}</span>
 
 <span class="sd">    .. math ::</span>
+<span class="sd">        \\theta(h) = \\begin{cases}</span>
+<span class="sd">                        \\theta_{r} + \\frac{\\theta_{s} - \\theta_{r}}{(1+(a*-h)^{n})^m},</span>
+<span class="sd">                        &amp; \\text{if } h &lt; 0\\\\</span>
+<span class="sd">                        \\theta_s, &amp; \\text{otherwise}</span>
+<span class="sd">                     \\end{cases}</span>
 
-<span class="sd">            \\theta(h) =</span>
-<span class="sd">        \\begin{cases}</span>
-<span class="sd">            \\theta_{r} + \\frac{\\theta_{s} - \\theta_{r}}{(1+(a*-h)^{n})^m},</span>
-<span class="sd">            &amp; \\text{if } h &lt; 0\\\\</span>
-<span class="sd">            \\theta_s, &amp; \\text{otherwise}</span>
-<span class="sd">        \\end{cases}</span>
+<span class="sd">    .. note::</span>
+<span class="sd">        For usage in the flow model,</span>
+<span class="sd">        :py:class:`~waterflow.flow1d.flowFE1d.Flow1DFE`, the number of</span>
+<span class="sd">        positional arguments needs to be reduced to one (``h``)</span>
+<span class="sd">        and the remaining should be assigned a default value. See the</span>
+<span class="sd">        examples section.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from waterflow.utility.conductivityfunctions import soilselector, VG_pressureh</span>
+<span class="sd">    &gt;&gt;&gt; from waterflow.utility.helper import initializer</span>
+<span class="sd">    &gt;&gt;&gt; soil = soilselector([8])</span>
+<span class="sd">    &gt;&gt;&gt; p = soil[0][0]</span>
+<span class="sd">    &gt;&gt;&gt; # Without preparation</span>
+<span class="sd">    &gt;&gt;&gt; round(VG_pressureh(-10**4.2, p.t_res, p.t_sat, p.alpha, p.n), 4)</span>
+<span class="sd">    0.1079</span>
+<span class="sd">    &gt;&gt;&gt; # With preparation</span>
+<span class="sd">    &gt;&gt;&gt; VG_pressureh = initializer(VG_pressureh, theta_r=p.t_res,</span>
+<span class="sd">    ...                            theta_s=p.t_sat, a=p.alpha, n=p.n)</span>
+<span class="sd">    &gt;&gt;&gt; round(VG_pressureh(-10**4.2), 4)</span>
+<span class="sd">    0.1079</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="c1"># to theta</span>
     <span class="k">if</span> <span class="n">h</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">theta_s</span>
@@ -230,28 +362,70 @@
     <span class="k">return</span> <span class="n">theta_r</span> <span class="o">+</span> <span class="p">(</span><span class="n">theta_s</span><span class="o">-</span><span class="n">theta_r</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="p">(</span><span class="n">a</span><span class="o">*-</span><span class="n">h</span><span class="p">)</span><span class="o">**</span><span class="n">n</span><span class="p">)</span><span class="o">**</span><span class="n">m</span></div>
 
 
-<span class="c1"># Van Genuchten (x, h)</span>
 <div class="viewcode-block" id="VG_conductivity"><a class="viewcode-back" href="../../../waterflow.utility.html#waterflow.utility.conductivityfunctions.VG_conductivity">[docs]</a><span class="k">def</span> <span class="nf">VG_conductivity</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">ksat</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; k-h relation as described by Van Genuchten</span>
+    <span class="sd">&quot;&quot;&quot; Hydraulic conductivity function</span>
+
+<span class="sd">    Unsaturated hydraulic conductivity function as described by</span>
+<span class="sd">    :cite:`VanGenuchten1980`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : `float`</span>
+<span class="sd">        Positional argument :math:`\\left(length\\right)`.</span>
+<span class="sd">    h : `float`</span>
+<span class="sd">        Soil water potential :math:`\\left(length\\right)`.</span>
+<span class="sd">    ksat : `float`</span>
+<span class="sd">        Saturated hydraulic conductivity :math:`\\left(\\frac{length}{time}\\right)`.</span>
+<span class="sd">    a : `float`</span>
+<span class="sd">        Empirical soil parameter :math:`\\left(\\frac{1}{length}\\right)`.</span>
+<span class="sd">    n : `float`</span>
+<span class="sd">        Empirical soil parameter :math:`\\left(-\\right)`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    `float`</span>
+<span class="sd">        Hydraulic conductivity :math:`\\left(\\frac{length}{time}\\right)`.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
+<span class="sd">    This is the hydraulic conductivity function with the Mualem approach which</span>
+<span class="sd">    means that parameter :math:`m` is fixed as described by :cite:`Mualem1976`</span>
+<span class="sd">    and :cite:`VanGenuchten1980`.</span>
 
 <span class="sd">    .. math ::</span>
-
 <span class="sd">        m = 1 - \\frac{1}{n}</span>
 
 <span class="sd">    .. math ::</span>
+<span class="sd">        k(h) = \\begin{cases}</span>
+<span class="sd">                    \\frac{\\left(1 - (a*-h)^{n-1}*(1+(a*-h)^{n})^{-m}\\right)^{2}}</span>
+<span class="sd">                    {(1 + (a*-h)^{n})^{\\frac{m}{2}}} * ksat, &amp; \\text{if } h&lt;0 \\\\</span>
+<span class="sd">                    ksat, &amp; \\text{otherwise}</span>
+<span class="sd">               \\end{cases}</span>
 
-<span class="sd">            k(h) =</span>
-<span class="sd">        \\begin{cases}</span>
-<span class="sd">            \\frac{\\left(1 - (a*-h)^{n-1}*(1+(a*-h)^{n})^{-m}\\right)^{2}}</span>
-<span class="sd">            {(1 + (a*-h)^{n})^{\\frac{m}{2}}} * ksat, &amp; \\text{if } h&lt;0\\\\</span>
-<span class="sd">            ksat, &amp; \\text{otherwise}</span>
-<span class="sd">        \\end{cases}</span>
+<span class="sd">    .. note::</span>
+<span class="sd">        For usage in the flow model,</span>
+<span class="sd">        :py:class:`~waterflow.flow1d.flowFE1d.Flow1DFE`, the number of</span>
+<span class="sd">        positional arguments needs to be reduced to two (``x`` &amp; ``h``).</span>
+<span class="sd">        Despite independence of argument ``x`` in this function is needs to</span>
+<span class="sd">        be included in the function signature. The other arguments need to be</span>
+<span class="sd">        assigned a default value. See the examples section.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    &gt;&gt;&gt; from waterflow.utility.conductivityfunctions import soilselector, VG_conductivity</span>
+<span class="sd">    &gt;&gt;&gt; from waterflow.utility.helper import initializer</span>
+<span class="sd">    &gt;&gt;&gt; soil = soilselector([3])</span>
+<span class="sd">    &gt;&gt;&gt; p = soil[0][0]</span>
+<span class="sd">    &gt;&gt;&gt; # Without preparation</span>
+<span class="sd">    &gt;&gt;&gt; round(VG_conductivity(1, -10**2, p.ksat, p.alpha, p.n), 4)</span>
+<span class="sd">    0.2742</span>
+<span class="sd">    &gt;&gt;&gt; # With preparation</span>
+<span class="sd">    &gt;&gt;&gt; VG_conductivity = initializer(VG_conductivity, ksat=p.ksat, a=p.alpha, n=p.n)</span>
+<span class="sd">    &gt;&gt;&gt; round(VG_conductivity(10, -10**2), 4)</span>
+<span class="sd">    0.2742</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="k">if</span> <span class="n">h</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">ksat</span>
     <span class="n">m</span> <span class="o">=</span> <span class="mi">1</span><span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="n">n</span>
@@ -261,7 +435,8 @@
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="k">pass</span>
+    <span class="kn">import</span> <span class="nn">doctest</span>
+    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
 </pre></div>
 
            </div>

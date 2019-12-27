@@ -11,31 +11,31 @@ def spacing(nx, Lx, ny=0, Ly=0, linear=True, loc=None, power=None, weight=None):
 
     Parameters
     ----------
-    nx : :obj:`int`
+    nx : `int`
         Number of nodes in the x-direction.
-    Lx : :obj:`int` of :obj:`float`
+    Lx : `int` or `float`
         Total length in the x-direction.
-    ny : :obj:`int`
+    ny : `int`
         Number of nodes in the y-direction.
-    Ly: :obj:`int` of :obj:`float`
+    Ly: `int` or `float`
         Total length in the y-direction.
-    linear : :obj:`bool`, default is True
+    linear : `bool`, default is True
         Distinguish between linear and non-linear nodal distributions.
-    loc : :obj:`list`, default is None
+    loc : `list`, default is None
         A list of nodes or coördinate tuples on which to concentrate nodal
         discretization.
-    power : :obj:`int`, default is None
+    power : `int`, default is None
         The number of nodes that are influenced by the nodal concentrations
         given at the `loc` parameter.
-    weight : :obj:`int` of :obj:`float`
+    weight : `int` of `float`
         The degree of nodal concentration around a given `loc`.
 
     Returns
     -------
-    x-dim : numpy.ndarray
-        Numpy Array that contains nodal positions in the x-direction.
-    y-dim : numpy.ndarray
-        Numpy Array that contains nodal positions in the y-direction.
+    `numpy.ndarray`
+        Nodal positions in the x-direction.
+    `numpy.ndarray`
+        Nodal positions in the y-direction.
 
     Notes
     -----
@@ -162,24 +162,24 @@ def biasedspacing(numnodes, power, lb=0, rb=1, maxdist=None, length=1):
 
     Parameters
     ----------
-    numnodes : :obj:`int`
+    numnodes : `int`
         Total number of nodes that is used for the nodal spacing.
-    power : :obj:`int` or :obj:`float`
+    power : `int` or `float`
         Degree of nodal shifting to the left of the domain.
-    lb : :obj:`int` or :obj:`float`, default is 0
+    lb : `int` or `float`, default is 0
         Left bound of the domain.
-    rb : :obj:`int` or :obj:`float`, default = 1
+    rb : `int` or `float`, default = 1
         Right bound of the domain.
-    maxdist : :obj:`int` or :obj:`float`, default is None
+    maxdist : `int` or `float`, default is None
         Maximum distance allowed between two nodes. The value of
         the `length` argument should be accounted for if given.
-    length : :obj:`int` or :obj:`float`, default is 1
+    length : `int` or `float`, default is 1
         Multiplier to scale the nodal positions.
 
     Returns
     -------
-    x-dim : numpy.ndarray
-        Positions of the nodes.
+    `numpy.ndarray`
+        Nodal positions in the x-direction.
 
     Notes
     -----

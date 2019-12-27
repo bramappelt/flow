@@ -39,7 +39,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="waterflow package" href="waterflow.html" />
-    <link rel="prev" title="Welcome to Flow’s documentation!" href="index.html" /> 
+    <link rel="prev" title="What is this Flow software package for?" href="index_examples.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -88,6 +88,7 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index_examples.html">What is this <em>Flow</em> software package for?</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">flow</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="waterflow.html">waterflow package</a></li>
 </ul>
@@ -172,6 +173,18 @@
 </li>
 </ul>
 </div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>From the <a class="reference external" href="https://docs.python.org/3/tutorial/classes.html#private-variables">Python</a> docs:</p>
+<p>“Private instance variables that cannot be accessed except from inside an
+object don’t exist in Python. However, there is a convention that is followed
+by most Python code: a name prefixed with an underscore (e.g. _spam) should be
+treated as a non-public part of the API (whether it is a function, a method or a data member).
+It should be considered an implementation detail and subject to change without notice.”</p>
+<p>However this is also true for this Python module, all private attributes, functions and
+methods are shown in the documentation as if they are <cite>normal</cite> members, but keep in mind that
+they should only be called internally by other objects to ensure the right context.</p>
+</div>
 </div>
 
 
@@ -185,7 +198,7 @@
         <a href="waterflow.html" class="btn btn-neutral float-right" title="waterflow package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to Flow’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="index_examples.html" class="btn btn-neutral float-left" title="What is this Flow software package for?" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

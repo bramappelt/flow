@@ -165,31 +165,31 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    nx : :obj:`int`</span>
+<span class="sd">    nx : `int`</span>
 <span class="sd">        Number of nodes in the x-direction.</span>
-<span class="sd">    Lx : :obj:`int` of :obj:`float`</span>
+<span class="sd">    Lx : `int` or `float`</span>
 <span class="sd">        Total length in the x-direction.</span>
-<span class="sd">    ny : :obj:`int`</span>
+<span class="sd">    ny : `int`</span>
 <span class="sd">        Number of nodes in the y-direction.</span>
-<span class="sd">    Ly: :obj:`int` of :obj:`float`</span>
+<span class="sd">    Ly: `int` or `float`</span>
 <span class="sd">        Total length in the y-direction.</span>
-<span class="sd">    linear : :obj:`bool`, default is True</span>
+<span class="sd">    linear : `bool`, default is True</span>
 <span class="sd">        Distinguish between linear and non-linear nodal distributions.</span>
-<span class="sd">    loc : :obj:`list`, default is None</span>
+<span class="sd">    loc : `list`, default is None</span>
 <span class="sd">        A list of nodes or coördinate tuples on which to concentrate nodal</span>
 <span class="sd">        discretization.</span>
-<span class="sd">    power : :obj:`int`, default is None</span>
+<span class="sd">    power : `int`, default is None</span>
 <span class="sd">        The number of nodes that are influenced by the nodal concentrations</span>
 <span class="sd">        given at the `loc` parameter.</span>
-<span class="sd">    weight : :obj:`int` of :obj:`float`</span>
+<span class="sd">    weight : `int` of `float`</span>
 <span class="sd">        The degree of nodal concentration around a given `loc`.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    x-dim : numpy.ndarray</span>
-<span class="sd">        Numpy Array that contains nodal positions in the x-direction.</span>
-<span class="sd">    y-dim : numpy.ndarray</span>
-<span class="sd">        Numpy Array that contains nodal positions in the y-direction.</span>
+<span class="sd">    `numpy.ndarray`</span>
+<span class="sd">        Nodal positions in the x-direction.</span>
+<span class="sd">    `numpy.ndarray`</span>
+<span class="sd">        Nodal positions in the y-direction.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -316,24 +316,24 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    numnodes : :obj:`int`</span>
+<span class="sd">    numnodes : `int`</span>
 <span class="sd">        Total number of nodes that is used for the nodal spacing.</span>
-<span class="sd">    power : :obj:`int` or :obj:`float`</span>
+<span class="sd">    power : `int` or `float`</span>
 <span class="sd">        Degree of nodal shifting to the left of the domain.</span>
-<span class="sd">    lb : :obj:`int` or :obj:`float`, default is 0</span>
+<span class="sd">    lb : `int` or `float`, default is 0</span>
 <span class="sd">        Left bound of the domain.</span>
-<span class="sd">    rb : :obj:`int` or :obj:`float`, default = 1</span>
+<span class="sd">    rb : `int` or `float`, default = 1</span>
 <span class="sd">        Right bound of the domain.</span>
-<span class="sd">    maxdist : :obj:`int` or :obj:`float`, default is None</span>
+<span class="sd">    maxdist : `int` or `float`, default is None</span>
 <span class="sd">        Maximum distance allowed between two nodes. The value of</span>
 <span class="sd">        the `length` argument should be accounted for if given.</span>
-<span class="sd">    length : :obj:`int` or :obj:`float`, default is 1</span>
+<span class="sd">    length : `int` or `float`, default is 1</span>
 <span class="sd">        Multiplier to scale the nodal positions.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    x-dim : numpy.ndarray</span>
-<span class="sd">        Positions of the nodes.</span>
+<span class="sd">    `numpy.ndarray`</span>
+<span class="sd">        Nodal positions in the x-direction.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
