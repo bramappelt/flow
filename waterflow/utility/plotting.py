@@ -1,4 +1,8 @@
-""" Ready to use plot functions """
+""" Ready to use plot functions
+
+*Subjected to change, will be documented in the future*
+
+"""
 
 import os
 from functools import partial

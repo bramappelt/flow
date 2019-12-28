@@ -14,7 +14,7 @@ def darcy(x, s, gradient, kfun=lambda x, s: 1):
     s : `float`
         State of the system :math:`\\left(length\\right)`.
     gradient : `float`
-        Gradient :math:\\frac{\\delta s}{\\delta x}.
+        Gradient :math:`\\frac{\\delta s}{\\delta x}`.
     kfun : `func`, default is :math:`kfun(x,s) = 1`
         Hydraulic conductivity function with signature :math:`kfun(x, s)`
         :math:`\\left(\\frac{length}{time}\\right)`.
@@ -75,7 +75,7 @@ def darcy_s(x, s, gradient, kfun=lambda x, s: 1):
     s : `float`
         State of the system :math:`\\left(length\\right)`.
     gradient : `float`
-        Gradient :math:\\frac{\\delta s}{\\delta x}.
+        Gradient :math:`\\frac{\\delta s}{\\delta x}`.
     kfun : `func`, default is :math:`kfun(x,s) = 1`
         Hydraulic conductivity function with signature :math:`kfun(x, s)`
         :math:`\\left(\\frac{length}{time}\\right)`.
@@ -198,18 +198,43 @@ def storage_change(x, s, prevstate, dt, fun=lambda x: x, S=1.0):
     S : `float`, default is 1.0
         Sorptivity as a fraction.
 
+    Returns
+    -------
+    `float`
+        Flux value :math:`\\left(\\frac{length}{time}\\right)`.
+
     Notes
     -----
+    Below the exact implementation of the storage change function is shown:
 
     .. math::
         q(x, s, prevstate, dt) = - S * \\frac{fun(s) - fun(prevstate(x))}{dt}
 
-    Examples
-    --------
+    With specific arguments the storage change function can be used for
+    unsaturated flow problems:
 
+    .. math::
+        q(x, s, prevstate, dt) = - \\frac{fun(s) - fun(prevstate(x))}{\\Delta t}
+
+    See the implementation for saturated flow problems below:
+
+    .. math::
+        q(x, s, prevstate, dt) = - \\frac{s - prevstate(x)}{\\Delta t}
+
+    :math:`fun` refers to a :math:`theta(h)`-relation of which one is
+    defined in :py:func:`~waterflow.utility.conductivityfunctions` and
+    :math:`prevstate(x)` calculates the states of the previous time step
+    as a function of position. The ready to use function can be found in
+    :py:meth:`~waterflow.flow1d.flowFE1d.Flow1DFE.states_to_function()`.
+
+    .. note::
+        The Storage change function is a special case of an external flux
+        function as described in
+        :py:class:`~waterflow.flow1d.flowFE1d.Flow1DFE.add_spatialflux` and
+        assumes four positional arguments and any amount of keyword arguments,
+        having a default value.
 
     """
-
     return - S * (fun(s) - fun(prevstate(x))) / dt
 
 

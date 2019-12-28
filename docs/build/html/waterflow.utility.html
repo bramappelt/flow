@@ -429,7 +429,7 @@ storage change function</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> (<cite>float</cite>) – Positional argument <img class="math" src="_images/math/6e5e038a450b3e1c936ae16c60b8efca897f5066.png" alt="\left(length\right)"/>.</p></li>
 <li><p><strong>s</strong> (<cite>float</cite>) – State of the system <img class="math" src="_images/math/6e5e038a450b3e1c936ae16c60b8efca897f5066.png" alt="\left(length\right)"/>.</p></li>
-<li><p><strong>gradient</strong> (<cite>float</cite>) – Gradient :math:frac{delta s}{delta x}.</p></li>
+<li><p><strong>gradient</strong> (<cite>float</cite>) – Gradient <img class="math" src="_images/math/4454191ffa1101270dd6b73b88861d9d362f7418.png" alt="\frac{\delta s}{\delta x}"/>.</p></li>
 <li><p><strong>kfun</strong> (<cite>func</cite>, default is <img class="math" src="_images/math/7ecccf989b50268704e2a70ede68865970912ff4.png" alt="kfun(x,s) = 1"/>) – Hydraulic conductivity function with signature <img class="math" src="_images/math/84a4d2c3db6584d748373534ff7c91b73a524077.png" alt="kfun(x, s)"/>
 <img class="math" src="_images/math/3f1267f19649eb284eeeb7b701977c8962d4a141.png" alt="\left(\frac{length}{time}\right)"/>.</p></li>
 </ul>
@@ -485,7 +485,7 @@ is altered to include a state dependency.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> (<cite>float</cite>) – Positional argument <img class="math" src="_images/math/6e5e038a450b3e1c936ae16c60b8efca897f5066.png" alt="\left(length\right)"/>.</p></li>
 <li><p><strong>s</strong> (<cite>float</cite>) – State of the system <img class="math" src="_images/math/6e5e038a450b3e1c936ae16c60b8efca897f5066.png" alt="\left(length\right)"/>.</p></li>
-<li><p><strong>gradient</strong> (<cite>float</cite>) – Gradient :math:frac{delta s}{delta x}.</p></li>
+<li><p><strong>gradient</strong> (<cite>float</cite>) – Gradient <img class="math" src="_images/math/4454191ffa1101270dd6b73b88861d9d362f7418.png" alt="\frac{\delta s}{\delta x}"/>.</p></li>
 <li><p><strong>kfun</strong> (<cite>func</cite>, default is <img class="math" src="_images/math/7ecccf989b50268704e2a70ede68865970912ff4.png" alt="kfun(x,s) = 1"/>) – Hydraulic conductivity function with signature <img class="math" src="_images/math/84a4d2c3db6584d748373534ff7c91b73a524077.png" alt="kfun(x, s)"/>
 <img class="math" src="_images/math/3f1267f19649eb284eeeb7b701977c8962d4a141.png" alt="\left(\frac{length}{time}\right)"/>.</p></li>
 </ul>
@@ -597,11 +597,37 @@ in case of unsaturated flow.</p></li>
 <li><p><strong>S</strong> (<cite>float</cite>, default is 1.0) – Sorptivity as a fraction.</p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Flux value <img class="math" src="_images/math/3f1267f19649eb284eeeb7b701977c8962d4a141.png" alt="\left(\frac{length}{time}\right)"/>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><cite>float</cite></p>
+</dd>
 </dl>
 <p class="rubric">Notes</p>
+<p>Below the exact implementation of the storage change function is shown:</p>
 <div class="math" id="equation-waterflow-utility-11">
 <p><span class="eqno">(12)<a class="headerlink" href="#equation-waterflow-utility-11" title="Permalink to this equation">¶</a></span><img src="_images/math/d286d3d90b954fc41d6d98bbff26859dfe9dcb4f.png" alt="q(x, s, prevstate, dt) = - S * \frac{fun(s) - fun(prevstate(x))}{dt}"/></p>
-</div><p class="rubric">Examples</p>
+</div><p>With specific arguments the storage change function can be used for
+unsaturated flow problems:</p>
+<div class="math" id="equation-waterflow-utility-12">
+<p><span class="eqno">(13)<a class="headerlink" href="#equation-waterflow-utility-12" title="Permalink to this equation">¶</a></span><img src="_images/math/1e4d70428aeff4dc1871a68d64cbd1ed074f9408.png" alt="q(x, s, prevstate, dt) = - \frac{fun(s) - fun(prevstate(x))}{\Delta t}"/></p>
+</div><p>See the implementation for saturated flow problems below:</p>
+<div class="math" id="equation-waterflow-utility-13">
+<p><span class="eqno">(14)<a class="headerlink" href="#equation-waterflow-utility-13" title="Permalink to this equation">¶</a></span><img src="_images/math/cda5e98b5acfbbf255207786e84321037913dc74.png" alt="q(x, s, prevstate, dt) = - \frac{s - prevstate(x)}{\Delta t}"/></p>
+</div><p><img class="math" src="_images/math/0cfbf33200db0e01ee3566e056e38fee8ac7685f.png" alt="fun"/> refers to a <img class="math" src="_images/math/ec87273788470ab7a90e7f1d54038e09890dd462.png" alt="theta(h)"/>-relation of which one is
+defined in <a class="reference internal" href="#module-waterflow.utility.conductivityfunctions" title="waterflow.utility.conductivityfunctions"><code class="xref py py-func docutils literal notranslate"><span class="pre">conductivityfunctions()</span></code></a> and
+<img class="math" src="_images/math/7dd5f1903478af7cce3a43b6822b9352dc94f605.png" alt="prevstate(x)"/> calculates the states of the previous time step
+as a function of position. The ready to use function can be found in
+<a class="reference internal" href="waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE.states_to_function" title="waterflow.flow1d.flowFE1d.Flow1DFE.states_to_function"><code class="xref py py-meth docutils literal notranslate"><span class="pre">states_to_function()</span></code></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The Storage change function is a special case of an external flux
+function as described in
+<a class="reference internal" href="waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE.add_spatialflux" title="waterflow.flow1d.flowFE1d.Flow1DFE.add_spatialflux"><code class="xref py py-class docutils literal notranslate"><span class="pre">add_spatialflux</span></code></a> and
+assumes four positional arguments and any amount of keyword arguments,
+having a default value.</p>
+</div>
 </dd></dl>
 
 </div>
@@ -673,6 +699,7 @@ copy the metadata from <code class="docutils literal notranslate"><span class="p
 <div class="section" id="module-waterflow.utility.plotting">
 <span id="waterflow-utility-plotting-module"></span><h2>waterflow.utility.plotting module<a class="headerlink" href="#module-waterflow.utility.plotting" title="Permalink to this headline">¶</a></h2>
 <p>Ready to use plot functions</p>
+<p><em>Subjected to change, will be documented in the future</em></p>
 <dl class="function">
 <dt id="waterflow.utility.plotting.quickplot">
 <code class="sig-prename descclassname">waterflow.utility.plotting.</code><code class="sig-name descname">quickplot</code><span class="sig-paren">(</span><em class="sig-param">df</em>, <em class="sig-param">x</em>, <em class="sig-param">y</em>, <em class="sig-param">ax=None</em>, <em class="sig-param">ax_sec=None</em>, <em class="sig-param">xlabel=None</em>, <em class="sig-param">ylabel=None</em>, <em class="sig-param">title=None</em>, <em class="sig-param">legend=True</em>, <em class="sig-param">grid=True</em>, <em class="sig-param">save=False</em>, <em class="sig-param">savepath='C:\\Users\\bramb\\Documents/flowoutput/'</em>, <em class="sig-param">filename=None</em>, <em class="sig-param">**kw</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/plotting.html#quickplot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.plotting.quickplot" title="Permalink to this definition">¶</a></dt>
@@ -726,8 +753,8 @@ the <cite>length</cite> argument should be accounted for if given.</p></li>
 <p>The nodal discretization is calculated iteratively. Note that
 aliases of the function arguments are used.</p>
 <p class="centered">
-<strong><img class="math" src="_images/math/f379b782dfc8cdd3d7847ffd35d0728ddbb25c64.png" alt="N = numnodes"/> ; <img class="math" src="_images/math/f9b710a12d03c60798546e8e46dcb205df35e889.png" alt="p = power"/> ; <img class="math" src="_images/math/0bf9bcb4d26c4c32e36036092a85595f363e91d4.png" alt="x_{N} = rb"/></strong></p><div class="math" id="equation-waterflow-utility-12">
-<p><span class="eqno">(13)<a class="headerlink" href="#equation-waterflow-utility-12" title="Permalink to this equation">¶</a></span><img src="_images/math/de69db22d4c34dc9b0113974619eb89ec9222de6.png" alt="x_{i + 1} = \frac{x_{N} - x_{i}}{p * \left(N - 2 - i\right)}
+<strong><img class="math" src="_images/math/f379b782dfc8cdd3d7847ffd35d0728ddbb25c64.png" alt="N = numnodes"/> ; <img class="math" src="_images/math/f9b710a12d03c60798546e8e46dcb205df35e889.png" alt="p = power"/> ; <img class="math" src="_images/math/0bf9bcb4d26c4c32e36036092a85595f363e91d4.png" alt="x_{N} = rb"/></strong></p><div class="math" id="equation-waterflow-utility-14">
+<p><span class="eqno">(15)<a class="headerlink" href="#equation-waterflow-utility-14" title="Permalink to this equation">¶</a></span><img src="_images/math/de69db22d4c34dc9b0113974619eb89ec9222de6.png" alt="x_{i + 1} = \frac{x_{N} - x_{i}}{p * \left(N - 2 - i\right)}
 \text{ for } i = 0, 1, \dots ,N - 1"/></p>
 </div><p>When <cite>maxdist</cite> is given and any of the nodal distances exceed this limit
 the nodes are shifted towards the right boundary of the domain until

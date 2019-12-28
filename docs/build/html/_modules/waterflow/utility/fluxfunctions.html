@@ -168,7 +168,7 @@
 <span class="sd">    s : `float`</span>
 <span class="sd">        State of the system :math:`\\left(length\\right)`.</span>
 <span class="sd">    gradient : `float`</span>
-<span class="sd">        Gradient :math:\\frac{\\delta s}{\\delta x}.</span>
+<span class="sd">        Gradient :math:`\\frac{\\delta s}{\\delta x}`.</span>
 <span class="sd">    kfun : `func`, default is :math:`kfun(x,s) = 1`</span>
 <span class="sd">        Hydraulic conductivity function with signature :math:`kfun(x, s)`</span>
 <span class="sd">        :math:`\\left(\\frac{length}{time}\\right)`.</span>
@@ -229,7 +229,7 @@
 <span class="sd">    s : `float`</span>
 <span class="sd">        State of the system :math:`\\left(length\\right)`.</span>
 <span class="sd">    gradient : `float`</span>
-<span class="sd">        Gradient :math:\\frac{\\delta s}{\\delta x}.</span>
+<span class="sd">        Gradient :math:`\\frac{\\delta s}{\\delta x}`.</span>
 <span class="sd">    kfun : `func`, default is :math:`kfun(x,s) = 1`</span>
 <span class="sd">        Hydraulic conductivity function with signature :math:`kfun(x, s)`</span>
 <span class="sd">        :math:`\\left(\\frac{length}{time}\\right)`.</span>
@@ -352,18 +352,43 @@
 <span class="sd">    S : `float`, default is 1.0</span>
 <span class="sd">        Sorptivity as a fraction.</span>
 
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    `float`</span>
+<span class="sd">        Flux value :math:`\\left(\\frac{length}{time}\\right)`.</span>
+
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
+<span class="sd">    Below the exact implementation of the storage change function is shown:</span>
 
 <span class="sd">    .. math::</span>
 <span class="sd">        q(x, s, prevstate, dt) = - S * \\frac{fun(s) - fun(prevstate(x))}{dt}</span>
 
-<span class="sd">    Examples</span>
-<span class="sd">    --------</span>
+<span class="sd">    With specific arguments the storage change function can be used for</span>
+<span class="sd">    unsaturated flow problems:</span>
 
+<span class="sd">    .. math::</span>
+<span class="sd">        q(x, s, prevstate, dt) = - \\frac{fun(s) - fun(prevstate(x))}{\\Delta t}</span>
+
+<span class="sd">    See the implementation for saturated flow problems below:</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        q(x, s, prevstate, dt) = - \\frac{s - prevstate(x)}{\\Delta t}</span>
+
+<span class="sd">    :math:`fun` refers to a :math:`theta(h)`-relation of which one is</span>
+<span class="sd">    defined in :py:func:`~waterflow.utility.conductivityfunctions` and</span>
+<span class="sd">    :math:`prevstate(x)` calculates the states of the previous time step</span>
+<span class="sd">    as a function of position. The ready to use function can be found in</span>
+<span class="sd">    :py:meth:`~waterflow.flow1d.flowFE1d.Flow1DFE.states_to_function()`.</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        The Storage change function is a special case of an external flux</span>
+<span class="sd">        function as described in</span>
+<span class="sd">        :py:class:`~waterflow.flow1d.flowFE1d.Flow1DFE.add_spatialflux` and</span>
+<span class="sd">        assumes four positional arguments and any amount of keyword arguments,</span>
+<span class="sd">        having a default value.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="k">return</span> <span class="o">-</span> <span class="n">S</span> <span class="o">*</span> <span class="p">(</span><span class="n">fun</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">-</span> <span class="n">fun</span><span class="p">(</span><span class="n">prevstate</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span> <span class="o">/</span> <span class="n">dt</span></div>
 
 

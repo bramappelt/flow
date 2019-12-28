@@ -2198,7 +2198,7 @@ conductivity can be used <a class="bibtex reference internal" href="#darcy1856" 
 definition of the fluxfunction.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">darcy</span> <span class="o">=</span> <span class="n">fluxf</span><span class="o">.</span><span class="n">darcy</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">FEdarcy</span> <span class="o">=</span> <span class="n">Flow1DFE</span><span class="p">(</span><span class="s2">&quot;Flow equations&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">FEdarcy</span><span class="o">.</span><span class="n">set_systemfluxfunction</span><span class="p">(</span><span class="n">darcy</span><span class="p">,</span> <span class="n">ksat</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">ksat</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FEdarcy</span><span class="o">.</span><span class="n">set_systemfluxfunction</span><span class="p">(</span><span class="n">darcy</span><span class="p">,</span> <span class="n">kfun</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">ksat</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>

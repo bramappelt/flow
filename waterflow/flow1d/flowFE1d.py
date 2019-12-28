@@ -1333,7 +1333,7 @@ class Flow1DFE:
 
         >>> darcy = fluxf.darcy
         >>> FEdarcy = Flow1DFE("Flow equations")
-        >>> FEdarcy.set_systemfluxfunction(darcy, ksat=s.ksat)
+        >>> FEdarcy.set_systemfluxfunction(darcy, kfun=lambda x, s: s.ksat)
 
         """
         for k, v in kwargs.items():
