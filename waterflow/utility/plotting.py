@@ -92,7 +92,7 @@ def scale(xi, n, min_, max_, invert=False):
     return a * xi + b
 
 
-def solutionspace(soils, indices, pltopts=None, lspace=None, rspace=None, show=True):
+def solutionspace(soils, indices, pltopts=None, lspace=None, rspace=None, saveat=None):
 
     tupsoils, dfs, (smin, smax) = soil = soilselector(soils)
 
@@ -143,8 +143,14 @@ def solutionspace(soils, indices, pltopts=None, lspace=None, rspace=None, show=T
         elif isinstance(space, str):
             axes[i].voxels(np.load(space, allow_pickle=True), alpha=0.2,
                            color=c[i], edgecolor='k')
-    if show is True:
-        plt.show()
+    if saveat:
+        saveat_d3dir = os.path.join(saveat, '3d')
+        if not os.path.isdir(saveat_d3dir):
+            os.makedirs(saveat_d3dir)
+
+        fname = f'{tupsoils[0].category}.png'
+        fpath = os.path.join(saveat_d3dir, fname)
+        plt.savefig(fpath)
 
 
 if __name__ == '__main__':
