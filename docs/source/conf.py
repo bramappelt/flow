@@ -21,7 +21,7 @@ sys.path.append(os.path.abspath('sphinxext'))
 # -- Project information -----------------------------------------------------
 
 project = 'Flow'
-copyright = '2019, Bram Berendsen'
+copyright = '2020, Bram Berendsen'
 author = 'Bram Berendsen'
 
 # The full version, including alpha/beta/rc tags

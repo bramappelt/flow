@@ -1,0 +1,364 @@
+Results of doctest builder run on 2021-01-12 12:42:26
+=====================================================
+
+Document: waterflow.flow1d
+--------------------------
+**********************************************************************
+File "..\..\waterflow\flow1d\flowFE1d.py", line ?, in default
+Failed example:
+    FE._statedep_forcing()
+Exception raised:
+    Traceback (most recent call last):
+      File "C:\Users\bramb\AppData\Local\Programs\Python\Python36\lib\doctest.py", line 1330, in __run
+        compileflags, 1), test.globs)
+      File "<doctest default[0]>", line 1, in <module>
+        FE._statedep_forcing()
+      File "C:\Users\bramb\OneDrive\thesis\flow\waterflow\flow1d\flowFE1d.py", line 748, in _statedep_forcing
+        value = Sfunc(state)
+      File "<doctest default[0]>", line 2, in Spflux
+    NameError: name 'np' is not defined
+**********************************************************************
+File "..\..\waterflow\flow1d\flowFE1d.py", line ?, in default
+Failed example:
+    FE.Spointflux['Spflux'][1]
+Expected:
+    array([ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
+            0.        , -0.0057844 , -0.05205958,  0.        ,  0.        ,
+            0.        ])
+Got:
+    array([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.])
+**********************************************************************
+File "..\..\waterflow\flow1d\flowFE1d.py", line ?, in default
+Failed example:
+    FE.Sspatflux['linear_s_extraction'][1]
+Expected:
+    array([-0.0045, -0.008 , -0.006 , -0.004 , -0.002 ,  0.    ,  0.002 ,
+            0.004 ,  0.006 ,  0.008 ,  0.0045])
+Got:
+    array([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.])
+**********************************************************************
+File "..\..\waterflow\flow1d\flowFE1d.py", line ?, in default
+Failed example:
+    np.array(FE.xintegration).shape
+Exception raised:
+    Traceback (most recent call last):
+      File "C:\Users\bramb\AppData\Local\Programs\Python\Python36\lib\doctest.py", line 1330, in __run
+        compileflags, 1), test.globs)
+      File "<doctest default[6]>", line 1, in <module>
+        np.array(FE.xintegration).shape
+    NameError: name 'np' is not defined
+**********************************************************************
+1 items had failures:
+   4 of 316 in default
+316 tests in 1 items.
+312 passed and 4 failed.
+***Test Failed*** 4 failures.
+
+Document: waterflow.utility
+---------------------------
+**********************************************************************
+File "..\..\waterflow\utility\spacing.py", line ?, in default
+Failed example:
+    biasedspacing(11, 1, length=10)
+Exception raised:
+    Traceback (most recent call last):
+      File "C:\Users\bramb\AppData\Local\Programs\Python\Python36\lib\doctest.py", line 1330, in __run
+        compileflags, 1), test.globs)
+      File "<doctest default[0]>", line 1, in <module>
+        biasedspacing(11, 1, length=10)
+    NameError: name 'biasedspacing' is not defined
+**********************************************************************
+File "..\..\waterflow\utility\spacing.py", line ?, in default
+Failed example:
+    biasedspacing(11, 3)
+Exception raised:
+    Traceback (most recent call last):
+      File "C:\Users\bramb\AppData\Local\Programs\Python\Python36\lib\doctest.py", line 1330, in __run
+        compileflags, 1), test.globs)
+      File "<doctest default[0]>", line 1, in <module>
+        biasedspacing(11, 3)
+    NameError: name 'biasedspacing' is not defined
+**********************************************************************
+File "..\..\waterflow\utility\spacing.py", line ?, in default
+Failed example:
+    biasedspacing(11, 2, lb=-1, rb=1, length=10)
+Exception raised:
+    Traceback (most recent call last):
+      File "C:\Users\bramb\AppData\Local\Programs\Python\Python36\lib\doctest.py", line 1330, in __run
+        compileflags, 1), test.globs)
+      File "<doctest default[0]>", line 1, in <module>
+        biasedspacing(11, 2, lb=-1, rb=1, length=10)
+    NameError: name 'biasedspacing' is not defined
+**********************************************************************
+File "..\..\waterflow\utility\spacing.py", line ?, in default
+Failed example:
+    biasedspacing(11, 5, maxdist=0.4, length=2)
+Exception raised:
+    Traceback (most recent call last):
+      File "C:\Users\bramb\AppData\Local\Programs\Python\Python36\lib\doctest.py", line 1330, in __run
+        compileflags, 1), test.globs)
+      File "<doctest default[0]>", line 1, in <module>
+        biasedspacing(11, 5, maxdist=0.4, length=2)
+    NameError: name 'biasedspacing' is not defined
+**********************************************************************
+File "..\..\waterflow\utility\spacing.py", line ?, in default
+Failed example:
+    x, _ = spacing(nx, Lx)
+Exception raised:
+    Traceback (most recent call last):
+      File "C:\Users\bramb\AppData\Local\Programs\Python\Python36\lib\doctest.py", line 1330, in __run
+        compileflags, 1), test.globs)
+      File "<doctest default[1]>", line 1, in <module>
+        x, _ = spacing(nx, Lx)
+    NameError: name 'spacing' is not defined
+**********************************************************************
+File "..\..\waterflow\utility\spacing.py", line ?, in default
+Failed example:
+    x
+Exception raised:
+    Traceback (most recent call last):
+      File "C:\Users\bramb\AppData\Local\Programs\Python\Python36\lib\doctest.py", line 1330, in __run
+        compileflags, 1), test.globs)
+      File "<doctest default[2]>", line 1, in <module>
+        x
+    NameError: name 'x' is not defined
+**********************************************************************
+File "..\..\waterflow\utility\spacing.py", line ?, in default
+Failed example:
+    x, _ = spacing(nx, Lx, linear=False, loc=[4, 7], power=1, weight=3)
+Exception raised:
+    Traceback (most recent call last):
+      File "C:\Users\bramb\AppData\Local\Programs\Python\Python36\lib\doctest.py", line 1330, in __run
+        compileflags, 1), test.globs)
+      File "<doctest default[0]>", line 1, in <module>
+        x, _ = spacing(nx, Lx, linear=False, loc=[4, 7], power=1, weight=3)
+    NameError: name 'spacing' is not defined
+**********************************************************************
+File "..\..\waterflow\utility\spacing.py", line ?, in default
+Failed example:
+    x
+Exception raised:
+    Traceback (most recent call last):
+      File "C:\Users\bramb\AppData\Local\Programs\Python\Python36\lib\doctest.py", line 1330, in __run
+        compileflags, 1), test.globs)
+      File "<doctest default[1]>", line 1, in <module>
+        x
+    NameError: name 'x' is not defined
+**********************************************************************
+File "..\..\waterflow\utility\spacing.py", line ?, in default
+Failed example:
+    x, y = spacing(nx, Lx, ny, Ly, linear=False, loc=[(4, 5)], power=2, weight=4)
+Exception raised:
+    Traceback (most recent call last):
+      File "C:\Users\bramb\AppData\Local\Programs\Python\Python36\lib\doctest.py", line 1330, in __run
+        compileflags, 1), test.globs)
+      File "<doctest default[1]>", line 1, in <module>
+        x, y = spacing(nx, Lx, ny, Ly, linear=False, loc=[(4, 5)], power=2, weight=4)
+    NameError: name 'spacing' is not defined
+**********************************************************************
+File "..\..\waterflow\utility\spacing.py", line ?, in default
+Failed example:
+    x
+Exception raised:
+    Traceback (most recent call last):
+      File "C:\Users\bramb\AppData\Local\Programs\Python\Python36\lib\doctest.py", line 1330, in __run
+        compileflags, 1), test.globs)
+      File "<doctest default[2]>", line 1, in <module>
+        x
+    NameError: name 'x' is not defined
+**********************************************************************
+File "..\..\waterflow\utility\spacing.py", line ?, in default
+Failed example:
+    y
+Exception raised:
+    Traceback (most recent call last):
+      File "C:\Users\bramb\AppData\Local\Programs\Python\Python36\lib\doctest.py", line 1330, in __run
+        compileflags, 1), test.globs)
+      File "<doctest default[3]>", line 1, in <module>
+        y
+    NameError: name 'y' is not defined
+**********************************************************************
+1 items had failures:
+  11 of  67 in default
+67 tests in 1 items.
+56 passed and 11 failed.
+***Test Failed*** 11 failures.
+
+Document: index_examples
+------------------------
+**********************************************************************
+File "index_examples.rst", line 72, in default
+Failed example:
+    M.solve(dt=0.01, end_time=15)
+Expected nothing
+Got:
+    Converged at time=0.01 for dt=0.01 with 9 iterations
+    Converged at time=0.02 for dt=0.01 with 5 iterations
+    Converged at time=0.035 for dt=0.015 with 5 iterations
+    Converged at time=0.0575 for dt=0.0225 with 5 iterations
+    Converged at time=0.09125 for dt=0.03375 with 5 iterations
+    Converged at time=0.141875 for dt=0.050625 with 5 iterations
+    Converged at time=0.21781250000000002 for dt=0.0759375 with 5 iterations
+    Converged at time=0.33171875000000006 for dt=0.11390625000000001 with 5 iterations
+    Converged at time=0.5025781250000001 for dt=0.17085937500000004 with 5 iterations
+    Converged at time=0.7588671875000002 for dt=0.25628906250000005 with 5 iterations
+    Converged at time=1.1433007812500002 for dt=0.3844335937500001 with 5 iterations
+    Converged at time=1.6433007812500002 for dt=0.5 with 4 iterations
+    Converged at time=2.1433007812500002 for dt=0.5 with 4 iterations
+    Converged at time=2.6433007812500002 for dt=0.5 with 4 iterations
+    Converged at time=3.1433007812500002 for dt=0.5 with 4 iterations
+    Converged at time=3.6433007812500002 for dt=0.5 with 4 iterations
+    Converged at time=4.14330078125 for dt=0.5 with 4 iterations
+    Converged at time=4.64330078125 for dt=0.5 with 4 iterations
+    Converged at time=5.14330078125 for dt=0.5 with 4 iterations
+    Converged at time=5.64330078125 for dt=0.5 with 3 iterations
+    Converged at time=6.14330078125 for dt=0.5 with 3 iterations
+    Converged at time=6.64330078125 for dt=0.5 with 3 iterations
+    Converged at time=7.14330078125 for dt=0.5 with 3 iterations
+    Converged at time=7.64330078125 for dt=0.5 with 3 iterations
+    Converged at time=8.14330078125 for dt=0.5 with 3 iterations
+    Converged at time=8.64330078125 for dt=0.5 with 3 iterations
+    Converged at time=9.14330078125 for dt=0.5 with 3 iterations
+    Converged at time=9.64330078125 for dt=0.5 with 2 iterations
+    Converged at time=10.14330078125 for dt=0.5 with 2 iterations
+    Converged at time=10.64330078125 for dt=0.5 with 2 iterations
+    Converged at time=11.14330078125 for dt=0.5 with 2 iterations
+    Converged at time=11.64330078125 for dt=0.5 with 2 iterations
+    Converged at time=12.14330078125 for dt=0.5 with 2 iterations
+    Converged at time=12.64330078125 for dt=0.5 with 2 iterations
+    Converged at time=13.14330078125 for dt=0.5 with 2 iterations
+    Converged at time=13.64330078125 for dt=0.5 with 2 iterations
+    Converged at time=14.14330078125 for dt=0.5 with 2 iterations
+    Converged at time=14.64330078125 for dt=0.5 with 1 iterations
+    Converged at time=15.0 for dt=0.3566992187500002 with 1 iterations
+**********************************************************************
+File "index_examples.rst", line 88, in default
+Failed example:
+    solverplot(M)
+Exception raised:
+    Traceback (most recent call last):
+      File "C:\Users\bramb\AppData\Local\Programs\Python\Python36\lib\doctest.py", line 1330, in __run
+        compileflags, 1), test.globs)
+      File "<doctest default[0]>", line 1, in <module>
+        solverplot(M)
+      File "C:\Users\bramb\OneDrive\thesis\flow\waterflow\utility\plotting.py", line 57, in solverplot
+        for k, v in states.items():
+    AttributeError: 'NoneType' object has no attribute 'items'
+**********************************************************************
+File "index_examples.rst", line 89, in default
+Failed example:
+    plt.tight_layout()
+Exception raised:
+    Traceback (most recent call last):
+      File "C:\Users\bramb\AppData\Local\Programs\Python\Python36\lib\doctest.py", line 1330, in __run
+        compileflags, 1), test.globs)
+      File "<doctest default[1]>", line 1, in <module>
+        plt.tight_layout()
+    NameError: name 'plt' is not defined
+**********************************************************************
+File "index_examples.rst", line 90, in default
+Failed example:
+    plt.show()
+Exception raised:
+    Traceback (most recent call last):
+      File "C:\Users\bramb\AppData\Local\Programs\Python\Python36\lib\doctest.py", line 1330, in __run
+        compileflags, 1), test.globs)
+      File "<doctest default[2]>", line 1, in <module>
+        plt.show()
+    NameError: name 'plt' is not defined
+**********************************************************************
+File "index_examples.rst", line 167, in default
+Failed example:
+    M.solve(dt=0.01, dt_max=5, end_time=200)
+Expected nothing
+Got:
+    Converged at time=0.01 for dt=0.01 with 1 iterations
+    Converged at time=0.025 for dt=0.015 with 1 iterations
+    Converged at time=0.0475 for dt=0.0225 with 1 iterations
+    Converged at time=0.08125 for dt=0.03375 with 1 iterations
+    Converged at time=0.13187500000000002 for dt=0.050625 with 1 iterations
+    Converged at time=0.2078125 for dt=0.0759375 with 1 iterations
+    Converged at time=0.32171875000000005 for dt=0.11390625000000001 with 1 iterations
+    Converged at time=0.4925781250000001 for dt=0.17085937500000004 with 1 iterations
+    Converged at time=0.7488671875000001 for dt=0.25628906250000005 with 1 iterations
+    Converged at time=1.1333007812500002 for dt=0.3844335937500001 with 1 iterations
+    Converged at time=1.7099511718750002 for dt=0.5766503906250001 with 1 iterations
+    Converged at time=2.5749267578125004 for dt=0.8649755859375001 with 1 iterations
+    Converged at time=3.8723901367187503 for dt=1.2974633789062502 with 1 iterations
+    Converged at time=5.818585205078126 for dt=1.9461950683593754 with 1 iterations
+    Converged at time=8.737877807617188 for dt=2.919292602539063 with 1 iterations
+    Converged at time=13.116816711425784 for dt=4.378938903808595 with 1 iterations
+    Converged at time=18.116816711425784 for dt=5 with 1 iterations
+    Converged at time=23.116816711425784 for dt=5 with 1 iterations
+    Converged at time=28.116816711425784 for dt=5 with 1 iterations
+    Converged at time=33.116816711425784 for dt=5 with 1 iterations
+    Converged at time=38.116816711425784 for dt=5 with 1 iterations
+    Converged at time=43.116816711425784 for dt=5 with 1 iterations
+    Converged at time=48.116816711425784 for dt=5 with 1 iterations
+    Converged at time=53.116816711425784 for dt=5 with 1 iterations
+    Converged at time=58.116816711425784 for dt=5 with 1 iterations
+    Converged at time=63.116816711425784 for dt=5 with 1 iterations
+    Converged at time=68.11681671142578 for dt=5 with 1 iterations
+    Converged at time=73.11681671142578 for dt=5 with 1 iterations
+    Converged at time=78.11681671142578 for dt=5 with 1 iterations
+    Converged at time=83.11681671142578 for dt=5 with 1 iterations
+    Converged at time=88.11681671142578 for dt=5 with 1 iterations
+    Converged at time=93.11681671142578 for dt=5 with 1 iterations
+    Converged at time=98.11681671142578 for dt=5 with 1 iterations
+    Converged at time=103.11681671142578 for dt=5 with 1 iterations
+    Converged at time=108.11681671142578 for dt=5 with 1 iterations
+    Converged at time=113.11681671142578 for dt=5 with 1 iterations
+    Converged at time=118.11681671142578 for dt=5 with 1 iterations
+    Converged at time=123.11681671142578 for dt=5 with 1 iterations
+    Converged at time=128.11681671142577 for dt=5 with 1 iterations
+    Converged at time=133.11681671142577 for dt=5 with 1 iterations
+    Converged at time=138.11681671142577 for dt=5 with 1 iterations
+    Converged at time=143.11681671142577 for dt=5 with 1 iterations
+    Converged at time=148.11681671142577 for dt=5 with 1 iterations
+    Converged at time=153.11681671142577 for dt=5 with 1 iterations
+    Converged at time=158.11681671142577 for dt=5 with 1 iterations
+    Converged at time=163.11681671142577 for dt=5 with 1 iterations
+    Converged at time=168.11681671142577 for dt=5 with 1 iterations
+    Converged at time=173.11681671142577 for dt=5 with 1 iterations
+    Converged at time=178.11681671142577 for dt=5 with 1 iterations
+    Converged at time=183.11681671142577 for dt=5 with 1 iterations
+    Converged at time=188.11681671142577 for dt=5 with 1 iterations
+    Converged at time=193.11681671142577 for dt=5 with 1 iterations
+    Converged at time=198.11681671142577 for dt=5 with 1 iterations
+    Converged at time=200.0 for dt=1.8831832885742301 with 1 iterations
+**********************************************************************
+File "index_examples.rst", line 164, in default
+Failed example:
+    for key in M.dft_states.keys():
+        quickplot(df=M.dft_states[key], x='nodes', y=['states'], ax=ax, xlabel='Distance (cm)',
+        ylabel='Hydraulic heads (cm)', title='Hydraulic heads over time', legend=False)
+Expected nothing
+Got:
+    (<matplotlib.axes._subplots.AxesSubplot object at 0x00000206C692C588>, None)
+    (<matplotlib.axes._subplots.AxesSubplot object at 0x00000206C692C588>, None)
+    (<matplotlib.axes._subplots.AxesSubplot object at 0x00000206C692C588>, None)
+    (<matplotlib.axes._subplots.AxesSubplot object at 0x00000206C692C588>, None)
+    (<matplotlib.axes._subplots.AxesSubplot object at 0x00000206C692C588>, None)
+    (<matplotlib.axes._subplots.AxesSubplot object at 0x00000206C692C588>, None)
+    (<matplotlib.axes._subplots.AxesSubplot object at 0x00000206C692C588>, None)
+    (<matplotlib.axes._subplots.AxesSubplot object at 0x00000206C692C588>, None)
+    (<matplotlib.axes._subplots.AxesSubplot object at 0x00000206C692C588>, None)
+    (<matplotlib.axes._subplots.AxesSubplot object at 0x00000206C692C588>, None)
+    (<matplotlib.axes._subplots.AxesSubplot object at 0x00000206C692C588>, None)
+    (<matplotlib.axes._subplots.AxesSubplot object at 0x00000206C692C588>, None)
+    (<matplotlib.axes._subplots.AxesSubplot object at 0x00000206C692C588>, None)
+    (<matplotlib.axes._subplots.AxesSubplot object at 0x00000206C692C588>, None)
+    (<matplotlib.axes._subplots.AxesSubplot object at 0x00000206C692C588>, None)
+**********************************************************************
+1 items had failures:
+   6 of  56 in default
+56 tests in 1 items.
+50 passed and 6 failed.
+***Test Failed*** 6 failures.
+
+Doctest summary
+===============
+  439 tests
+   21 failures in tests
+    0 failures in setup code
+    0 failures in cleanup code

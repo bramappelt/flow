@@ -18,7 +18,10 @@ Which
 Unsaturated flow example
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
->>> # Necessary imports
+>>> # Third party imports
+>>> import numpy as np
+
+>>> # Model imports
 >>> from waterflow.flow1d.flowFE1d import Flow1DFE
 >>> from waterflow.utility import conductivityfunctions as condf
 >>> from waterflow.utility import fluxfunctions as fluxf

@@ -1,41 +1,44 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>waterflow.utility package &mdash; Flow v1.0 documentation</title>
   
 
   
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+
+  
   
     <link rel="shortcut icon" href="_static/drop.bmp"/>
   
+
   
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Symbol Glossary" href="glossary.html" />
@@ -79,6 +82,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -107,6 +111,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -141,11 +146,13 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="modules.html">flow</a> &raquo;</li>
         
@@ -156,7 +163,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="_sources/waterflow.utility.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -189,9 +196,9 @@
 <div class="section" id="module-waterflow.utility.conductivityfunctions">
 <span id="waterflow-utility-conductivityfunctions-module"></span><h2>waterflow.utility.conductivityfunctions module<a class="headerlink" href="#module-waterflow.utility.conductivityfunctions" title="Permalink to this headline">¶</a></h2>
 <p>Conductivity functions and a soil selector function</p>
-<dl class="function">
+<dl class="py function">
 <dt id="waterflow.utility.conductivityfunctions.VG_conductivity">
-<code class="sig-prename descclassname">waterflow.utility.conductivityfunctions.</code><code class="sig-name descname">VG_conductivity</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">h</em>, <em class="sig-param">ksat</em>, <em class="sig-param">a</em>, <em class="sig-param">n</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/conductivityfunctions.html#VG_conductivity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.conductivityfunctions.VG_conductivity" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">waterflow.utility.conductivityfunctions.</code><code class="sig-name descname">VG_conductivity</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">h</span></em>, <em class="sig-param"><span class="n">ksat</span></em>, <em class="sig-param"><span class="n">a</span></em>, <em class="sig-param"><span class="n">n</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/conductivityfunctions.html#VG_conductivity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.conductivityfunctions.VG_conductivity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Hydraulic conductivity function</p>
 <p>Unsaturated hydraulic conductivity function as described by
 <a class="bibtex reference internal" href="waterflow.flow1d.html#vangenuchten1980" id="id1">[genclo80vGgenclo80vG80]</a>.</p>
@@ -234,8 +241,8 @@ be included in the function signature. The other arguments need to be
 assigned a default value. See the examples section.</p>
 </div>
 <p class="rubric">Examples</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.conductivityfunctions</span> <span class="k">import</span> <span class="n">soilselector</span><span class="p">,</span> <span class="n">VG_conductivity</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="k">import</span> <span class="n">initializer</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.conductivityfunctions</span> <span class="kn">import</span> <span class="n">soilselector</span><span class="p">,</span> <span class="n">VG_conductivity</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="kn">import</span> <span class="n">initializer</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">soil</span> <span class="o">=</span> <span class="n">soilselector</span><span class="p">([</span><span class="mi">3</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">soil</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Without preparation</span>
@@ -249,9 +256,9 @@ assigned a default value. See the examples section.</p>
 </div>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="waterflow.utility.conductivityfunctions.VG_pressureh">
-<code class="sig-prename descclassname">waterflow.utility.conductivityfunctions.</code><code class="sig-name descname">VG_pressureh</code><span class="sig-paren">(</span><em class="sig-param">h</em>, <em class="sig-param">theta_r</em>, <em class="sig-param">theta_s</em>, <em class="sig-param">a</em>, <em class="sig-param">n</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/conductivityfunctions.html#VG_pressureh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.conductivityfunctions.VG_pressureh" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">waterflow.utility.conductivityfunctions.</code><code class="sig-name descname">VG_pressureh</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">h</span></em>, <em class="sig-param"><span class="n">theta_r</span></em>, <em class="sig-param"><span class="n">theta_s</span></em>, <em class="sig-param"><span class="n">a</span></em>, <em class="sig-param"><span class="n">n</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/conductivityfunctions.html#VG_pressureh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.conductivityfunctions.VG_pressureh" title="Permalink to this definition">¶</a></dt>
 <dd><p>Water retention function <img class="math" src="_images/math/ec87273788470ab7a90e7f1d54038e09890dd462.png" alt="theta(h)"/></p>
 <p>Soil water retention function as described by
 <a class="bibtex reference internal" href="waterflow.flow1d.html#vangenuchten1980" id="id4">[genclo80vGgenclo80vG80]</a>.</p>
@@ -294,8 +301,8 @@ and the remaining should be assigned a default value. See the
 examples section.</p>
 </div>
 <p class="rubric">Examples</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.conductivityfunctions</span> <span class="k">import</span> <span class="n">soilselector</span><span class="p">,</span> <span class="n">VG_pressureh</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="k">import</span> <span class="n">initializer</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.conductivityfunctions</span> <span class="kn">import</span> <span class="n">soilselector</span><span class="p">,</span> <span class="n">VG_pressureh</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="kn">import</span> <span class="n">initializer</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">soil</span> <span class="o">=</span> <span class="n">soilselector</span><span class="p">([</span><span class="mi">8</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">soil</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Without preparation</span>
@@ -310,9 +317,9 @@ examples section.</p>
 </div>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="waterflow.utility.conductivityfunctions.VG_theta">
-<code class="sig-prename descclassname">waterflow.utility.conductivityfunctions.</code><code class="sig-name descname">VG_theta</code><span class="sig-paren">(</span><em class="sig-param">theta</em>, <em class="sig-param">theta_r</em>, <em class="sig-param">theta_s</em>, <em class="sig-param">a</em>, <em class="sig-param">n</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/conductivityfunctions.html#VG_theta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.conductivityfunctions.VG_theta" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">waterflow.utility.conductivityfunctions.</code><code class="sig-name descname">VG_theta</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">theta</span></em>, <em class="sig-param"><span class="n">theta_r</span></em>, <em class="sig-param"><span class="n">theta_s</span></em>, <em class="sig-param"><span class="n">a</span></em>, <em class="sig-param"><span class="n">n</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/conductivityfunctions.html#VG_theta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.conductivityfunctions.VG_theta" title="Permalink to this definition">¶</a></dt>
 <dd><p>Water retention function, :math:h(theta)</p>
 <p>Soil water retention function as described by
 <a class="bibtex reference internal" href="waterflow.flow1d.html#vangenuchten1980" id="id7">[genclo80vGgenclo80vG80]</a>.</p>
@@ -354,8 +361,8 @@ and the remaining should be assigned a default value. See the
 examples section.</p>
 </div>
 <p class="rubric">Examples</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.conductivityfunctions</span> <span class="k">import</span> <span class="n">soilselector</span><span class="p">,</span> <span class="n">VG_theta</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="k">import</span> <span class="n">initializer</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.conductivityfunctions</span> <span class="kn">import</span> <span class="n">soilselector</span><span class="p">,</span> <span class="n">VG_theta</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="kn">import</span> <span class="n">initializer</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">soil</span> <span class="o">=</span> <span class="n">soilselector</span><span class="p">([</span><span class="mi">2</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">soil</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Without preparation</span>
@@ -370,9 +377,9 @@ examples section.</p>
 </div>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="waterflow.utility.conductivityfunctions.soilselector">
-<code class="sig-prename descclassname">waterflow.utility.conductivityfunctions.</code><code class="sig-name descname">soilselector</code><span class="sig-paren">(</span><em class="sig-param">soils</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/conductivityfunctions.html#soilselector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.conductivityfunctions.soilselector" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">waterflow.utility.conductivityfunctions.</code><code class="sig-name descname">soilselector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soils</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/conductivityfunctions.html#soilselector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.conductivityfunctions.soilselector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Select soil(s) from the Staringreeks</p>
 <p>Select soil parameters from one or multiple soils as described in
 The Staringreeks <a class="bibtex reference internal" href="waterflow.flow1d.html#wosten2001" id="id10">[WostenVDS01]</a>.</p>
@@ -393,7 +400,7 @@ The Staringreeks <a class="bibtex reference internal" href="waterflow.flow1d.htm
 <p>The source file from which the soil data is read can be found in
 <a class="reference internal" href="waterflow.html#waterflow.DATA_DIR" title="waterflow.DATA_DIR"><code class="xref py py-data docutils literal notranslate"><span class="pre">DATA_DIR</span></code></a>.</p>
 <p class="rubric">Examples</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.conductivityfunctions</span> <span class="k">import</span> <span class="n">soilselector</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.conductivityfunctions</span> <span class="kn">import</span> <span class="n">soilselector</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">params</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">extrema</span> <span class="o">=</span> <span class="n">soilselector</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">13</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span><span class="p">,</span> <span class="n">s10</span><span class="p">,</span> <span class="n">s13</span> <span class="o">=</span> <span class="n">params</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Print some parameters of the selected soils</span>
@@ -419,7 +426,7 @@ The Staringreeks <a class="bibtex reference internal" href="waterflow.flow1d.htm
 <span id="waterflow-utility-fluxfunctions-module"></span><h2>waterflow.utility.fluxfunctions module<a class="headerlink" href="#module-waterflow.utility.fluxfunctions" title="Permalink to this headline">¶</a></h2>
 <p>Several flow equations for (un)saturated flow problems and a
 storage change function</p>
-<dl class="function">
+<dl class="py function">
 <dt id="waterflow.utility.fluxfunctions.darcy">
 <code class="sig-prename descclassname">waterflow.utility.fluxfunctions.</code><code class="sig-name descname">darcy</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">s</em>, <em class="sig-param">gradient</em>, <em class="sig-param">kfun=&lt;function &lt;lambda&gt;&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/fluxfunctions.html#darcy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.fluxfunctions.darcy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flux function for saturated flow</p>
@@ -459,8 +466,8 @@ The <code class="docutils literal notranslate"><span class="pre">kfun</span></co
 (lambda x, s: ksat) or just with a common function.</p>
 </div>
 <p class="rubric">Examples</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.fluxfunctions</span> <span class="k">import</span> <span class="n">darcy</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="k">import</span> <span class="n">initializer</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.fluxfunctions</span> <span class="kn">import</span> <span class="n">darcy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="kn">import</span> <span class="n">initializer</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># In this case ksat is 1, negative gradient is returned</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">darcy</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
 <span class="go">-0.01</span>
@@ -474,7 +481,7 @@ The <code class="docutils literal notranslate"><span class="pre">kfun</span></co
 </div>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="waterflow.utility.fluxfunctions.darcy_s">
 <code class="sig-prename descclassname">waterflow.utility.fluxfunctions.</code><code class="sig-name descname">darcy_s</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">s</em>, <em class="sig-param">gradient</em>, <em class="sig-param">kfun=&lt;function &lt;lambda&gt;&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/fluxfunctions.html#darcy_s"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.fluxfunctions.darcy_s" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flux function for saturated flow</p>
@@ -515,8 +522,8 @@ The <code class="docutils literal notranslate"><span class="pre">kfun</span></co
 (lambda x, s: ksat) or just with a common function.</p>
 </div>
 <p class="rubric">Examples</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.fluxfunctions</span> <span class="k">import</span> <span class="n">darcy_s</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="k">import</span> <span class="n">initializer</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.fluxfunctions</span> <span class="kn">import</span> <span class="n">darcy_s</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="kn">import</span> <span class="n">initializer</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># In this case ksat is 1, negative gradient is returned</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">darcy_s</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
 <span class="go">-0.05</span>
@@ -530,9 +537,9 @@ The <code class="docutils literal notranslate"><span class="pre">kfun</span></co
 </div>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="waterflow.utility.fluxfunctions.richards_equation">
-<code class="sig-prename descclassname">waterflow.utility.fluxfunctions.</code><code class="sig-name descname">richards_equation</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">s</em>, <em class="sig-param">gradient</em>, <em class="sig-param">kfun</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/fluxfunctions.html#richards_equation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.fluxfunctions.richards_equation" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">waterflow.utility.fluxfunctions.</code><code class="sig-name descname">richards_equation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">s</span></em>, <em class="sig-param"><span class="n">gradient</span></em>, <em class="sig-param"><span class="n">kfun</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/fluxfunctions.html#richards_equation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.fluxfunctions.richards_equation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flux function for unsaturated flow</p>
 <p>Flux function for unsaturated flow as described by <a class="bibtex reference internal" href="waterflow.flow1d.html#richards1970" id="id14">[Ric70]</a>.</p>
 <dl class="field-list simple">
@@ -566,9 +573,9 @@ needs to be reduced to 3 positional arguments. <code class="docutils literal not
 a default value, see the examples section.</p>
 </div>
 <p class="rubric">Examples</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.fluxfunctions</span> <span class="k">import</span> <span class="n">richards_equation</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.conductivityfunctions</span> <span class="k">import</span> <span class="n">VG_pressureh</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="k">import</span> <span class="n">initializer</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.fluxfunctions</span> <span class="kn">import</span> <span class="n">richards_equation</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.conductivityfunctions</span> <span class="kn">import</span> <span class="n">VG_pressureh</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="kn">import</span> <span class="n">initializer</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># kfun itself needs to be initialized too</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">VG_pressureh</span> <span class="o">=</span> <span class="n">initializer</span><span class="p">(</span><span class="n">VG_pressureh</span><span class="p">,</span> <span class="n">theta_s</span><span class="o">=</span><span class="mf">0.42</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mf">0.0748</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mf">1.44</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Prepare the unsaturated hydraulic conductivity function</span>
@@ -579,7 +586,7 @@ a default value, see the examples section.</p>
 </div>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="waterflow.utility.fluxfunctions.storage_change">
 <code class="sig-prename descclassname">waterflow.utility.fluxfunctions.</code><code class="sig-name descname">storage_change</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">s</em>, <em class="sig-param">prevstate</em>, <em class="sig-param">dt</em>, <em class="sig-param">fun=&lt;function &lt;lambda&gt;&gt;</em>, <em class="sig-param">S=1.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/fluxfunctions.html#storage_change"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.fluxfunctions.storage_change" title="Permalink to this definition">¶</a></dt>
 <dd><p>Storage change function</p>
@@ -634,9 +641,9 @@ having a default value.</p>
 <div class="section" id="module-waterflow.utility.helper">
 <span id="waterflow-utility-helper-module"></span><h2>waterflow.utility.helper module<a class="headerlink" href="#module-waterflow.utility.helper" title="Permalink to this headline">¶</a></h2>
 <p>Miscellaneous helper functions</p>
-<dl class="function">
+<dl class="py function">
 <dt id="waterflow.utility.helper.initializer">
-<code class="sig-prename descclassname">waterflow.utility.helper.</code><code class="sig-name descname">initializer</code><span class="sig-paren">(</span><em class="sig-param">func</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/helper.html#initializer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.helper.initializer" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">waterflow.utility.helper.</code><code class="sig-name descname">initializer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">func</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/helper.html#initializer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.helper.initializer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prepare or reduce a function with default arguments</p>
 <p>Reduce the number of positional arguments in <code class="docutils literal notranslate"><span class="pre">func</span></code> or change
 the default values of already set keyword arguments.</p>
@@ -655,11 +662,11 @@ the default values of already set keyword arguments.</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
-<p>This function is implemented as a combination of <a class="reference external" href="https://docs.python.org/3/library/functools.html#functools.partial" title="(in Python v3.8)"><code class="xref py py-func docutils literal notranslate"><span class="pre">functools.partial()</span></code></a>
-to adapt the function signature and <a class="reference external" href="https://docs.python.org/3/library/functools.html#functools.update_wrapper" title="(in Python v3.8)"><code class="xref py py-func docutils literal notranslate"><span class="pre">functools.update_wrapper()</span></code></a> to
+<p>This function is implemented as a combination of <code class="xref py py-func docutils literal notranslate"><span class="pre">functools.partial()</span></code>
+to adapt the function signature and <code class="xref py py-func docutils literal notranslate"><span class="pre">functools.update_wrapper()</span></code> to
 copy the metadata from <code class="docutils literal notranslate"><span class="pre">func</span></code>.</p>
 <p>Examples</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="k">import</span> <span class="n">initializer</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="kn">import</span> <span class="n">initializer</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="k">return</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
@@ -674,9 +681,9 @@ copy the metadata from <code class="docutils literal notranslate"><span class="p
 </div>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="waterflow.utility.helper.newdir">
-<code class="sig-prename descclassname">waterflow.utility.helper.</code><code class="sig-name descname">newdir</code><span class="sig-paren">(</span><em class="sig-param">basepath</em>, <em class="sig-param">dirname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/helper.html#newdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.helper.newdir" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">waterflow.utility.helper.</code><code class="sig-name descname">newdir</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">basepath</span></em>, <em class="sig-param"><span class="n">dirname</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/helper.html#newdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.helper.newdir" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates new directory</p>
 <p>Creates a new directory if it does not exist.</p>
 <dl class="field-list simple">
@@ -700,33 +707,33 @@ copy the metadata from <code class="docutils literal notranslate"><span class="p
 <span id="waterflow-utility-plotting-module"></span><h2>waterflow.utility.plotting module<a class="headerlink" href="#module-waterflow.utility.plotting" title="Permalink to this headline">¶</a></h2>
 <p>Ready to use plot functions</p>
 <p><em>Subjected to change, will be documented in the future</em></p>
-<dl class="function">
+<dl class="py function">
 <dt id="waterflow.utility.plotting.quickplot">
-<code class="sig-prename descclassname">waterflow.utility.plotting.</code><code class="sig-name descname">quickplot</code><span class="sig-paren">(</span><em class="sig-param">df</em>, <em class="sig-param">x</em>, <em class="sig-param">y</em>, <em class="sig-param">ax=None</em>, <em class="sig-param">ax_sec=None</em>, <em class="sig-param">xlabel=None</em>, <em class="sig-param">ylabel=None</em>, <em class="sig-param">title=None</em>, <em class="sig-param">legend=True</em>, <em class="sig-param">grid=True</em>, <em class="sig-param">save=False</em>, <em class="sig-param">savepath='C:\\Users\\bramb\\Documents/flowoutput/'</em>, <em class="sig-param">filename=None</em>, <em class="sig-param">**kw</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/plotting.html#quickplot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.plotting.quickplot" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">waterflow.utility.plotting.</code><code class="sig-name descname">quickplot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">ax</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ax_sec</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xlabel</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ylabel</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">legend</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">grid</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">save</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">savepath</span><span class="o">=</span><span class="default_value">'C:\\Users\\bramb\\Documents/flowoutput/'</span></em>, <em class="sig-param"><span class="n">filename</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/plotting.html#quickplot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.plotting.quickplot" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="waterflow.utility.plotting.scale">
-<code class="sig-prename descclassname">waterflow.utility.plotting.</code><code class="sig-name descname">scale</code><span class="sig-paren">(</span><em class="sig-param">xi</em>, <em class="sig-param">n</em>, <em class="sig-param">min_</em>, <em class="sig-param">max_</em>, <em class="sig-param">invert=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/plotting.html#scale"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.plotting.scale" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">waterflow.utility.plotting.</code><code class="sig-name descname">scale</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">xi</span></em>, <em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="n">min_</span></em>, <em class="sig-param"><span class="n">max_</span></em>, <em class="sig-param"><span class="n">invert</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/plotting.html#scale"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.plotting.scale" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="waterflow.utility.plotting.solutionspace">
-<code class="sig-prename descclassname">waterflow.utility.plotting.</code><code class="sig-name descname">solutionspace</code><span class="sig-paren">(</span><em class="sig-param">soils</em>, <em class="sig-param">indices</em>, <em class="sig-param">pltopts=None</em>, <em class="sig-param">lspace=None</em>, <em class="sig-param">rspace=None</em>, <em class="sig-param">show=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/plotting.html#solutionspace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.plotting.solutionspace" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">waterflow.utility.plotting.</code><code class="sig-name descname">solutionspace</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">soils</span></em>, <em class="sig-param"><span class="n">indices</span></em>, <em class="sig-param"><span class="n">pltopts</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">lspace</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">rspace</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">saveat</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/plotting.html#solutionspace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.plotting.solutionspace" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="waterflow.utility.plotting.solverplot">
-<code class="sig-prename descclassname">waterflow.utility.plotting.</code><code class="sig-name descname">solverplot</code><span class="sig-paren">(</span><em class="sig-param">model</em>, <em class="sig-param">save=False</em>, <em class="sig-param">savepath='C:\\Users\\bramb\\Documents/flowoutput/'</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/plotting.html#solverplot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.plotting.solverplot" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">waterflow.utility.plotting.</code><code class="sig-name descname">solverplot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">save</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">savepath</span><span class="o">=</span><span class="default_value">'C:\\Users\\bramb\\Documents/flowoutput/'</span></em>, <em class="sig-param"><span class="n">filename</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/plotting.html#solverplot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.plotting.solverplot" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
 <div class="section" id="module-waterflow.utility.spacing">
 <span id="waterflow-utility-spacing-module"></span><h2>waterflow.utility.spacing module<a class="headerlink" href="#module-waterflow.utility.spacing" title="Permalink to this headline">¶</a></h2>
 <p>Grid spacing functions</p>
-<dl class="function">
+<dl class="py function">
 <dt id="waterflow.utility.spacing.biasedspacing">
-<code class="sig-prename descclassname">waterflow.utility.spacing.</code><code class="sig-name descname">biasedspacing</code><span class="sig-paren">(</span><em class="sig-param">numnodes</em>, <em class="sig-param">power</em>, <em class="sig-param">lb=0</em>, <em class="sig-param">rb=1</em>, <em class="sig-param">maxdist=None</em>, <em class="sig-param">length=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/spacing.html#biasedspacing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.spacing.biasedspacing" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">waterflow.utility.spacing.</code><code class="sig-name descname">biasedspacing</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">numnodes</span></em>, <em class="sig-param"><span class="n">power</span></em>, <em class="sig-param"><span class="n">lb</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">rb</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">maxdist</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">length</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/spacing.html#biasedspacing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.spacing.biasedspacing" title="Permalink to this definition">¶</a></dt>
 <dd><p>One dimensional nodal spacing function</p>
 <p>Returns an array that contains a biased nodal distribution in
 which distances increase from left to right.</p>
@@ -761,26 +768,26 @@ the nodes are shifted towards the right boundary of the domain until
 the <cite>maxdist</cite> condition is met. Shifting occurs proportionally.</p>
 <p class="rubric">Examples</p>
 <p>Linear spacing with scaling</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">biasedspacing</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">biasedspacing</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 <span class="go">array([ 0.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9., 10.])</span>
 </pre></div>
 </div>
 <p>Non-linear spacing without scaling</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">biasedspacing</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">biasedspacing</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 <span class="go">array([0.        , 0.03703704, 0.07716049, 0.12110523, 0.16993272,</span>
 <span class="go">       0.22527054, 0.28983133, 0.36873896, 0.47394913, 0.64929942,</span>
 <span class="go">       1.        ])</span>
 </pre></div>
 </div>
 <p>Non-linear spacing with scaling and custom domain boundaries</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">biasedspacing</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">lb</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">rb</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">biasedspacing</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">lb</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">rb</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 <span class="go">array([-10.        ,  -8.88888889,  -7.70833333,  -6.44345238,</span>
 <span class="go">        -5.07316468,  -3.56584821,  -1.87011719,   0.10823568,</span>
 <span class="go">         2.58117676,   6.29058838,  10.        ])</span>
 </pre></div>
 </div>
 <p>Non-linear spacing with maximum nodal distance limitation</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">biasedspacing</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">maxdist</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">biasedspacing</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">maxdist</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="go">array([0.        , 0.04815903, 0.09747244, 0.15250051, 0.21499075,</span>
 <span class="go">       0.29019617, 0.4       , 0.8       , 1.2       , 1.6       ,</span>
 <span class="go">       2.        ])</span>
@@ -792,9 +799,9 @@ the <cite>maxdist</cite> condition is met. Shifting occurs proportionally.</p>
 </div>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="waterflow.utility.spacing.spacing">
-<code class="sig-prename descclassname">waterflow.utility.spacing.</code><code class="sig-name descname">spacing</code><span class="sig-paren">(</span><em class="sig-param">nx</em>, <em class="sig-param">Lx</em>, <em class="sig-param">ny=0</em>, <em class="sig-param">Ly=0</em>, <em class="sig-param">linear=True</em>, <em class="sig-param">loc=None</em>, <em class="sig-param">power=None</em>, <em class="sig-param">weight=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/spacing.html#spacing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.spacing.spacing" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">waterflow.utility.spacing.</code><code class="sig-name descname">spacing</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nx</span></em>, <em class="sig-param"><span class="n">Lx</span></em>, <em class="sig-param"><span class="n">ny</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">Ly</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">linear</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">loc</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">power</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">weight</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/spacing.html#spacing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.spacing.spacing" title="Permalink to this definition">¶</a></dt>
 <dd><p>One and two dimensional nodal spacing function.</p>
 <p>Return two arrays that contain a discretization which may be focussed on
 selected locations.</p>
@@ -827,7 +834,7 @@ adjacent nodes or boundary nodes that define the domain.
 Improper use will result in wrongly defined domains.</p>
 <p class="rubric">Examples</p>
 <p>One dimensional linear example</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">nx</span><span class="p">,</span> <span class="n">Lx</span> <span class="o">=</span> <span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">nx</span><span class="p">,</span> <span class="n">Lx</span> <span class="o">=</span> <span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">spacing</span><span class="p">(</span><span class="n">nx</span><span class="p">,</span> <span class="n">Lx</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span>
 <span class="go">array([ 0.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9., 10.])</span>
@@ -835,7 +842,7 @@ Improper use will result in wrongly defined domains.</p>
 </div>
 <p>One dimensional non-linear example, 1 node around the locations of
 interest are influenced by a factor weight</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">spacing</span><span class="p">(</span><span class="n">nx</span><span class="p">,</span> <span class="n">Lx</span><span class="p">,</span> <span class="n">linear</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span> <span class="n">power</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">spacing</span><span class="p">(</span><span class="n">nx</span><span class="p">,</span> <span class="n">Lx</span><span class="p">,</span> <span class="n">linear</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span> <span class="n">power</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span>
 <span class="go">array([ 0.        ,  1.22222222,  2.44444444,  3.66666667,  4.        ,</span>
 <span class="go">        4.33333333,  6.66666667,  7.        ,  7.33333333,  8.66666667,</span>
@@ -848,7 +855,7 @@ interest are influenced by a factor weight</p>
 </div>
 <p>Two dimensional non-linear example, 2 nodes around the location of interest
 are influenced by a factor weight.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ny</span><span class="p">,</span> <span class="n">Ly</span> <span class="o">=</span> <span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ny</span><span class="p">,</span> <span class="n">Ly</span> <span class="o">=</span> <span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">spacing</span><span class="p">(</span><span class="n">nx</span><span class="p">,</span> <span class="n">Lx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">Ly</span><span class="p">,</span> <span class="n">linear</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="p">[(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">)],</span> <span class="n">power</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span>
 <span class="go">array([ 0.      ,  1.65625 ,  3.3125  ,  3.75    ,  4.      ,  4.25    ,</span>
@@ -872,29 +879,29 @@ are influenced by a factor weight.</p>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="glossary.html" class="btn btn-neutral float-right" title="Symbol Glossary" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="waterflow.flow1d.html" class="btn btn-neutral float-left" title="waterflow.flow1d package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="glossary.html" class="btn btn-neutral float-right" title="Symbol Glossary" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="waterflow.flow1d.html" class="btn btn-neutral float-left" title="waterflow.flow1d package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Bram Berendsen
+        &#169; Copyright 2020, Bram Berendsen.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -902,7 +909,6 @@ are influenced by a factor weight.</p>
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {
