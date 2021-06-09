@@ -173,6 +173,7 @@
 <span class="kn">from</span> <span class="nn">scipy.special</span> <span class="kn">import</span> <span class="n">legendre</span>
 
 <span class="kn">from</span> <span class="nn">waterflow</span> <span class="kn">import</span> <span class="n">OUTPUT_DIR</span>
+<span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="kn">import</span> <span class="n">converged</span>
 
 
 <div class="viewcode-block" id="Flow1DFE"><a class="viewcode-back" href="../../../waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE">[docs]</a><span class="k">class</span> <span class="nc">Flow1DFE</span><span class="p">:</span>
@@ -213,6 +214,10 @@
 <span class="sd">    states : `numpy.ndarray`</span>
 <span class="sd">        State solutions at the nodal positions as defined in :py:attr:`~nodes`.</span>
 <span class="sd">        Matrix of dimension :math:`[1 \\times N]`.</span>
+
+<span class="sd">    nr_states : list of `numpy.ndarray`</span>
+<span class="sd">        State solutions as described by `states` at every Newton-Raphson</span>
+<span class="sd">        iteration.</span>
 
 <span class="sd">    seg_lengths : `numpy.ndarray`</span>
 <span class="sd">        Lengths of segments between the nodes in the shape</span>
@@ -393,6 +398,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">systemfluxfunc</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">states</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nr_states</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">seg_lenghts</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lengths</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coefmatr</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1539,7 +1545,7 @@
 <span class="sd">        array([  0.,  -1.,  -2.,  -3.,  -4.,  -5.,  -6.,  -7.,  -8.,  -9., -10.])</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">states</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">states</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">states</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
             <span class="n">states</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">states</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">states</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">states</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">))])</span>
         <span class="k">else</span><span class="p">:</span>
@@ -2250,7 +2256,7 @@
         <span class="c1"># linearly interpolate between states including assigned boundaries</span>
         <span class="k">return</span> <span class="n">partial</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">,</span> <span class="n">xp</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">,</span> <span class="n">fp</span><span class="o">=</span><span class="n">states</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Flow1DFE.dt_solve"><a class="viewcode-back" href="../../../waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE.dt_solve">[docs]</a>    <span class="k">def</span> <span class="nf">dt_solve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">):</span>
+<div class="viewcode-block" id="Flow1DFE.dt_solve"><a class="viewcode-back" href="../../../waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE.dt_solve">[docs]</a>    <span class="k">def</span> <span class="nf">dt_solve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Solve the system for one specific time step</span>
 
 <span class="sd">        Performs the Newton-Raphson method, :cite:`Newton1964`, to find a</span>
@@ -2269,6 +2275,9 @@
 
 <span class="sd">            .. math::</span>
 <span class="sd">                max(abs(s_{t-1}-s_{t})) &lt; max(abs(threshold * s_{t}))</span>
+
+<span class="sd">        store : `bool`, default is False</span>
+<span class="sd">            Whether to store each individual iteration.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -2384,10 +2393,11 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_internal_forcing</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_statedep_forcing</span><span class="p">()</span>
 
-            <span class="c1"># check solution for conversion</span>
-            <span class="n">max_abs_change</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">prevstates</span> <span class="o">-</span> <span class="n">curstates</span><span class="p">))</span>
-            <span class="n">max_abs_allowed_change</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">threshold</span> <span class="o">*</span> <span class="n">curstates</span><span class="p">))</span>
-            <span class="k">if</span> <span class="n">max_abs_change</span> <span class="o">&lt;</span> <span class="n">max_abs_allowed_change</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">store</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">nr_states</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">)</span>
+
+            <span class="c1"># check local/inner loop solution for conversion</span>
+            <span class="k">if</span> <span class="n">converged</span><span class="p">(</span><span class="n">prevstates</span><span class="p">,</span> <span class="n">curstates</span><span class="p">,</span> <span class="n">threshold</span><span class="p">):</span>
                 <span class="k">break</span>
 
             <span class="n">itercount</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -2398,7 +2408,7 @@
 
 <div class="viewcode-block" id="Flow1DFE.solve"><a class="viewcode-back" href="../../../waterflow.flow1d.html#waterflow.flow1d.flowFE1d.Flow1DFE.solve">[docs]</a>    <span class="k">def</span> <span class="nf">solve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">dt_min</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> <span class="n">dt_max</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">end_time</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
               <span class="n">dtitlow</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">dtithigh</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">itermin</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">itermax</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
-              <span class="n">verbosity</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+              <span class="n">global_threshold</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">storeNR</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Solve the system for an arbitrary period of time</span>
 
 <span class="sd">        The outer loop that progresses the model over time by calling</span>
@@ -2441,14 +2451,23 @@
 <span class="sd">                procedure.</span>
 
 <span class="sd">        threshold : `float`, default is 1e-3</span>
-<span class="sd">            Threshold for conversion, the system has converged when the</span>
-<span class="sd">            definition below is satisfied:</span>
+<span class="sd">            Threshold for conversion of Newton-Raphson iteration,</span>
+<span class="sd">            the system has converged when the definition below is satisfied:</span>
 
 <span class="sd">            .. math::</span>
 <span class="sd">                max(abs(s_{t-1}-s_{t})) &lt; max(abs(threshold * s_{t}))</span>
 
+<span class="sd">        global_threshold : `float`, default is 0.0</span>
+<span class="sd">            Conversion threshold for time stepping, steady state is assumed</span>
+<span class="sd">            if change of states is within the tolerance. The same conversion</span>
+<span class="sd">            relation as for ``threshold`` applies.</span>
+
 <span class="sd">        verbosity : `bool`, default is True</span>
 <span class="sd">            Be descriptive about the solve process.</span>
+
+<span class="sd">        storeNR : `bool`, default is False</span>
+<span class="sd">            Store internal Newton-Raphson states. Turned off due to</span>
+<span class="sd">            memory and performance reasons.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -2534,7 +2553,7 @@
         <span class="n">t0</span> <span class="o">=</span> <span class="n">Time</span><span class="o">.</span><span class="n">clock</span><span class="p">()</span>
         <span class="k">while</span> <span class="n">time</span> <span class="o">&lt;=</span> <span class="n">end_time</span><span class="p">:</span>
             <span class="c1"># solve for given dt</span>
-            <span class="n">iters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt_solve</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">maxiter</span><span class="p">,</span> <span class="n">threshold</span><span class="p">)</span>
+            <span class="n">iters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt_solve</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">maxiter</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">storeNR</span><span class="p">)</span>
 
             <span class="c1"># catch cases where maxiter is reached</span>
             <span class="k">if</span> <span class="n">iters</span> <span class="o">&gt;</span> <span class="n">maxiter</span><span class="p">:</span>
@@ -2573,6 +2592,11 @@
             <span class="n">time_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
             <span class="n">dt_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
             <span class="n">iter_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">iters</span><span class="p">)</span>
+
+            <span class="c1"># check for global/outer loop convergence</span>
+            <span class="k">if</span> <span class="n">converged</span><span class="p">(</span><span class="n">solved_objs</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">states</span><span class="p">,</span> <span class="n">solved_objs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">states</span><span class="p">,</span>
+                         <span class="n">global_threshold</span><span class="p">):</span>
+                <span class="k">break</span>
 
             <span class="c1"># adapt dt as function of iterations of previous step</span>
             <span class="k">if</span> <span class="n">iters</span> <span class="o">&lt;=</span> <span class="n">itermin</span><span class="p">:</span>

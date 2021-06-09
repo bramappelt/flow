@@ -642,6 +642,34 @@ having a default value.</p>
 <span id="waterflow-utility-helper-module"></span><h2>waterflow.utility.helper module<a class="headerlink" href="#module-waterflow.utility.helper" title="Permalink to this headline">¶</a></h2>
 <p>Miscellaneous helper functions</p>
 <dl class="py function">
+<dt id="waterflow.utility.helper.converged">
+<code class="sig-prename descclassname">waterflow.utility.helper.</code><code class="sig-name descname">converged</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">old_states</span></em>, <em class="sig-param"><span class="n">new_states</span></em>, <em class="sig-param"><span class="n">threshold</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/helper.html#converged"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.helper.converged" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check for convergence</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="kn">import</span> <span class="n">converged</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">old_states</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_states</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">converged</span><span class="p">(</span><span class="n">old_states</span><span class="p">,</span> <span class="n">new_states</span><span class="p">,</span> <span class="n">threshold</span><span class="p">)</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.101</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">converged</span><span class="p">(</span><span class="n">old_states</span><span class="p">,</span> <span class="n">new_states</span><span class="p">,</span> <span class="n">threshold</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">old_states</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_states</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">converged</span><span class="p">(</span><span class="n">old_states</span><span class="p">,</span> <span class="n">new_states</span><span class="p">,</span> <span class="n">threshold</span><span class="p">)</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
 <dt id="waterflow.utility.helper.initializer">
 <code class="sig-prename descclassname">waterflow.utility.helper.</code><code class="sig-name descname">initializer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">func</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/utility/helper.html#initializer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.utility.helper.initializer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prepare or reduce a function with default arguments</p>
@@ -665,7 +693,7 @@ the default values of already set keyword arguments.</p>
 <p>This function is implemented as a combination of <code class="xref py py-func docutils literal notranslate"><span class="pre">functools.partial()</span></code>
 to adapt the function signature and <code class="xref py py-func docutils literal notranslate"><span class="pre">functools.update_wrapper()</span></code> to
 copy the metadata from <code class="docutils literal notranslate"><span class="pre">func</span></code>.</p>
-<p>Examples</p>
+<p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="kn">import</span> <span class="n">initializer</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="k">return</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span>

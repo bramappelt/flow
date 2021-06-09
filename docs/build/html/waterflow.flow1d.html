@@ -267,6 +267,18 @@ Matrix of dimension <img class="math" src="_images/math/12617a66745b1b5f689f3a46
 </dd></dl>
 
 <dl class="py attribute">
+<dt id="waterflow.flow1d.flowFE1d.Flow1DFE.nr_states">
+<code class="sig-name descname">nr_states</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.nr_states" title="Permalink to this definition">¶</a></dt>
+<dd><p>State solutions as described by <cite>states</cite> at every Newton-Raphson
+iteration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list of <cite>numpy.ndarray</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.seg_lengths">
 <code class="sig-name descname">seg_lengths</code><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.seg_lengths" title="Permalink to this definition">¶</a></dt>
 <dd><p>Lengths of segments between the nodes in the shape
@@ -972,7 +984,7 @@ is not explicitly set, a natural boundary condition (no flow) is
 set as default.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.LinAlgError.html#numpy.linalg.LinAlgError" title="(in NumPy v1.19)"><strong>numpy.linalg.LinAlgError</strong></a> – This error is raised if the system has infinitely many solutions
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.LinAlgError.html#numpy.linalg.LinAlgError" title="(in NumPy v1.20)"><strong>numpy.linalg.LinAlgError</strong></a> – This error is raised if the system has infinitely many solutions
     as a consequence of two Neumann boundary conditions or when none
     are entered.</p>
 </dd>
@@ -1382,7 +1394,7 @@ of the pointflux function is used.</p></li>
 <p class="rubric">Notes</p>
 <p><img class="math" src="_images/math/2373bbe3b79c85cbb454720d66cd1c1e6e42263d.png" alt="node_{r}"/> is the index of the right node that is nearest
 the position of the pointflux and is calculated by
-<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.searchsorted.html#numpy.searchsorted" title="(in NumPy v1.19)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.searchsorted()</span></code></a>. <img class="math" src="_images/math/c37f7d30844f9dc0e4d9992e40e0caf1a70319f0.png" alt="node_{l} = node_{r} - 1"/>,
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.searchsorted.html#numpy.searchsorted" title="(in NumPy v1.20)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.searchsorted()</span></code></a>. <img class="math" src="_images/math/c37f7d30844f9dc0e4d9992e40e0caf1a70319f0.png" alt="node_{l} = node_{r} - 1"/>,
 which is the left node that is most near the position of the pointflux.</p>
 <p><img class="math" src="_images/math/05f849c308f3b3287a5b63a095df2e3247025c1f.png" alt="lfac"/> and <img class="math" src="_images/math/0ac002b95bdf53f34b0324be11dda0527b39cda1.png" alt="rfac"/> represent the fractions of the pointflux
 that contribute to the nearest left and right node repectively.</p>
@@ -1731,7 +1743,7 @@ relation needs to be added to the model explicitly.</p>
 
 <dl class="py method">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.dt_solve">
-<code class="sig-name descname">dt_solve</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dt</span></em>, <em class="sig-param"><span class="n">maxiter</span><span class="o">=</span><span class="default_value">500</span></em>, <em class="sig-param"><span class="n">threshold</span><span class="o">=</span><span class="default_value">0.001</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/flow1d/flowFE1d.html#Flow1DFE.dt_solve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.dt_solve" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">dt_solve</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dt</span></em>, <em class="sig-param"><span class="n">maxiter</span><span class="o">=</span><span class="default_value">500</span></em>, <em class="sig-param"><span class="n">threshold</span><span class="o">=</span><span class="default_value">0.001</span></em>, <em class="sig-param"><span class="n">store</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/flow1d/flowFE1d.html#Flow1DFE.dt_solve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.dt_solve" title="Permalink to this definition">¶</a></dt>
 <dd><p>Solve the system for one specific time step</p>
 <p>Performs the Newton-Raphson method, <a class="bibtex reference internal" href="#newton1964" id="id7">[New64]</a>, to find a
 solution to the system of equations.</p>
@@ -1746,6 +1758,7 @@ definition below is satisfied:</p>
 <span class="target" id="equation-waterflow-flow1d-42"></span><div class="math">
 <p><span class="eqno">(43)</span><img src="_images/math/deb48833d088483ae7d930085f906562be916fa3.png" alt="max(abs(s_{t-1}-s_{t})) &lt; max(abs(threshold * s_{t}))"/></p>
 </div></p></li>
+<li><p><strong>store</strong> (<cite>bool</cite>, default is False) – Whether to store each individual iteration.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1779,7 +1792,7 @@ function if system is transient (<a class="reference internal" href="#waterflow.
 <li><p>Build the jacobian matrix (<a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE._CMAT" title="waterflow.flow1d.flowFE1d.Flow1DFE._CMAT"><code class="xref py py-meth docutils literal notranslate"><span class="pre">_CMAT()</span></code></a>).</p></li>
 <li><p>Newton-Raphson iteration <a class="bibtex reference internal" href="#newton1964" id="id8">[New64]</a>.</p>
 <ol class="loweralpha simple">
-<li><p><img class="math" src="_images/math/aaf9d72928602213963e5fbe2b5e2afecf5d0332.png" alt="A * y + F_{forcing} = 0"/> is solved for <img class="math" src="_images/math/1b5e577d6216dca3af7d87aa122a0b9b360d6cb3.png" alt="y"/> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.solve.html#numpy.linalg.solve" title="(in NumPy v1.19)"><code class="xref py py-func docutils literal notranslate"><span class="pre">solve()</span></code></a>).</p></li>
+<li><p><img class="math" src="_images/math/aaf9d72928602213963e5fbe2b5e2afecf5d0332.png" alt="A * y + F_{forcing} = 0"/> is solved for <img class="math" src="_images/math/1b5e577d6216dca3af7d87aa122a0b9b360d6cb3.png" alt="y"/> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.solve.html#numpy.linalg.solve" title="(in NumPy v1.20)"><code class="xref py py-func docutils literal notranslate"><span class="pre">solve()</span></code></a>).</p></li>
 <li><p><img class="math" src="_images/math/1b5e577d6216dca3af7d87aa122a0b9b360d6cb3.png" alt="y"/> is accumulated to <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.states" title="waterflow.flow1d.flowFE1d.Flow1DFE.states"><code class="xref py py-attr docutils literal notranslate"><span class="pre">states</span></code></a>.</p></li>
 </ol>
 </li>
@@ -2212,7 +2225,7 @@ definition of the fluxfunction.</p>
 
 <dl class="py method">
 <dt id="waterflow.flow1d.flowFE1d.Flow1DFE.solve">
-<code class="sig-name descname">solve</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dt</span><span class="o">=</span><span class="default_value">0.001</span></em>, <em class="sig-param"><span class="n">dt_min</span><span class="o">=</span><span class="default_value">1e-05</span></em>, <em class="sig-param"><span class="n">dt_max</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">end_time</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">maxiter</span><span class="o">=</span><span class="default_value">500</span></em>, <em class="sig-param"><span class="n">dtitlow</span><span class="o">=</span><span class="default_value">1.5</span></em>, <em class="sig-param"><span class="n">dtithigh</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">itermin</span><span class="o">=</span><span class="default_value">5</span></em>, <em class="sig-param"><span class="n">itermax</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">threshold</span><span class="o">=</span><span class="default_value">0.001</span></em>, <em class="sig-param"><span class="n">verbosity</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/flow1d/flowFE1d.html#Flow1DFE.solve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.solve" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">solve</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dt</span><span class="o">=</span><span class="default_value">0.001</span></em>, <em class="sig-param"><span class="n">dt_min</span><span class="o">=</span><span class="default_value">1e-05</span></em>, <em class="sig-param"><span class="n">dt_max</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">end_time</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">maxiter</span><span class="o">=</span><span class="default_value">500</span></em>, <em class="sig-param"><span class="n">dtitlow</span><span class="o">=</span><span class="default_value">1.5</span></em>, <em class="sig-param"><span class="n">dtithigh</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">itermin</span><span class="o">=</span><span class="default_value">5</span></em>, <em class="sig-param"><span class="n">itermax</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">threshold</span><span class="o">=</span><span class="default_value">0.001</span></em>, <em class="sig-param"><span class="n">global_threshold</span><span class="o">=</span><span class="default_value">0.0</span></em>, <em class="sig-param"><span class="n">verbosity</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">storeNR</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/waterflow/flow1d/flowFE1d.html#Flow1DFE.solve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#waterflow.flow1d.flowFE1d.Flow1DFE.solve" title="Permalink to this definition">¶</a></dt>
 <dd><p>Solve the system for an arbitrary period of time</p>
 <p>The outer loop that progresses the model over time by calling
 <a class="reference internal" href="#waterflow.flow1d.flowFE1d.Flow1DFE.dt_solve" title="waterflow.flow1d.flowFE1d.Flow1DFE.dt_solve"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dt_solve()</span></code></a> sequentially until <code class="docutils literal notranslate"><span class="pre">end_time</span></code> is reached.
@@ -2245,12 +2258,17 @@ precise description of the variable time step selection
 procedure.</p>
 </div>
 </p></li>
-<li><p><strong>threshold</strong> (<cite>float</cite>, default is 1e-3) – <p>Threshold for conversion, the system has converged when the
-definition below is satisfied:</p>
+<li><p><strong>threshold</strong> (<cite>float</cite>, default is 1e-3) – <p>Threshold for conversion of Newton-Raphson iteration,
+the system has converged when the definition below is satisfied:</p>
 <span class="target" id="equation-waterflow-flow1d-45"></span><div class="math">
 <p><span class="eqno">(46)</span><img src="_images/math/deb48833d088483ae7d930085f906562be916fa3.png" alt="max(abs(s_{t-1}-s_{t})) &lt; max(abs(threshold * s_{t}))"/></p>
 </div></p></li>
+<li><p><strong>global_threshold</strong> (<cite>float</cite>, default is 0.0) – Conversion threshold for time stepping, steady state is assumed
+if change of states is within the tolerance. The same conversion
+relation as for <code class="docutils literal notranslate"><span class="pre">threshold</span></code> applies.</p></li>
 <li><p><strong>verbosity</strong> (<cite>bool</cite>, default is True) – Be descriptive about the solve process.</p></li>
+<li><p><strong>storeNR</strong> (<cite>bool</cite>, default is False) – Store internal Newton-Raphson states. Turned off due to
+memory and performance reasons.</p></li>
 </ul>
 </dd>
 </dl>

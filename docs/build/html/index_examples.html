@@ -180,34 +180,38 @@
 </dl>
 <div class="section" id="unsaturated-flow-example">
 <h2>Unsaturated flow example<a class="headerlink" href="#unsaturated-flow-example" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="go">print(&#39;Hello, World!&#39;)</span>
-<span class="go">Hello</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Third party imports</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 </pre></div>
 </div>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Necessary imports</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Model imports</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.flow1d.flowFE1d</span> <span class="kn">import</span> <span class="n">Flow1DFE</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility</span> <span class="kn">import</span> <span class="n">conductivityfunctions</span> <span class="k">as</span> <span class="n">condf</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility</span> <span class="kn">import</span> <span class="n">fluxfunctions</span> <span class="k">as</span> <span class="n">fluxf</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.helper</span> <span class="kn">import</span> <span class="n">initializer</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.spacing</span> <span class="kn">import</span> <span class="n">biasedspacing</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">waterflow.utility.plotting</span> <span class="kn">import</span> <span class="n">solverplot</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Select soil 13 from The Staringreeks</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Select soil 13 from The Staringreeks</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">soil</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">condf</span><span class="o">.</span><span class="n">soilselector</span><span class="p">([</span><span class="mi">13</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">theta_r</span><span class="p">,</span> <span class="n">theta_s</span><span class="p">,</span> <span class="n">ksat</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="p">(</span><span class="n">soil</span><span class="o">.</span><span class="n">t_res</span><span class="p">,</span> <span class="n">soil</span><span class="o">.</span><span class="n">t_sat</span><span class="p">,</span> <span class="n">soil</span><span class="o">.</span><span class="n">ksat</span><span class="p">,</span> <span class="n">soil</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="n">soil</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Field&#39;s discretization</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Field&#39;s discretization</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">L</span> <span class="o">=</span> <span class="mi">100</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">nx</span> <span class="o">=</span> <span class="mi">51</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">xsp</span> <span class="o">=</span> <span class="n">biasedspacing</span><span class="p">(</span><span class="n">nx</span><span class="p">,</span> <span class="n">power</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">rb</span><span class="o">=-</span><span class="n">L</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">initial_states</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nx</span><span class="p">)</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Prepare functions with soil specific values</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Prepare functions with soil specific values</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">theta_h</span> <span class="o">=</span> <span class="n">initializer</span><span class="p">(</span><span class="n">condf</span><span class="o">.</span><span class="n">VG_pressureh</span><span class="p">,</span> <span class="n">theta_r</span><span class="o">=</span><span class="n">theta_r</span><span class="p">,</span> <span class="n">theta_s</span><span class="o">=</span><span class="n">theta_s</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">conductivity_func</span> <span class="o">=</span> <span class="n">initializer</span><span class="p">(</span><span class="n">condf</span><span class="o">.</span><span class="n">VG_conductivity</span><span class="p">,</span> <span class="n">ksat</span><span class="o">=</span><span class="n">ksat</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">storage_change</span> <span class="o">=</span> <span class="n">initializer</span><span class="p">(</span><span class="n">fluxf</span><span class="o">.</span><span class="n">storage_change</span><span class="p">,</span> <span class="n">fun</span><span class="o">=</span><span class="n">theta_h</span><span class="p">)</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Define and solve the model</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Define and solve the model</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">M</span> <span class="o">=</span> <span class="n">Flow1DFE</span><span class="p">(</span><span class="s1">&#39;Unsaturated transient model&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">M</span><span class="o">.</span><span class="n">set_field1d</span><span class="p">(</span><span class="n">nodes</span><span class="o">=</span><span class="n">xsp</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">M</span><span class="o">.</span><span class="n">set_gaussian_quadrature</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
@@ -221,8 +225,9 @@
 <span class="gp">&gt;&gt;&gt; </span><span class="n">M</span><span class="o">.</span><span class="n">tfun</span> <span class="o">=</span> <span class="n">theta_h</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">M</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">end_time</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">M</span><span class="o">.</span><span class="n">transient_dataframeify</span><span class="p">()</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Plot summary information</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Plot summary information</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">M</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span>
 <span class="go">Id: Unsaturated transient model</span>
 <span class="go">System length: 100.0</span>

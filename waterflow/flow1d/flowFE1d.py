@@ -12,6 +12,7 @@ import pandas as pd
 from scipy.special import legendre
 
 from waterflow import OUTPUT_DIR
+from waterflow.utility.helper import converged
 
 
 class Flow1DFE:
@@ -52,6 +53,10 @@ class Flow1DFE:
     states : `numpy.ndarray`
         State solutions at the nodal positions as defined in :py:attr:`~nodes`.
         Matrix of dimension :math:`[1 \\times N]`.
+
+    nr_states : list of `numpy.ndarray`
+        State solutions as described by `states` at every Newton-Raphson
+        iteration.
 
     seg_lengths : `numpy.ndarray`
         Lengths of segments between the nodes in the shape
@@ -232,6 +237,7 @@ class Flow1DFE:
         self.systemfluxfunc = None
         self.nodes = None
         self.states = None
+        self.nr_states = []
         self.seg_lenghts = None
         self.lengths = None
         self.coefmatr = None
@@ -1378,7 +1384,7 @@ class Flow1DFE:
         array([  0.,  -1.,  -2.,  -3.,  -4.,  -5.,  -6.,  -7.,  -8.,  -9., -10.])
 
         """
-        if isinstance(states, int) or isinstance(states, float):
+        if isinstance(states, (int, float)):
             states = float(states)
             self.states = np.array([states for x in range(len(self.nodes))])
         else:
@@ -2089,7 +2095,7 @@ class Flow1DFE:
         # linearly interpolate between states including assigned boundaries
         return partial(np.interp, xp=self.nodes, fp=states)
 
-    def dt_solve(self, dt, maxiter=500, threshold=1e-3):
+    def dt_solve(self, dt, maxiter=500, threshold=1e-3, store=False):
         """ Solve the system for one specific time step
 
         Performs the Newton-Raphson method, :cite:`Newton1964`, to find a
@@ -2108,6 +2114,9 @@ class Flow1DFE:
 
             .. math::
                 max(abs(s_{t-1}-s_{t})) < max(abs(threshold * s_{t}))
+
+        store : `bool`, default is False
+            Whether to store each individual iteration.
 
         Notes
         -----
@@ -2223,10 +2232,11 @@ class Flow1DFE:
             self._internal_forcing()
             self._statedep_forcing()
 
-            # check solution for conversion
-            max_abs_change = max(abs(prevstates - curstates))
-            max_abs_allowed_change = max(abs(threshold * curstates))
-            if max_abs_change < max_abs_allowed_change:
+            if store:
+                self.nr_states.append(self.states)
+
+            # check local/inner loop solution for conversion
+            if converged(prevstates, curstates, threshold):
                 break
 
             itercount += 1
@@ -2237,7 +2247,7 @@ class Flow1DFE:
 
     def solve(self, dt=0.001, dt_min=1e-5, dt_max=0.5, end_time=1, maxiter=500,
               dtitlow=1.5, dtithigh=0.5, itermin=5, itermax=10, threshold=1e-3,
-              verbosity=True):
+              global_threshold=0.0, verbosity=True, storeNR=False):
         """ Solve the system for an arbitrary period of time
 
         The outer loop that progresses the model over time by calling
@@ -2280,14 +2290,23 @@ class Flow1DFE:
                 procedure.
 
         threshold : `float`, default is 1e-3
-            Threshold for conversion, the system has converged when the
-            definition below is satisfied:
+            Threshold for conversion of Newton-Raphson iteration,
+            the system has converged when the definition below is satisfied:
 
             .. math::
                 max(abs(s_{t-1}-s_{t})) < max(abs(threshold * s_{t}))
 
+        global_threshold : `float`, default is 0.0
+            Conversion threshold for time stepping, steady state is assumed
+            if change of states is within the tolerance. The same conversion
+            relation as for ``threshold`` applies.
+
         verbosity : `bool`, default is True
             Be descriptive about the solve process.
+
+        storeNR : `bool`, default is False
+            Store internal Newton-Raphson states. Turned off due to
+            memory and performance reasons.
 
         Notes
         -----
@@ -2373,7 +2392,7 @@ class Flow1DFE:
         t0 = Time.clock()
         while time <= end_time:
             # solve for given dt
-            iters = self.dt_solve(dt, maxiter, threshold)
+            iters = self.dt_solve(dt, maxiter, threshold, store=storeNR)
 
             # catch cases where maxiter is reached
             if iters > maxiter:
@@ -2412,6 +2431,11 @@ class Flow1DFE:
             time_data.append(time)
             dt_data.append(dt)
             iter_data.append(iters)
+
+            # check for global/outer loop convergence
+            if converged(solved_objs[-2].states, solved_objs[-1].states,
+                         global_threshold):
+                break
 
             # adapt dt as function of iterations of previous step
             if iters <= itermin:

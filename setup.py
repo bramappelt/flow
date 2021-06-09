@@ -13,7 +13,7 @@ if os.path.isfile("requirements.txt"):
 
 setuptools.setup(
     name="Flow-BramAppelt",
-    version="0.0.5",
+    version="1.1.0",
     author="Bram Berendsen",
     author_email="bram.berendsen@outlook.com",
     long_description=long_description,

@@ -4,6 +4,37 @@ import os
 from functools import partial, update_wrapper
 
 
+def converged(old_states, new_states, threshold):
+    """ Check for convergence
+
+    Examples
+    --------
+
+    >>> import numpy as np
+    >>> from waterflow.utility.helper import converged
+    >>> old_states = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+    >>> new_states = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+    >>> threshold = 0.1
+    >>> converged(old_states, new_states, threshold)
+    False
+
+    >>> threshold = 0.101
+    >>> converged(old_states, new_states, threshold)
+    True
+
+    >>> old_states = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+    >>> new_states = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+    >>> threshold = 0.0
+    >>> converged(old_states, new_states, threshold)
+    False
+
+    """
+    max_abs_change = max(abs(old_states - new_states))
+    max_abs_allowed_change = max(abs(threshold * new_states))
+
+    return max_abs_change < max_abs_allowed_change
+
+
 def initializer(func, *args, **kwargs):
     """ Prepare or reduce a function with default arguments
 
@@ -29,6 +60,7 @@ def initializer(func, *args, **kwargs):
     copy the metadata from ``func``.
 
     Examples
+    --------
 
     >>> from waterflow.utility.helper import initializer
     >>> def f(a, b, c=3):
